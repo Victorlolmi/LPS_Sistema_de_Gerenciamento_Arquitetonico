@@ -40,7 +40,7 @@ public class CadastroController {
 
         // Validação simples de CPF (apenas para garantir que não está em branco e tem 11 dígitos)
         String cpfLimpo = cpf.replaceAll("[.\\-]", "");
-        if (cpfLimpo.length() != 3) {
+        if (cpfLimpo.length() != 11) {
             view.exibeMensagem("CPF inválido! Deve conter 11 dígitos.");
             return;
         }

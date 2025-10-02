@@ -79,27 +79,27 @@ public class FrLogin extends javax.swing.JFrame {
         jLabel2.setFont(new java.awt.Font("Calibri", 0, 20)); // NOI18N
         jLabel2.setForeground(new java.awt.Color(86, 86, 86));
         jLabel2.setText("Acesse sua conta");
-        jPanel2.add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(400, 230, 140, 30));
+        jPanel2.add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(450, 230, 140, 30));
 
         edtIdentificador.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 edtIdentificadorActionPerformed(evt);
             }
         });
-        jPanel2.add(edtIdentificador, new org.netbeans.lib.awtextra.AbsoluteConstraints(320, 280, 280, 30));
+        jPanel2.add(edtIdentificador, new org.netbeans.lib.awtextra.AbsoluteConstraints(370, 280, 280, 30));
 
         edtSenha.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 edtSenhaActionPerformed(evt);
             }
         });
-        jPanel2.add(edtSenha, new org.netbeans.lib.awtextra.AbsoluteConstraints(320, 340, 280, 30));
+        jPanel2.add(edtSenha, new org.netbeans.lib.awtextra.AbsoluteConstraints(370, 340, 280, 30));
 
         jLabel3.setText("Senha");
-        jPanel2.add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(320, 320, -1, -1));
+        jPanel2.add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(370, 320, -1, -1));
 
         jLabel4.setText("Login");
-        jPanel2.add(jLabel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(320, 260, -1, -1));
+        jPanel2.add(jLabel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(370, 260, -1, -1));
 
         cadastroButton.setForeground(new java.awt.Color(82, 149, 205));
         cadastroButton.setText("Não possui cadastro?");
@@ -111,7 +111,7 @@ public class FrLogin extends javax.swing.JFrame {
                 cadastroButtonActionPerformed(evt);
             }
         });
-        jPanel2.add(cadastroButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(320, 380, -1, -1));
+        jPanel2.add(cadastroButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(370, 380, -1, -1));
 
         recuperacaoButton.setForeground(new java.awt.Color(82, 149, 205));
         recuperacaoButton.setText("Esueceu sua senha?");
@@ -123,7 +123,7 @@ public class FrLogin extends javax.swing.JFrame {
                 recuperacaoButtonActionPerformed(evt);
             }
         });
-        jPanel2.add(recuperacaoButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(490, 380, -1, -1));
+        jPanel2.add(recuperacaoButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(540, 380, -1, -1));
 
         entrarButton.setBackground(new java.awt.Color(64, 86, 213));
         entrarButton.setForeground(new java.awt.Color(255, 255, 255));
@@ -133,10 +133,10 @@ public class FrLogin extends javax.swing.JFrame {
                 entrarButtonActionPerformed(evt);
             }
         });
-        jPanel2.add(entrarButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(340, 420, 240, 40));
+        jPanel2.add(entrarButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(390, 420, 240, 40));
 
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Imagens/Fundo.png"))); // NOI18N
-        jPanel2.add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(248, 134, 440, 380));
+        jPanel2.add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(300, 130, 440, 380));
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);

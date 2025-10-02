@@ -151,8 +151,9 @@ public class FrCadastro extends javax.swing.JFrame {
         jPanel2.add(jLabel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(370, 320, -1, -1));
 
         jLabel7.setText("Já tem uma conta?");
-        jPanel2.add(jLabel7, new org.netbeans.lib.awtextra.AbsoluteConstraints(430, 520, -1, -1));
+        jPanel2.add(jLabel7, new org.netbeans.lib.awtextra.AbsoluteConstraints(420, 520, -1, -1));
 
+        edtTipo.setBackground(new java.awt.Color(255, 255, 255));
         edtTipo.setText("Cadastrar como gestor?");
         edtTipo.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
