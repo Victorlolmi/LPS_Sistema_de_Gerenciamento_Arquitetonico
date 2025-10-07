@@ -21,13 +21,7 @@ public class GerenciadorProjetosArq {
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
-                // --- A PARTE QUE MUDOU ---
-                // Agora é mais simples:
-                
-                // Apenas crie a instância da sua tela de login...
                 FrLogin telaLogin = new FrLogin();
-
-                // ...e a torne visível.
                 telaLogin.setVisible(true);
             }
         });

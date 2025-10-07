@@ -70,11 +70,14 @@ public class FrCadastro extends javax.swing.JFrame {
         jLabel5 = new javax.swing.JLabel();
         edtINome = new javax.swing.JTextField();
         edtEmail = new javax.swing.JTextField();
+        jLabel11 = new javax.swing.JLabel();
+        jLabel10 = new javax.swing.JLabel();
         jLabel6 = new javax.swing.JLabel();
         jLabel7 = new javax.swing.JLabel();
         edtTipo = new javax.swing.JCheckBox();
         jLabel1 = new javax.swing.JLabel();
         jLabel8 = new javax.swing.JLabel();
+        cadastroButton2 = new javax.swing.JLabel();
         jLabel9 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
@@ -86,7 +89,8 @@ public class FrCadastro extends javax.swing.JFrame {
         jLabel2.setFont(new java.awt.Font("Calibri", 0, 20)); // NOI18N
         jLabel2.setForeground(new java.awt.Color(86, 86, 86));
         jLabel2.setText("Crie sua conta");
-        jPanel2.add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(440, 150, 120, 30));
+        jLabel2.setVerticalAlignment(javax.swing.SwingConstants.BOTTOM);
+        jPanel2.add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(440, 170, 120, 30));
 
         edtCpf.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -147,6 +151,15 @@ public class FrCadastro extends javax.swing.JFrame {
         });
         jPanel2.add(edtEmail, new org.netbeans.lib.awtextra.AbsoluteConstraints(370, 340, 280, 30));
 
+        jLabel11.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Imagens/Logo.png"))); // NOI18N
+        jLabel11.setVerticalAlignment(javax.swing.SwingConstants.BOTTOM);
+        jPanel2.add(jLabel11, new org.netbeans.lib.awtextra.AbsoluteConstraints(410, 130, 40, 40));
+
+        jLabel10.setFont(new java.awt.Font("Segoe UI", 1, 28)); // NOI18N
+        jLabel10.setForeground(new java.awt.Color(30, 42, 58));
+        jLabel10.setText("ArchFlow");
+        jPanel2.add(jLabel10, new org.netbeans.lib.awtextra.AbsoluteConstraints(460, 130, -1, -1));
+
         jLabel6.setText("Email");
         jPanel2.add(jLabel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(370, 320, -1, -1));
 
@@ -167,6 +180,14 @@ public class FrCadastro extends javax.swing.JFrame {
 
         jLabel8.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Imagens/Fundo.png"))); // NOI18N
         jPanel2.add(jLabel8, new org.netbeans.lib.awtextra.AbsoluteConstraints(290, 230, 440, 380));
+
+        cadastroButton2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Imagens/BotaoVoltar.png"))); // NOI18N
+        cadastroButton2.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                cadastroButton2MouseClicked(evt);
+            }
+        });
+        jPanel2.add(cadastroButton2, new org.netbeans.lib.awtextra.AbsoluteConstraints(350, 130, -1, -1));
 
         jLabel9.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Imagens/Fundo.png"))); // NOI18N
         jPanel2.add(jLabel9, new org.netbeans.lib.awtextra.AbsoluteConstraints(290, 90, 440, 380));
@@ -213,6 +234,10 @@ public class FrCadastro extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_edtTipoActionPerformed
 
+    private void cadastroButton2MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_cadastroButton2MouseClicked
+        controller.navegarParaLogin();
+    }//GEN-LAST:event_cadastroButton2MouseClicked
+
     /**
      * @param args the command line arguments
      */
@@ -251,6 +276,7 @@ public class FrCadastro extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JLabel cadastroButton2;
     private javax.swing.JButton criarButton;
     private javax.swing.JTextField edtCpf;
     private javax.swing.JTextField edtEmail;
@@ -258,6 +284,8 @@ public class FrCadastro extends javax.swing.JFrame {
     private javax.swing.JPasswordField edtSenha;
     private javax.swing.JCheckBox edtTipo;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel10;
+    private javax.swing.JLabel jLabel11;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;

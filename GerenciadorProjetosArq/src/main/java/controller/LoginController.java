@@ -9,6 +9,7 @@ import model.entities.Usuario;
 import org.mindrot.jbcrypt.BCrypt;
 import view.screens.FrLogin;
 import view.screens.FrCadastro;
+import view.screens.FrRecuperacaoSenha;
 /**
  *
  * @author Viktin
@@ -55,7 +56,14 @@ public class LoginController {
             }
         }
     }
-    
+        public void exibirRecuperacaoSenha() {
+        // Cria a nova tela de recuperação
+        FrRecuperacaoSenha telaRecuperacao = new FrRecuperacaoSenha();
+        telaRecuperacao.setVisible(true);
+
+        // Fecha a tela de login atual
+        this.view.dispose(); // 'view' é a sua instância de FrLogin
+    }
     public void navegarParaCadastro() {
         
         FrCadastro telaCadastro = new FrCadastro();
@@ -65,9 +73,5 @@ public class LoginController {
         
         // Fecha e libera os recursos da tela de login atual
         view.dispose();
-    }
-
-    public void exibirRecuperacaoSenha() {
-        view.exibeMensagem("Funcionalidade de recuperação de senha a ser implementada.");
     }
 }

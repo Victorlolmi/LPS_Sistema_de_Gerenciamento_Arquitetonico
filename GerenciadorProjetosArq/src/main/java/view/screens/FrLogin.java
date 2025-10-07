@@ -67,10 +67,11 @@ public class FrLogin extends javax.swing.JFrame {
         cadastroButton = new javax.swing.JButton();
         recuperacaoButton = new javax.swing.JButton();
         entrarButton = new javax.swing.JButton();
+        jLabel5 = new javax.swing.JLabel();
+        jLabel6 = new javax.swing.JLabel();
         jLabel1 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        setPreferredSize(new java.awt.Dimension(1000, 700));
 
         jPanel2.setBackground(new java.awt.Color(243, 244, 246));
         jPanel2.setPreferredSize(new java.awt.Dimension(400, 350));
@@ -79,7 +80,8 @@ public class FrLogin extends javax.swing.JFrame {
         jLabel2.setFont(new java.awt.Font("Calibri", 0, 20)); // NOI18N
         jLabel2.setForeground(new java.awt.Color(86, 86, 86));
         jLabel2.setText("Acesse sua conta");
-        jPanel2.add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(450, 230, 140, 30));
+        jLabel2.setVerticalAlignment(javax.swing.SwingConstants.TOP);
+        jPanel2.add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(430, 240, 150, 30));
 
         edtIdentificador.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -114,7 +116,7 @@ public class FrLogin extends javax.swing.JFrame {
         jPanel2.add(cadastroButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(370, 380, -1, -1));
 
         recuperacaoButton.setForeground(new java.awt.Color(82, 149, 205));
-        recuperacaoButton.setText("Esueceu sua senha?");
+        recuperacaoButton.setText("Esqueceu sua senha?");
         recuperacaoButton.setBorder(null);
         recuperacaoButton.setBorderPainted(false);
         recuperacaoButton.setContentAreaFilled(false);
@@ -133,7 +135,16 @@ public class FrLogin extends javax.swing.JFrame {
                 entrarButtonActionPerformed(evt);
             }
         });
-        jPanel2.add(entrarButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(390, 420, 240, 40));
+        jPanel2.add(entrarButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(380, 420, 240, 40));
+
+        jLabel5.setFont(new java.awt.Font("Segoe UI", 1, 28)); // NOI18N
+        jLabel5.setForeground(new java.awt.Color(30, 42, 58));
+        jLabel5.setText("ArchFlow");
+        jPanel2.add(jLabel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(460, 190, -1, -1));
+
+        jLabel6.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Imagens/Logo.png"))); // NOI18N
+        jLabel6.setVerticalAlignment(javax.swing.SwingConstants.BOTTOM);
+        jPanel2.add(jLabel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(410, 190, -1, -1));
 
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Imagens/Fundo.png"))); // NOI18N
         jPanel2.add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(300, 150, 440, 380));
@@ -142,11 +153,11 @@ public class FrLogin extends javax.swing.JFrame {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, 1001, Short.MAX_VALUE)
+            .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, 1969, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 702, Short.MAX_VALUE)
+            .addComponent(jPanel2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 1234, Short.MAX_VALUE)
         );
 
         pack();
@@ -206,6 +217,8 @@ public class FrLogin extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
+    private javax.swing.JLabel jLabel5;
+    private javax.swing.JLabel jLabel6;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JButton recuperacaoButton;
     // End of variables declaration//GEN-END:variables
