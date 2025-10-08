@@ -52,10 +52,10 @@ public class FrNovaSenha extends javax.swing.JFrame {
         jLabel6 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
         jLabel5 = new javax.swing.JLabel();
-        edtSenhaNovaConfirm = new javax.swing.JTextField();
-        edtSenhaNova = new javax.swing.JTextField();
         jLabel7 = new javax.swing.JLabel();
         jLabel8 = new javax.swing.JLabel();
+        edtSenhaNovaConfirm = new javax.swing.JPasswordField();
+        edtSenhaNova = new javax.swing.JPasswordField();
 
         edtIdentificador2.setForeground(new java.awt.Color(86, 86, 86));
         edtIdentificador2.setText("Seu email de cadastro");
@@ -117,25 +117,21 @@ public class FrNovaSenha extends javax.swing.JFrame {
         jLabel5.setForeground(new java.awt.Color(30, 42, 58));
         jLabel5.setText("ArchFlow");
 
-        edtSenhaNovaConfirm.setForeground(new java.awt.Color(86, 86, 86));
-        edtSenhaNovaConfirm.setText("Seu email de cadastro");
+        jLabel7.setText("Nova senha");
+
+        jLabel8.setText("Confirme sua senha");
+
         edtSenhaNovaConfirm.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 edtSenhaNovaConfirmActionPerformed(evt);
             }
         });
 
-        edtSenhaNova.setForeground(new java.awt.Color(86, 86, 86));
-        edtSenhaNova.setText("Seu email de cadastro");
         edtSenhaNova.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 edtSenhaNovaActionPerformed(evt);
             }
         });
-
-        jLabel7.setText("Nova senha");
-
-        jLabel8.setText("Confirme sua senha");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -166,11 +162,14 @@ public class FrNovaSenha extends javax.swing.JFrame {
                     .addGroup(layout.createSequentialGroup()
                         .addGap(71, 71, 71)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(edtSenhaNovaConfirm, javax.swing.GroupLayout.PREFERRED_SIZE, 280, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(edtSenhaNova, javax.swing.GroupLayout.PREFERRED_SIZE, 280, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(jLabel7)
-                            .addComponent(jLabel8))))
-                .addContainerGap(55, Short.MAX_VALUE))
+                            .addComponent(jLabel8)
+                            .addGroup(layout.createSequentialGroup()
+                                .addGap(6, 6, 6)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(edtSenhaNovaConfirm, javax.swing.GroupLayout.PREFERRED_SIZE, 258, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(edtSenhaNova, javax.swing.GroupLayout.PREFERRED_SIZE, 258, javax.swing.GroupLayout.PREFERRED_SIZE))))))
+                .addContainerGap(71, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -189,16 +188,15 @@ public class FrNovaSenha extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(18, 18, 18))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addComponent(jLabel7)
-                        .addGap(4, 4, 4)))
-                .addComponent(edtSenhaNova, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(27, 27, 27)
+                        .addGap(20, 20, 20))
+                    .addComponent(jLabel7, javax.swing.GroupLayout.Alignment.TRAILING))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 15, Short.MAX_VALUE)
+                .addComponent(edtSenhaNova, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
                 .addComponent(jLabel8)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(edtSenhaNovaConfirm, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
+                .addComponent(edtSenhaNovaConfirm, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(26, 26, 26)
                 .addComponent(enviarButton, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
@@ -226,10 +224,6 @@ public class FrNovaSenha extends javax.swing.JFrame {
         controller.atualizarSenha();
     }//GEN-LAST:event_enviarButtonActionPerformed
 
-    private void edtSenhaNovaConfirmActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_edtSenhaNovaConfirmActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_edtSenhaNovaConfirmActionPerformed
-
     private void edtIdentificador2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_edtIdentificador2ActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_edtIdentificador2ActionPerformed
@@ -237,6 +231,10 @@ public class FrNovaSenha extends javax.swing.JFrame {
     private void edtSenhaNovaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_edtSenhaNovaActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_edtSenhaNovaActionPerformed
+
+    private void edtSenhaNovaConfirmActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_edtSenhaNovaConfirmActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_edtSenhaNovaConfirmActionPerformed
 
     /**
      * @param args the command line arguments
@@ -281,8 +279,8 @@ public class FrNovaSenha extends javax.swing.JFrame {
     private javax.swing.JButton cadastroButton1;
     private javax.swing.JLabel cadastroButton2;
     private javax.swing.JTextField edtIdentificador2;
-    private javax.swing.JTextField edtSenhaNova;
-    private javax.swing.JTextField edtSenhaNovaConfirm;
+    private javax.swing.JPasswordField edtSenhaNova;
+    private javax.swing.JPasswordField edtSenhaNovaConfirm;
     private javax.swing.JButton enviarButton;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel5;
