@@ -3,6 +3,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 package model.entities;
+import java.time.LocalDateTime;
 import javax.persistence.*;
 /**
  *
@@ -25,6 +26,10 @@ public abstract class Usuario {
     private String email;
     @Column(nullable = false, unique = true) 
     private String cpf;
+    @Column(name = "codigo_recuperacao")
+    private String codigo_recuperacao;
+    @Column(name = "validade_codigo_recuperacao")
+    private LocalDateTime validade_codigo_recuperacao;
     
     // Ligacao com o JPA
     @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
@@ -118,6 +123,21 @@ public abstract class Usuario {
         this.endereco = endereco;
     }
     
-    
+
+    public String getCodigo_recuperacao() {
+        return codigo_recuperacao;
+    }
+
+    public void setCodigo_recuperacao(String codigo_recuperacao) {
+        this.codigo_recuperacao = codigo_recuperacao;
+    }
+
+    public LocalDateTime getValidade_codigo_recuperacao() {
+        return validade_codigo_recuperacao;
+    }
+
+    public void setValidade_codigo_recuperacao(LocalDateTime validade_codigo_recuperacao) {
+        this.validade_codigo_recuperacao = validade_codigo_recuperacao;
+    }
     
 }

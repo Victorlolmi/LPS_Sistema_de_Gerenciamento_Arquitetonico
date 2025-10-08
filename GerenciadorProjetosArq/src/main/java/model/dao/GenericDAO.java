@@ -44,4 +44,19 @@ public class GenericDAO<T> {
             }
         }
     }
+    public void update(T entity) {
+    EntityManager em = JPAUtil.getEntityManager();
+    try {
+        em.getTransaction().begin();
+        em.merge(entity); 
+        em.getTransaction().commit();
+    } catch (Exception e) {
+        if (em.getTransaction().isActive()) {
+            em.getTransaction().rollback();
+        }
+        e.printStackTrace();
+    } finally {
+        em.close();
+    }
+}
 }

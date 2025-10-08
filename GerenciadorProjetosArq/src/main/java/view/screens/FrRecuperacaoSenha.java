@@ -25,26 +25,18 @@ public class FrRecuperacaoSenha extends javax.swing.JFrame {
         initComponents();
         this.controller = new RecuperacaoSenhaController(this);
         
-        // NOVO: Adiciona a lógica do placeholder ao campo de texto ✨
         addPlaceholderStyle(edtIdentificador, "Seu email de cadastro");
     }
 
-    // NOVO: Método para configurar o estilo de placeholder
     public void addPlaceholderStyle(javax.swing.JTextField textField, String placeholder) {
-        // Cor cinza para o placeholder
         java.awt.Color placeholderColor = new java.awt.Color(153, 153, 153);
-        // Cor preta para o texto normal
         java.awt.Color normalColor = new java.awt.Color(0, 0, 0);
-
-        // Define o texto e a cor iniciais
         textField.setText(placeholder);
         textField.setForeground(placeholderColor);
 
-        // Adiciona o listener de foco
         textField.addFocusListener(new java.awt.event.FocusAdapter() {
             @Override
             public void focusGained(java.awt.event.FocusEvent e) {
-                // Se o texto for o placeholder, limpa o campo e muda a cor para preto
                 if (textField.getText().equals(placeholder)) {
                     textField.setText("");
                     textField.setForeground(normalColor);
@@ -53,7 +45,6 @@ public class FrRecuperacaoSenha extends javax.swing.JFrame {
 
             @Override
             public void focusLost(java.awt.event.FocusEvent e) {
-                // Se o campo estiver vazio, restaura o placeholder e a cor cinza
                 if (textField.getText().isEmpty()) {
                     textField.setText(placeholder);
                     textField.setForeground(placeholderColor);
@@ -62,16 +53,12 @@ public class FrRecuperacaoSenha extends javax.swing.JFrame {
         });
     }
 
-    // Método para que o controller possa pegar o email digitado na tela
     public String getIdentificador() {
-        // Se o texto for o placeholder, retorna vazio, senão retorna o texto digitado
         if (edtIdentificador.getText().equals("Seu email de cadastro")) {
             return "";
         }
         return edtIdentificador.getText().trim();
     }
-
-    // Método para que o controller possa exibir mensagens na tela
     public void exibeMensagem(String mensagem) {
         JOptionPane.showMessageDialog(this, mensagem);
     }
@@ -91,8 +78,8 @@ public class FrRecuperacaoSenha extends javax.swing.JFrame {
         edtIdentificador = new javax.swing.JTextField();
         cadastroButton = new javax.swing.JButton();
         cadastroButton1 = new javax.swing.JButton();
-        jLabel3 = new javax.swing.JLabel();
         cadastroButton2 = new javax.swing.JLabel();
+        jLabel4 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -118,7 +105,6 @@ public class FrRecuperacaoSenha extends javax.swing.JFrame {
         jLabel5.setText("ArchFlow");
 
         edtIdentificador.setForeground(new java.awt.Color(86, 86, 86));
-        edtIdentificador.setText("Seu email de cadastro");
         edtIdentificador.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 edtIdentificadorActionPerformed(evt);
@@ -147,8 +133,6 @@ public class FrRecuperacaoSenha extends javax.swing.JFrame {
             }
         });
 
-        jLabel3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Imagens/Fundo.png"))); // NOI18N
-
         cadastroButton2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Imagens/BotaoVoltar.png"))); // NOI18N
         cadastroButton2.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
@@ -156,14 +140,16 @@ public class FrRecuperacaoSenha extends javax.swing.JFrame {
             }
         });
 
+        jLabel4.setText("Email");
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addComponent(jLabel3)
-                .addGap(98, 98, 98)
+                .addGap(40, 40, 40)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel4)
                     .addGroup(layout.createSequentialGroup()
                         .addGap(69, 69, 69)
                         .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -182,37 +168,34 @@ public class FrRecuperacaoSenha extends javax.swing.JFrame {
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                 .addComponent(cadastroButton))
                             .addComponent(entrarButton, javax.swing.GroupLayout.PREFERRED_SIZE, 240, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                .addContainerGap(507, Short.MAX_VALUE))
+                .addContainerGap(55, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
+                .addGap(19, 19, 19)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(layout.createSequentialGroup()
-                                .addGap(99, 99, 99)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                                    .addComponent(jLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(jLabel5))
-                                .addGap(18, 18, 18))
-                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                                .addContainerGap()
-                                .addComponent(cadastroButton2)
-                                .addGap(27, 27, 27)))
-                        .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(33, 33, 33)
-                        .addComponent(edtIdentificador, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(18, 18, 18)
-                        .addComponent(entrarButton, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(58, 58, 58)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(cadastroButton1)
-                            .addComponent(cadastroButton)))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(53, 53, 53)
-                        .addComponent(jLabel3)))
-                .addContainerGap(256, Short.MAX_VALUE))
+                        .addGap(7, 7, 7)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(jLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel5))
+                        .addGap(18, 18, 18))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addComponent(cadastroButton2)
+                        .addGap(27, 27, 27)))
+                .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(11, 11, 11)
+                .addComponent(jLabel4)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(edtIdentificador, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addComponent(entrarButton, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(58, 58, 58)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(cadastroButton1)
+                    .addComponent(cadastroButton))
+                .addContainerGap(56, Short.MAX_VALUE))
         );
 
         pack();
@@ -270,7 +253,7 @@ public class FrRecuperacaoSenha extends javax.swing.JFrame {
     private javax.swing.JTextField edtIdentificador;
     private javax.swing.JButton entrarButton;
     private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
     // End of variables declaration//GEN-END:variables

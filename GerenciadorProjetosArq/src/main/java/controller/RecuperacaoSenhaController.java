@@ -1,58 +1,66 @@
 package controller;
 
+import java.time.LocalDateTime;
+import java.util.UUID;
 import model.dao.UsuarioDAO;
 import model.entities.Usuario;
+import model.services.EmailService;
 import view.screens.FrLogin;
 import view.screens.FrRecuperacaoSenha;
+import view.screens.FrVerificacaoCodigo;
 
 public class RecuperacaoSenhaController {
-        
+
     private final FrRecuperacaoSenha view;
     private final UsuarioDAO usuarioDAO;
+    private final EmailService emailService;
 
     public RecuperacaoSenhaController(FrRecuperacaoSenha view) {
         this.view = view;
         this.usuarioDAO = new UsuarioDAO();
+        this.emailService = new EmailService();
     }
 
-    /**
-     * Inicia o processo de recuperação de senha.
-     */
     public void iniciarRecuperacao() {
         String identificador = view.getIdentificador();
 
         if (identificador.isEmpty()) {
-            view.exibeMensagem("Por favor, preencha o campo com seu e-mail ou CPF.");
+            view.exibeMensagem("Por favor, preencha o campo com seu e-mail.");
             return;
         }
 
-        // Tenta encontrar o usuário no banco de dados
         Usuario usuario = usuarioDAO.findByEmailOrCpf(identificador);
 
         if (usuario != null) {
-            // Lógica de recuperação de senha (ex: enviar email)
-            // Por enquanto, vamos apenas exibir uma mensagem de sucesso.
-            System.out.println("Enviando link de recuperação para o e-mail: " + usuario.getEmail());
-            view.exibeMensagem("Se o usuário existir, um link de recuperação será enviado para o e-mail associado.");
+            String codigo = gerarCodigoRecuperacao();
+            LocalDateTime validade = LocalDateTime.now().plusMinutes(15);
             
-            // Opcional: voltar para a tela de login após a mensagem
-            navegarParaLogin();
-        } else {
-            // Mesmo que não encontre, exibe uma mensagem genérica por segurança
-            view.exibeMensagem("Se o usuário existir, um link de recuperação será enviado para o e-mail associado.");
-            navegarParaLogin();
+            usuario.setCodigo_recuperacao(codigo);
+            usuario.setValidade_codigo_recuperacao(validade);
+            
+            usuarioDAO.update(usuario);
+            
+            emailService.enviarEmailRecuperacao(usuario.getEmail(), codigo);
         }
+
+        view.exibeMensagem("Se o e-mail informado estiver em nossa base de dados, um código de recuperação será enviado.");
+        
+        navegarParaVerificacao(identificador);
+    }
+
+    private String gerarCodigoRecuperacao() {
+        return UUID.randomUUID().toString().replaceAll("-", "").substring(0, 6).toUpperCase();
+    }
+
+    public void navegarParaVerificacao(String email) {
+        FrVerificacaoCodigo frVerificacao = new FrVerificacaoCodigo(email);
+        frVerificacao.setVisible(true);
+        this.view.dispose();
     }
     
-    /**
-     * Fecha a tela de recuperação e volta para a tela de login.
-     */
     public void navegarParaLogin() {
-        // Cria e exibe a tela de login
         FrLogin frLogin = new FrLogin();
         frLogin.setVisible(true);
-        
-        // Fecha a tela atual de recuperação
         this.view.dispose();
     }
 }
