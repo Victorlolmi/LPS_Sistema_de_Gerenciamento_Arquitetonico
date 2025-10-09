@@ -21,6 +21,7 @@ public class FrVerificacaoCodigo extends javax.swing.JFrame {
 
     public FrVerificacaoCodigo(String email) {
         initComponents();
+        setLocationRelativeTo(null);
         this.emailUsuario = email;
         this.controller = new VerificacaoCodigoController(this);
     }

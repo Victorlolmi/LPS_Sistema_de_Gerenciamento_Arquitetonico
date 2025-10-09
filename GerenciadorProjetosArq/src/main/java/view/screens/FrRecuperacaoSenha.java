@@ -23,6 +23,7 @@ public class FrRecuperacaoSenha extends javax.swing.JFrame {
      */
     public FrRecuperacaoSenha() {
         initComponents();
+        setLocationRelativeTo(null);
         this.controller = new RecuperacaoSenhaController(this);
        
     }

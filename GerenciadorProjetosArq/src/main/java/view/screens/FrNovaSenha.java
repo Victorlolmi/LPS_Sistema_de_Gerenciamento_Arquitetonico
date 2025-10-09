@@ -21,6 +21,7 @@ public class FrNovaSenha extends javax.swing.JFrame {
 
     public FrNovaSenha(String email) {
         initComponents();
+        setLocationRelativeTo(null);
         this.emailUsuario = email;
         this.controller = new NovaSenhaController(this);
     }
