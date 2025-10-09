@@ -24,39 +24,10 @@ public class FrRecuperacaoSenha extends javax.swing.JFrame {
     public FrRecuperacaoSenha() {
         initComponents();
         this.controller = new RecuperacaoSenhaController(this);
-        
-        addPlaceholderStyle(edtIdentificador, "Seu email de cadastro");
-    }
-
-    public void addPlaceholderStyle(javax.swing.JTextField textField, String placeholder) {
-        java.awt.Color placeholderColor = new java.awt.Color(153, 153, 153);
-        java.awt.Color normalColor = new java.awt.Color(0, 0, 0);
-        textField.setText(placeholder);
-        textField.setForeground(placeholderColor);
-
-        textField.addFocusListener(new java.awt.event.FocusAdapter() {
-            @Override
-            public void focusGained(java.awt.event.FocusEvent e) {
-                if (textField.getText().equals(placeholder)) {
-                    textField.setText("");
-                    textField.setForeground(normalColor);
-                }
-            }
-
-            @Override
-            public void focusLost(java.awt.event.FocusEvent e) {
-                if (textField.getText().isEmpty()) {
-                    textField.setText(placeholder);
-                    textField.setForeground(placeholderColor);
-                }
-            }
-        });
+       
     }
 
     public String getIdentificador() {
-        if (edtIdentificador.getText().equals("Seu email de cadastro")) {
-            return "";
-        }
         return edtIdentificador.getText().trim();
     }
     public void exibeMensagem(String mensagem) {
