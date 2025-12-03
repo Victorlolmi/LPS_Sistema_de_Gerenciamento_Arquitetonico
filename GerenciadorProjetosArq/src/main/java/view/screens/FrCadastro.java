@@ -40,12 +40,29 @@ public class FrCadastro extends javax.swing.JFrame {
     }
 
     public String getSenha() {
-        return new String(edtSenha.getPassword());
+        return new String(edtSenha1.getPassword());
     }
+
+    public String getCep() {
+        return edtCep.getText();
+    }
+    
     public boolean isTipo() {
         return edtTipo.isSelected();
     }   
 
+    public String getCidade() {
+        return edtCidade.getText(); 
+    }
+    public String getLogadouro() {
+        return edtLogadouro.getText(); 
+    }
+    public String getBairro() {
+        return edtBairro.getText(); 
+    }
+    public String getNumero() {
+        return edtNumero.getText(); 
+    }
     public void exibeMensagem(String mensagem) {
         JOptionPane.showMessageDialog(this, mensagem);
     }
@@ -62,13 +79,23 @@ public class FrCadastro extends javax.swing.JFrame {
         jPanel2 = new javax.swing.JPanel();
         jLabel2 = new javax.swing.JLabel();
         edtCpf = new javax.swing.JTextField();
-        edtSenha = new javax.swing.JPasswordField();
         jLabel3 = new javax.swing.JLabel();
         jLabel4 = new javax.swing.JLabel();
         loginButton = new javax.swing.JButton();
         criarButton = new javax.swing.JButton();
         jLabel5 = new javax.swing.JLabel();
         edtINome = new javax.swing.JTextField();
+        jLabel14 = new javax.swing.JLabel();
+        jLabel15 = new javax.swing.JLabel();
+        edtCep = new javax.swing.JTextField();
+        edtSenha1 = new javax.swing.JPasswordField();
+        jLabel17 = new javax.swing.JLabel();
+        edtNumero = new javax.swing.JTextField();
+        edtLogadouro = new javax.swing.JTextField();
+        jLabel16 = new javax.swing.JLabel();
+        jLabel18 = new javax.swing.JLabel();
+        edtBairro = new javax.swing.JTextField();
+        edtCidade = new javax.swing.JTextField();
         edtEmail = new javax.swing.JTextField();
         jLabel11 = new javax.swing.JLabel();
         jLabel10 = new javax.swing.JLabel();
@@ -79,6 +106,7 @@ public class FrCadastro extends javax.swing.JFrame {
         jLabel8 = new javax.swing.JLabel();
         cadastroButton2 = new javax.swing.JLabel();
         jLabel9 = new javax.swing.JLabel();
+        jLabel12 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
@@ -90,27 +118,20 @@ public class FrCadastro extends javax.swing.JFrame {
         jLabel2.setForeground(new java.awt.Color(86, 86, 86));
         jLabel2.setText("Crie sua conta");
         jLabel2.setVerticalAlignment(javax.swing.SwingConstants.BOTTOM);
-        jPanel2.add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(440, 170, 120, 30));
+        jPanel2.add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(440, 140, 120, 30));
 
         edtCpf.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 edtCpfActionPerformed(evt);
             }
         });
-        jPanel2.add(edtCpf, new org.netbeans.lib.awtextra.AbsoluteConstraints(370, 280, 280, 30));
-
-        edtSenha.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                edtSenhaActionPerformed(evt);
-            }
-        });
-        jPanel2.add(edtSenha, new org.netbeans.lib.awtextra.AbsoluteConstraints(370, 400, 280, 30));
+        jPanel2.add(edtCpf, new org.netbeans.lib.awtextra.AbsoluteConstraints(370, 250, 280, 30));
 
         jLabel3.setText("Senha");
-        jPanel2.add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(370, 380, -1, -1));
+        jPanel2.add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(370, 650, -1, -1));
 
         jLabel4.setText("Cpf");
-        jPanel2.add(jLabel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(370, 260, 30, -1));
+        jPanel2.add(jLabel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(370, 230, 30, -1));
 
         loginButton.setForeground(new java.awt.Color(82, 149, 205));
         loginButton.setText(" Entre aqui");
@@ -122,7 +143,7 @@ public class FrCadastro extends javax.swing.JFrame {
                 loginButtonActionPerformed(evt);
             }
         });
-        jPanel2.add(loginButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(530, 520, -1, -1));
+        jPanel2.add(loginButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(530, 790, -1, -1));
 
         criarButton.setBackground(new java.awt.Color(64, 86, 213));
         criarButton.setForeground(new java.awt.Color(255, 255, 255));
@@ -132,39 +153,96 @@ public class FrCadastro extends javax.swing.JFrame {
                 criarButtonActionPerformed(evt);
             }
         });
-        jPanel2.add(criarButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(420, 470, 180, 40));
+        jPanel2.add(criarButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(410, 750, 180, 40));
 
         jLabel5.setText("Nome");
-        jPanel2.add(jLabel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(370, 200, -1, -1));
+        jPanel2.add(jLabel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(370, 170, -1, -1));
 
         edtINome.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 edtINomeActionPerformed(evt);
             }
         });
-        jPanel2.add(edtINome, new org.netbeans.lib.awtextra.AbsoluteConstraints(370, 220, 280, 30));
+        jPanel2.add(edtINome, new org.netbeans.lib.awtextra.AbsoluteConstraints(370, 190, 280, 30));
+
+        jLabel14.setText("Numero");
+        jPanel2.add(jLabel14, new org.netbeans.lib.awtextra.AbsoluteConstraints(370, 530, -1, -1));
+
+        jLabel15.setText("Cep");
+        jPanel2.add(jLabel15, new org.netbeans.lib.awtextra.AbsoluteConstraints(370, 290, -1, -1));
+
+        edtCep.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                edtCepActionPerformed(evt);
+            }
+        });
+        jPanel2.add(edtCep, new org.netbeans.lib.awtextra.AbsoluteConstraints(370, 310, 280, 30));
+
+        edtSenha1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                edtSenha1ActionPerformed(evt);
+            }
+        });
+        jPanel2.add(edtSenha1, new org.netbeans.lib.awtextra.AbsoluteConstraints(370, 670, 280, 30));
+
+        jLabel17.setText("Logradouro");
+        jPanel2.add(jLabel17, new org.netbeans.lib.awtextra.AbsoluteConstraints(370, 410, -1, -1));
+
+        edtNumero.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                edtNumeroActionPerformed(evt);
+            }
+        });
+        jPanel2.add(edtNumero, new org.netbeans.lib.awtextra.AbsoluteConstraints(370, 550, 280, 30));
+
+        edtLogadouro.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                edtLogadouroActionPerformed(evt);
+            }
+        });
+        jPanel2.add(edtLogadouro, new org.netbeans.lib.awtextra.AbsoluteConstraints(370, 430, 280, 30));
+
+        jLabel16.setText("Cidade");
+        jPanel2.add(jLabel16, new org.netbeans.lib.awtextra.AbsoluteConstraints(370, 350, -1, -1));
+
+        jLabel18.setText("Bairro");
+        jPanel2.add(jLabel18, new org.netbeans.lib.awtextra.AbsoluteConstraints(370, 470, -1, -1));
+
+        edtBairro.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                edtBairroActionPerformed(evt);
+            }
+        });
+        jPanel2.add(edtBairro, new org.netbeans.lib.awtextra.AbsoluteConstraints(370, 490, 280, 30));
+
+        edtCidade.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                edtCidadeActionPerformed(evt);
+            }
+        });
+        jPanel2.add(edtCidade, new org.netbeans.lib.awtextra.AbsoluteConstraints(370, 370, 280, 30));
 
         edtEmail.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 edtEmailActionPerformed(evt);
             }
         });
-        jPanel2.add(edtEmail, new org.netbeans.lib.awtextra.AbsoluteConstraints(370, 340, 280, 30));
+        jPanel2.add(edtEmail, new org.netbeans.lib.awtextra.AbsoluteConstraints(370, 610, 280, 30));
 
         jLabel11.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Imagens/Logo.png"))); // NOI18N
         jLabel11.setVerticalAlignment(javax.swing.SwingConstants.BOTTOM);
-        jPanel2.add(jLabel11, new org.netbeans.lib.awtextra.AbsoluteConstraints(410, 130, 40, 40));
+        jPanel2.add(jLabel11, new org.netbeans.lib.awtextra.AbsoluteConstraints(410, 90, 40, 40));
 
         jLabel10.setFont(new java.awt.Font("Segoe UI", 1, 28)); // NOI18N
         jLabel10.setForeground(new java.awt.Color(30, 42, 58));
         jLabel10.setText("ArchFlow");
-        jPanel2.add(jLabel10, new org.netbeans.lib.awtextra.AbsoluteConstraints(460, 130, -1, -1));
+        jPanel2.add(jLabel10, new org.netbeans.lib.awtextra.AbsoluteConstraints(460, 90, -1, -1));
 
         jLabel6.setText("Email");
-        jPanel2.add(jLabel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(370, 320, -1, -1));
+        jPanel2.add(jLabel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(370, 590, -1, -1));
 
         jLabel7.setText("Já tem uma conta?");
-        jPanel2.add(jLabel7, new org.netbeans.lib.awtextra.AbsoluteConstraints(420, 520, -1, -1));
+        jPanel2.add(jLabel7, new org.netbeans.lib.awtextra.AbsoluteConstraints(410, 790, -1, -1));
 
         edtTipo.setBackground(new java.awt.Color(255, 255, 255));
         edtTipo.setText("Cadastrar como gestor?");
@@ -173,13 +251,13 @@ public class FrCadastro extends javax.swing.JFrame {
                 edtTipoActionPerformed(evt);
             }
         });
-        jPanel2.add(edtTipo, new org.netbeans.lib.awtextra.AbsoluteConstraints(430, 440, -1, -1));
+        jPanel2.add(edtTipo, new org.netbeans.lib.awtextra.AbsoluteConstraints(430, 720, -1, -1));
 
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Imagens/Fundo.png"))); // NOI18N
         jPanel2.add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(290, 220, 440, 290));
 
         jLabel8.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Imagens/Fundo.png"))); // NOI18N
-        jPanel2.add(jLabel8, new org.netbeans.lib.awtextra.AbsoluteConstraints(290, 230, 440, 380));
+        jPanel2.add(jLabel8, new org.netbeans.lib.awtextra.AbsoluteConstraints(290, 410, 440, 490));
 
         cadastroButton2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Imagens/BotaoVoltar.png"))); // NOI18N
         cadastroButton2.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -187,20 +265,23 @@ public class FrCadastro extends javax.swing.JFrame {
                 cadastroButton2MouseClicked(evt);
             }
         });
-        jPanel2.add(cadastroButton2, new org.netbeans.lib.awtextra.AbsoluteConstraints(350, 130, -1, -1));
+        jPanel2.add(cadastroButton2, new org.netbeans.lib.awtextra.AbsoluteConstraints(360, 90, -1, -1));
 
         jLabel9.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Imagens/Fundo.png"))); // NOI18N
-        jPanel2.add(jLabel9, new org.netbeans.lib.awtextra.AbsoluteConstraints(290, 90, 440, 380));
+        jPanel2.add(jLabel9, new org.netbeans.lib.awtextra.AbsoluteConstraints(290, 0, -1, 470));
+
+        jLabel12.setText("Senha");
+        jPanel2.add(jLabel12, new org.netbeans.lib.awtextra.AbsoluteConstraints(370, 350, -1, -1));
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, 1004, Short.MAX_VALUE)
+            .addComponent(jPanel2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 1004, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 701, Short.MAX_VALUE)
+            .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, 922, Short.MAX_VALUE)
         );
 
         pack();
@@ -209,10 +290,6 @@ public class FrCadastro extends javax.swing.JFrame {
     private void edtCpfActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_edtCpfActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_edtCpfActionPerformed
-
-    private void edtSenhaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_edtSenhaActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_edtSenhaActionPerformed
 
     private void loginButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_loginButtonActionPerformed
         controller.navegarParaLogin();
@@ -237,6 +314,30 @@ public class FrCadastro extends javax.swing.JFrame {
     private void cadastroButton2MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_cadastroButton2MouseClicked
         controller.navegarParaLogin();
     }//GEN-LAST:event_cadastroButton2MouseClicked
+
+    private void edtSenha1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_edtSenha1ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_edtSenha1ActionPerformed
+
+    private void edtNumeroActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_edtNumeroActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_edtNumeroActionPerformed
+
+    private void edtCepActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_edtCepActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_edtCepActionPerformed
+
+    private void edtCidadeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_edtCidadeActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_edtCidadeActionPerformed
+
+    private void edtLogadouroActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_edtLogadouroActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_edtLogadouroActionPerformed
+
+    private void edtBairroActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_edtBairroActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_edtBairroActionPerformed
 
     /**
      * @param args the command line arguments
@@ -278,14 +379,25 @@ public class FrCadastro extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel cadastroButton2;
     private javax.swing.JButton criarButton;
+    private javax.swing.JTextField edtBairro;
+    private javax.swing.JTextField edtCep;
+    private javax.swing.JTextField edtCidade;
     private javax.swing.JTextField edtCpf;
     private javax.swing.JTextField edtEmail;
     private javax.swing.JTextField edtINome;
-    private javax.swing.JPasswordField edtSenha;
+    private javax.swing.JTextField edtLogadouro;
+    private javax.swing.JTextField edtNumero;
+    private javax.swing.JPasswordField edtSenha1;
     private javax.swing.JCheckBox edtTipo;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
+    private javax.swing.JLabel jLabel12;
+    private javax.swing.JLabel jLabel14;
+    private javax.swing.JLabel jLabel15;
+    private javax.swing.JLabel jLabel16;
+    private javax.swing.JLabel jLabel17;
+    private javax.swing.JLabel jLabel18;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;

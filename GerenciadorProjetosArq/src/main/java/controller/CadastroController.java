@@ -8,8 +8,11 @@ import model.dao.UsuarioDAO;
 import model.entities.Gestor;
 import model.entities.Usuario;
 import model.entities.Cliente;
-import model.exceptions.UsuarioException; // Import novo
-import model.valid.ValidadorUsuario;     // Import novo
+import model.entities.Endereco;
+import model.exceptions.EnderecoException;
+import model.exceptions.UsuarioException; 
+import model.valid.ValidadorEndereco;
+import model.valid.ValidadorUsuario;     
 import org.mindrot.jbcrypt.BCrypt;
 import view.screens.FrCadastro;
 import view.screens.FrLogin;
@@ -28,7 +31,7 @@ public class CadastroController {
         this.usuarioDAO = new UsuarioDAO();
     }
 
-    // Removi o "throws UsuarioException" da assinatura porque vamos tratar aqui mesmo com try/catch
+    // Removi o "throws UsuarioException" e "throws EnderecoException"   da assinatura porque vamos tratar aqui mesmo com try/catch
     public void realizarCadastro() { 
         
         try {
@@ -41,7 +44,12 @@ public class CadastroController {
 
             // Chamada do Validador
             new ValidadorUsuario().validarCadastro(nome, cpf, email, senha, usuarioDAO);
-
+            Endereco endereco = new Endereco();
+            endereco.setCep(view.getCep());      
+            endereco.setCidade(view.getCidade());
+            endereco.setBairro(view.getBairro());
+            endereco.setNumero(view.getNumero());
+            endereco.setLogadouro(view.getLogadouro());
             // 2. Validar os dados de entrada (tratamento de exceções de negócio)
             if (nome.isEmpty() || cpf.isEmpty() || email.isEmpty() || senha.isEmpty()) {
                 view.exibeMensagem("Todos os campos são obrigatórios!");
@@ -60,6 +68,7 @@ public class CadastroController {
                 view.exibeMensagem("Erro: CPF ou Email já cadastrado no sistema.");
                 return;
             }
+            new ValidadorEndereco().validar(endereco);
             // Precisamos limpar o CPF novamente para salvar no objeto, pois a variável 'cpfLimpo' 
             // estava dentro do bloco comentado ou no validador.
             String cpfParaSalvar = cpf.replaceAll("[.\\-]", "");
@@ -96,6 +105,10 @@ public class CadastroController {
         } catch (UsuarioException e) {
             // A mensagem (ex: "CPF Inválido") vem de dentro da Exception
             view.exibeMensagem(e.getMessage());
+            
+        } catch (EnderecoException e) {
+            // Erros de CEP, Rua, Bairro
+            view.exibeMensagem("Erro no Endereço: " + e.getMessage());
             
         } catch (Exception e) {
             // Banco fora do ar, erro de código, etc
