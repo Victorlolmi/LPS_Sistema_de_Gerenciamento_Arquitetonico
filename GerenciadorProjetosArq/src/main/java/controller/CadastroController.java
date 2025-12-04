@@ -63,7 +63,7 @@ public class CadastroController {
                 return;
             }
 
-            // 3. Verificar se o usuário já existe
+            // Verificar se o usuário já existe
             if (usuarioDAO.findByEmailOrCpf(email) != null || usuarioDAO.findByEmailOrCpf(cpfLimpoAntigo) != null) {
                 view.exibeMensagem("Erro: CPF ou Email já cadastrado no sistema.");
                 return;
@@ -89,13 +89,13 @@ public class CadastroController {
                 System.out.println("Criando um novo CLIENTE."); 
             }
 
-            // 5. Criar o novo objeto (Preencher dados)
+            // Criar o novo objeto (Preencher dados)
             novoUsuario.setNome(nome);
             novoUsuario.setCpf(cpfParaSalvar);
             novoUsuario.setEmail(email);
             novoUsuario.setSenha(senhaComHash);
 
-            // 6. Salvar no banco de dados
+            // Salvar no banco de dados
             usuarioDAO.salvar(novoUsuario);
             
             // Se chegou até aqui sem erro, mostra sucesso
