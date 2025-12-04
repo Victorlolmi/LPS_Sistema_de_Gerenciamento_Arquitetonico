@@ -17,4 +17,10 @@ public class JPAUtil {
     public static EntityManager getEntityManager() {
         return FACTORY.createEntityManager();
     }
+    public static void closeFactory() {
+        if (FACTORY.isOpen()) {
+            FACTORY.close();
+        }
+    }
+
 }
