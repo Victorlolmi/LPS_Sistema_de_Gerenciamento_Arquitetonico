@@ -43,17 +43,25 @@ public class FrRecuperacaoSenha extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        entrarButton = new javax.swing.JButton();
-        jLabel6 = new javax.swing.JLabel();
-        jLabel2 = new javax.swing.JLabel();
+        jDesktopPane1 = new javax.swing.JDesktopPane();
         jLabel5 = new javax.swing.JLabel();
-        edtIdentificador = new javax.swing.JTextField();
+        entrarButton = new javax.swing.JButton();
+        jLabel2 = new javax.swing.JLabel();
         cadastroButton = new javax.swing.JButton();
+        edtIdentificador = new javax.swing.JTextField();
+        jLabel4 = new javax.swing.JLabel();
+        jLabel6 = new javax.swing.JLabel();
         cadastroButton1 = new javax.swing.JButton();
         cadastroButton2 = new javax.swing.JLabel();
-        jLabel4 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+
+        jDesktopPane1.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+
+        jLabel5.setFont(new java.awt.Font("Segoe UI", 1, 28)); // NOI18N
+        jLabel5.setForeground(new java.awt.Color(30, 42, 58));
+        jLabel5.setText("ArchFlow");
+        jDesktopPane1.add(jLabel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(120, 50, -1, -1));
 
         entrarButton.setBackground(new java.awt.Color(64, 86, 213));
         entrarButton.setForeground(new java.awt.Color(255, 255, 255));
@@ -63,25 +71,13 @@ public class FrRecuperacaoSenha extends javax.swing.JFrame {
                 entrarButtonActionPerformed(evt);
             }
         });
-
-        jLabel6.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Imagens/Logo.png"))); // NOI18N
-        jLabel6.setVerticalAlignment(javax.swing.SwingConstants.BOTTOM);
+        jDesktopPane1.add(entrarButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(80, 230, 180, 40));
 
         jLabel2.setFont(new java.awt.Font("Calibri", 0, 20)); // NOI18N
         jLabel2.setForeground(new java.awt.Color(86, 86, 86));
         jLabel2.setText("Recuperar Senha");
         jLabel2.setVerticalAlignment(javax.swing.SwingConstants.TOP);
-
-        jLabel5.setFont(new java.awt.Font("Segoe UI", 1, 28)); // NOI18N
-        jLabel5.setForeground(new java.awt.Color(30, 42, 58));
-        jLabel5.setText("ArchFlow");
-
-        edtIdentificador.setForeground(new java.awt.Color(86, 86, 86));
-        edtIdentificador.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                edtIdentificadorActionPerformed(evt);
-            }
-        });
+        jDesktopPane1.add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(100, 100, 150, 30));
 
         cadastroButton.setForeground(new java.awt.Color(82, 149, 205));
         cadastroButton.setText("Voltar para o Login");
@@ -93,6 +89,22 @@ public class FrRecuperacaoSenha extends javax.swing.JFrame {
                 cadastroButtonActionPerformed(evt);
             }
         });
+        jDesktopPane1.add(cadastroButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(160, 290, -1, -1));
+
+        edtIdentificador.setForeground(new java.awt.Color(86, 86, 86));
+        edtIdentificador.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                edtIdentificadorActionPerformed(evt);
+            }
+        });
+        jDesktopPane1.add(edtIdentificador, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 170, 280, 30));
+
+        jLabel4.setText("Email");
+        jDesktopPane1.add(jLabel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 150, -1, -1));
+
+        jLabel6.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Imagens/Logo.png"))); // NOI18N
+        jLabel6.setVerticalAlignment(javax.swing.SwingConstants.BOTTOM);
+        jDesktopPane1.add(jLabel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(70, 50, -1, -1));
 
         cadastroButton1.setForeground(new java.awt.Color(86, 86, 86));
         cadastroButton1.setText("Lembrou a senha?");
@@ -104,6 +116,7 @@ public class FrRecuperacaoSenha extends javax.swing.JFrame {
                 cadastroButton1ActionPerformed(evt);
             }
         });
+        jDesktopPane1.add(cadastroButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 290, -1, -1));
 
         cadastroButton2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Imagens/BotaoVoltar.png"))); // NOI18N
         cadastroButton2.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -111,63 +124,19 @@ public class FrRecuperacaoSenha extends javax.swing.JFrame {
                 cadastroButton2MouseClicked(evt);
             }
         });
-
-        jLabel4.setText("Email");
+        jDesktopPane1.add(cadastroButton2, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 10, -1, -1));
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addGap(40, 40, 40)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel4)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(69, 69, 69)
-                        .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(edtIdentificador, javax.swing.GroupLayout.PREFERRED_SIZE, 280, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(cadastroButton2)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, 38, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jLabel5))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(24, 24, 24)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(cadastroButton1)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(cadastroButton))
-                            .addComponent(entrarButton, javax.swing.GroupLayout.PREFERRED_SIZE, 240, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                .addContainerGap(55, Short.MAX_VALUE))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addComponent(jDesktopPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 339, Short.MAX_VALUE)
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addGap(19, 19, 19)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(7, 7, 7)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(jLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel5))
-                        .addGap(18, 18, 18))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addComponent(cadastroButton2)
-                        .addGap(27, 27, 27)))
-                .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(11, 11, 11)
-                .addComponent(jLabel4)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(edtIdentificador, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
-                .addComponent(entrarButton, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(58, 58, 58)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(cadastroButton1)
-                    .addComponent(cadastroButton))
-                .addContainerGap(56, Short.MAX_VALUE))
+            .addComponent(jDesktopPane1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 365, Short.MAX_VALUE)
         );
 
         pack();
@@ -224,6 +193,7 @@ public class FrRecuperacaoSenha extends javax.swing.JFrame {
     private javax.swing.JLabel cadastroButton2;
     private javax.swing.JTextField edtIdentificador;
     private javax.swing.JButton entrarButton;
+    private javax.swing.JDesktopPane jDesktopPane1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
