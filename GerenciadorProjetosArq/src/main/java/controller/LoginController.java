@@ -8,6 +8,7 @@ import model.dao.UsuarioDAO;
 import model.entities.Usuario;
 import org.mindrot.jbcrypt.BCrypt;
 import view.screens.FrLogin;
+import view.screens.FrMain;
 import view.screens.FrCadastro;
 import view.screens.FrRecuperacaoSenha;
 /**
@@ -48,8 +49,14 @@ public class LoginController {
             // Usuário encontrado, agora verificar a senha com BCrypt
             if (BCrypt.checkpw(senhaDigitada, usuarioDoBanco.getSenha())) {
                 // Sucesso!
-                view.exibeMensagem("Login realizado com sucesso! Bem-vindo, " + usuarioDoBanco.getNome() + ".");
-                // TODO: Fechar a tela de login e abrir a tela principal do sistema.
+                
+                //FrMain telaCadastro = new FrMain();
+        
+                // Torna a nova tela visível
+                //telaCadastro.setVisible(true);
+        
+                // Fecha e libera os recursos da tela de login atual
+                //view.dispose();
             } else {
                 // Senha incorreta
                 view.exibeMensagem("Falha no login: Senha incorreta.");

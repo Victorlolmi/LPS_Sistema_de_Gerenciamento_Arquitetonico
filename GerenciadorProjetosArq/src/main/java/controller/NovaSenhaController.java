@@ -6,6 +6,7 @@ package controller;
 
 import model.dao.UsuarioDAO;
 import model.entities.Usuario;
+import org.mindrot.jbcrypt.BCrypt;
 import view.screens.FrLogin;
 import view.screens.FrNovaSenha;
 
@@ -44,7 +45,7 @@ public class NovaSenhaController {
         Usuario usuario = usuarioDAO.findByEmailOrCpf(email);
 
         if (usuario != null) {
-            String senhaCriptografada = novaSenha; 
+            String senhaCriptografada = BCrypt.hashpw(novaSenha, BCrypt.gensalt());
             usuario.setSenha(senhaCriptografada);
             usuario.setCodigo_recuperacao(null); 
             usuario.setValidade_codigo_recuperacao(null); 
