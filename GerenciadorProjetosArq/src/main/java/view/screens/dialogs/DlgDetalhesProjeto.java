@@ -17,34 +17,35 @@ public class DlgDetalhesProjeto extends javax.swing.JDialog {
     /**
      * Creates new form DlgDetalhesProjeto
      */
-    public DlgDetalhesProjeto(java.awt.Frame parent, boolean modal) {
+    public DlgDetalhesProjeto(java.awt.Frame parent, boolean modal, Projeto projeto) {
         super(parent, modal);
         initComponents();
         
         // Centraliza a janela na tela
         this.setLocationRelativeTo(parent); 
         
-        // PREENCHE OS CAMPOS DA TELA COM OS DADOS DO PROJETO
+        // Agora a variável "projeto" existe e pode ser usada
         preencherDados(projeto);
     }
+    
     private void preencherDados(Projeto p) {
         // Supondo que você criou JLabels ou JTextFields na tela:
-        lblNomeProjeto.setText(p.getNome());
-        lblStatus.setText(p.getStatus());
-        txtDescricao.setText(p.getDescricao()); // Use JTextArea para descrição
+        edtNomeProjeto.setText(p.getNome());
+        cbStatus.setSelectedItem(p.getStatus());
+        edtDescricao.setText(p.getDescricao()); // Use JTextArea para descrição
         
         // Formatação de valores
         if(p.getOrcamento() != null) {
-            lblOrcamento.setText("R$ " + String.format("%.2f", p.getOrcamento()));
+            edtOrcamento.setText("R$ " + String.format("%.2f", p.getOrcamento()));
         }
 
         // Formatação de Datas (importante verificar se não é nulo)
         if (p.getDataInicio() != null) {
-            lblDataInicio.setText(p.getDataInicio().format(fmt));
+            edtDataInicio.setText(p.getDataInicio().format(fmt));
         }
         
         if (p.getCliente() != null) {
-            lblNomeCliente.setText(p.getCliente().getNome());
+            edtCliente.setText(p.getCliente().getNome());
         }
     }
     /**
@@ -77,7 +78,7 @@ public class DlgDetalhesProjeto extends javax.swing.JDialog {
         edtPrevisao = new javax.swing.JFormattedTextField();
         edtDataInicio = new javax.swing.JFormattedTextField();
         jScrollPane1 = new javax.swing.JScrollPane();
-        jTextArea1 = new javax.swing.JTextArea();
+        edtDescricao = new javax.swing.JTextArea();
 
         edtIdentificador.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -136,9 +137,9 @@ public class DlgDetalhesProjeto extends javax.swing.JDialog {
 
         edtDataInicio.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.DateFormatter(java.text.DateFormat.getDateInstance(java.text.DateFormat.SHORT))));
 
-        jTextArea1.setColumns(20);
-        jTextArea1.setRows(5);
-        jScrollPane1.setViewportView(jTextArea1);
+        edtDescricao.setColumns(20);
+        edtDescricao.setRows(5);
+        jScrollPane1.setViewportView(edtDescricao);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -273,7 +274,7 @@ public class DlgDetalhesProjeto extends javax.swing.JDialog {
         java.awt.EventQueue.invokeLater(new Runnable() {
             @Override
             public void run() {
-                DlgDetalhesProjeto dialog = new DlgDetalhesProjeto(new javax.swing.JFrame(), true);
+                DlgDetalhesProjeto dialog = new DlgDetalhesProjeto(new javax.swing.JFrame(), true, null);
                 dialog.addWindowListener(new java.awt.event.WindowAdapter() {
                     @Override
                     public void windowClosing(java.awt.event.WindowEvent e) {
@@ -293,6 +294,7 @@ public class DlgDetalhesProjeto extends javax.swing.JDialog {
     private javax.swing.JComboBox<String> cbStatus;
     private javax.swing.JTextField edtCliente;
     private javax.swing.JFormattedTextField edtDataInicio;
+    private javax.swing.JTextArea edtDescricao;
     private javax.swing.JTextField edtIdentificador;
     private javax.swing.JTextField edtNomeProjeto;
     private javax.swing.JFormattedTextField edtOrcamento;
@@ -307,6 +309,5 @@ public class DlgDetalhesProjeto extends javax.swing.JDialog {
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTextArea jTextArea1;
     // End of variables declaration//GEN-END:variables
 }
