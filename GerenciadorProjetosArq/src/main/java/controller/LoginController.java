@@ -8,7 +8,6 @@ import model.dao.UsuarioDAO;
 import model.entities.Usuario;
 import org.mindrot.jbcrypt.BCrypt;
 import view.screens.FrLogin;
-import view.screens.FrMain;
 import view.screens.FrCadastro;
 import view.screens.FrRecuperacaoSenha;
 /**
