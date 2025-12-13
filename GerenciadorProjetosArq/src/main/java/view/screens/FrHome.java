@@ -93,19 +93,78 @@ public class FrHome extends javax.swing.JFrame {
     }
     
     private void configurarTabelaClientes() {
-        DefaultTableModel modelo = (DefaultTableModel) jTClientes.getModel();
-        modelo.setColumnCount(0); // Limpa colunas padrão "Title 1, Title 2..."
+        DefaultTableModel modelo = new DefaultTableModel() {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false;
+            }
+        };
         
-        // Adiciona as colunas que você quer mostrar
-        modelo.addColumn("ID");
-        modelo.addColumn("Nome");
-        modelo.addColumn("CPF");
-        modelo.addColumn("E-mail");
-        modelo.addColumn("Cidade");
+        jTClientes.setModel(modelo);
+        modelo.setColumnCount(0); 
         
-        // Ajuste opcional de largura (Ex: ID menor, Nome maior)
-        jTClientes.getColumnModel().getColumn(0).setPreferredWidth(30); 
-        jTClientes.getColumnModel().getColumn(1).setPreferredWidth(200);
+        // Definição das Colunas
+        modelo.addColumn("ID");      // 0: Oculto
+        modelo.addColumn("Nome");    // 1: Botão Azul
+        modelo.addColumn("CPF");     // 2: Centralizado
+        modelo.addColumn("E-mail");  // 3: Centralizado
+        modelo.addColumn("Cidade");  // 4: Centralizado
+        
+        // --- ESCONDER COLUNA ID ---
+        jTClientes.getColumnModel().getColumn(0).setMinWidth(0);
+        jTClientes.getColumnModel().getColumn(0).setMaxWidth(0);
+        jTClientes.getColumnModel().getColumn(0).setWidth(0);
+        
+        // --- LARGURAS ---
+        jTClientes.getColumnModel().getColumn(1).setPreferredWidth(250); // Nome
+        jTClientes.getColumnModel().getColumn(2).setPreferredWidth(120); // CPF
+        jTClientes.getColumnModel().getColumn(3).setPreferredWidth(200); // Email
+        jTClientes.getColumnModel().getColumn(4).setPreferredWidth(150); // Cidade
+
+        // --- RENDERIZADOR DO BOTÃO (Coluna 1 - Nome) ---
+        jTClientes.getColumnModel().getColumn(1).setCellRenderer(new DefaultTableCellRenderer() {
+            final JPanel panel = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 7));
+            final JButton btn = new JButton();
+
+            {
+                // Estilo igual ao de Projetos
+                btn.setPreferredSize(new Dimension(220, 30)); 
+                btn.setBackground(new Color(64, 86, 213));    
+                btn.setForeground(Color.WHITE);               
+                btn.setFont(new Font("Segoe UI", Font.BOLD, 12)); 
+                btn.setFocusPainted(false);
+                btn.setBorderPainted(false); 
+                panel.add(btn);
+            }
+
+            @Override
+            public Component getTableCellRendererComponent(JTable table, Object value,
+                    boolean isSelected, boolean hasFocus, int row, int column) {
+                
+                // Texto do botão é o Nome do Cliente
+                btn.setText((value != null) ? value.toString() : "Cliente");
+                
+                if (isSelected) {
+                    panel.setBackground(table.getSelectionBackground());
+                } else {
+                    panel.setBackground(table.getBackground());
+                }
+                return panel; 
+            }
+        });
+
+        // --- CENTRALIZAR DEMAIS COLUNAS ---
+        DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
+        centerRenderer.setHorizontalAlignment(SwingConstants.CENTER);
+        
+        jTClientes.getColumnModel().getColumn(2).setCellRenderer(centerRenderer);
+        jTClientes.getColumnModel().getColumn(3).setCellRenderer(centerRenderer);
+        jTClientes.getColumnModel().getColumn(4).setCellRenderer(centerRenderer);
+        
+        // --- VISUAL GERAL ---
+        jTClientes.setRowHeight(45); // Espaçamento maior
+        jTClientes.setShowVerticalLines(false);
+        jTClientes.setGridColor(new Color(230, 230, 230));
     }
     
     public void carregarTabelaClientes() {
