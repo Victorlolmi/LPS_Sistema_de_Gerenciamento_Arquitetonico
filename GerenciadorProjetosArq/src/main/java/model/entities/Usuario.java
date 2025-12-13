@@ -140,4 +140,8 @@ public abstract class Usuario {
         this.validade_codigo_recuperacao = validade_codigo_recuperacao;
     }
     
+    @Override
+    public String toString() {
+        return this.getNome(); // Retorna o nome para aparecer na lista
+    }
 }

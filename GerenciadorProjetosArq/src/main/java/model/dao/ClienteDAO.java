@@ -29,8 +29,7 @@ public class ClienteDAO extends GenericDAO<Cliente> {
         EntityManager em = JPAUtil.getEntityManager();
         try {
             // O "ORDER BY c.nome" é importante para a lista aparecer em ordem alfabética
-            String jpql = "SELECT c FROM Cliente c ORDER BY c.nome";
-            
+            String jpql = "SELECT c FROM Cliente c LEFT JOIN FETCH c.endereco ORDER BY c.nome";
             return em.createQuery(jpql, Cliente.class).getResultList();
             
         } finally {
@@ -70,6 +69,39 @@ public class ClienteDAO extends GenericDAO<Cliente> {
             
         } catch (NoResultException e) {
             return null;
+        } finally {
+            em.close();
+        }
+    }
+    
+    public Cliente buscarPorEmail(String email) {
+    EntityManager em = JPAUtil.getEntityManager();
+    try {
+        // Busca um cliente onde o email seja igual ao informado
+        String jpql = "SELECT c FROM Cliente c WHERE c.email = :email";
+        
+        return em.createQuery(jpql, Cliente.class)
+                .setParameter("email", email)
+                .getSingleResult();
+                
+    } catch (NoResultException e) {
+        return null; // Não achou ninguém, retorna null (o que é bom para cadastro!)
+    } finally {
+        em.close();
+    }
+    }
+
+    public Cliente buscarPorCpf(String cpf) {
+        EntityManager em = JPAUtil.getEntityManager();
+        try {
+            String jpql = "SELECT c FROM Cliente c WHERE c.cpf = :cpf";
+
+            return em.createQuery(jpql, Cliente.class)
+                    .setParameter("cpf", cpf)
+                    .getSingleResult();
+
+        } catch (NoResultException e) {
+            return null; 
         } finally {
             em.close();
         }

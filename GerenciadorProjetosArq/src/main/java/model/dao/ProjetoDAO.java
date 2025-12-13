@@ -28,7 +28,7 @@ public class ProjetoDAO extends GenericDAO<Projeto> {
         EntityManager em = JPAUtil.getEntityManager();
         try {
             // ORDER BY p.dataInicio DESC -> Mostra os projetos mais novos no topo da lista
-            String jpql = "SELECT p FROM Projeto p ORDER BY p.dataInicio DESC";
+           String jpql = "SELECT p FROM Projeto p LEFT JOIN FETCH p.cliente ORDER BY p.nome";
             
             return em.createQuery(jpql, Projeto.class).getResultList();
             

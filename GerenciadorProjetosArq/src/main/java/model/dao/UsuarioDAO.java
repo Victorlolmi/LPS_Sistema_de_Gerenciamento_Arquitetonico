@@ -38,4 +38,5 @@ public class UsuarioDAO extends GenericDAO<Usuario> {
             em.close();
         }
     }
+    
 }

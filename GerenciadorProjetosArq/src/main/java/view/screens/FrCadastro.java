@@ -54,8 +54,8 @@ public class FrCadastro extends javax.swing.JFrame {
     public String getCidade() {
         return edtCidade.getText(); 
     }
-    public String getLogadouro() {
-        return edtLogadouro.getText(); 
+    public String getLogradouro() {
+        return edtLogradouro.getText(); 
     }
     public String getBairro() {
         return edtBairro.getText(); 
@@ -91,7 +91,7 @@ public class FrCadastro extends javax.swing.JFrame {
         edtSenha1 = new javax.swing.JPasswordField();
         jLabel17 = new javax.swing.JLabel();
         edtNumero = new javax.swing.JTextField();
-        edtLogadouro = new javax.swing.JTextField();
+        edtLogradouro = new javax.swing.JTextField();
         jLabel16 = new javax.swing.JLabel();
         jLabel18 = new javax.swing.JLabel();
         edtBairro = new javax.swing.JTextField();
@@ -195,12 +195,12 @@ public class FrCadastro extends javax.swing.JFrame {
         });
         jPanel2.add(edtNumero, new org.netbeans.lib.awtextra.AbsoluteConstraints(370, 550, 280, 30));
 
-        edtLogadouro.addActionListener(new java.awt.event.ActionListener() {
+        edtLogradouro.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                edtLogadouroActionPerformed(evt);
+                edtLogradouroActionPerformed(evt);
             }
         });
-        jPanel2.add(edtLogadouro, new org.netbeans.lib.awtextra.AbsoluteConstraints(370, 430, 280, 30));
+        jPanel2.add(edtLogradouro, new org.netbeans.lib.awtextra.AbsoluteConstraints(370, 430, 280, 30));
 
         jLabel16.setText("Cidade");
         jPanel2.add(jLabel16, new org.netbeans.lib.awtextra.AbsoluteConstraints(370, 350, -1, -1));
@@ -331,9 +331,9 @@ public class FrCadastro extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_edtCidadeActionPerformed
 
-    private void edtLogadouroActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_edtLogadouroActionPerformed
+    private void edtLogradouroActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_edtLogradouroActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_edtLogadouroActionPerformed
+    }//GEN-LAST:event_edtLogradouroActionPerformed
 
     private void edtBairroActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_edtBairroActionPerformed
         // TODO add your handling code here:
@@ -385,7 +385,7 @@ public class FrCadastro extends javax.swing.JFrame {
     private javax.swing.JTextField edtCpf;
     private javax.swing.JTextField edtEmail;
     private javax.swing.JTextField edtINome;
-    private javax.swing.JTextField edtLogadouro;
+    private javax.swing.JTextField edtLogradouro;
     private javax.swing.JTextField edtNumero;
     private javax.swing.JPasswordField edtSenha1;
     private javax.swing.JCheckBox edtTipo;

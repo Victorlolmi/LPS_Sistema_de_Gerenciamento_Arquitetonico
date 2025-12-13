@@ -25,7 +25,7 @@ public class Endereco {
     
     private String numero;
     
-    @Column(nullable = false, length = 8)
+    @Column(nullable = false, length = 20)
     private String cep;
     
     private String cidade;
@@ -46,7 +46,7 @@ public class Endereco {
         return logadouro;
     }
 
-    public void setLogadouro(String logadouro) {
+    public void setLogradouro(String logadouro) {
         this.logadouro = logadouro;
     }
 
@@ -81,5 +81,4 @@ public class Endereco {
     public void setCidade(String cidade) {
         this.cidade = cidade;
     }
-    
 }

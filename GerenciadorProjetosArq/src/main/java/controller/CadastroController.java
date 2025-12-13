@@ -31,7 +31,6 @@ public class CadastroController {
         this.usuarioDAO = new UsuarioDAO();
     }
 
-    // Removi o "throws UsuarioException" e "throws EnderecoException"   da assinatura porque vamos tratar aqui mesmo com try/catch
     public void realizarCadastro() { 
         
         try {
@@ -41,77 +40,103 @@ public class CadastroController {
             String email = view.getEmail();
             String senha = view.getSenha();
             boolean isGestor = view.isTipo();
+            
+            // Dados do Endereço
+            String rawCep = view.getCep(); // <--- PEGA O CEP BRUTO
+            String cidade = view.getCidade();
+            String bairro = view.getBairro();
+            String numero = view.getNumero();
+            String logradouro = view.getLogradouro();
 
-            // Chamada do Validador
-            new ValidadorUsuario().validarCadastro(nome, cpf, email, senha, usuarioDAO);
-            Endereco endereco = new Endereco();
-            endereco.setCep(view.getCep());      
-            endereco.setCidade(view.getCidade());
-            endereco.setBairro(view.getBairro());
-            endereco.setNumero(view.getNumero());
-            endereco.setLogadouro(view.getLogadouro());
-            // 2. Validar os dados de entrada (tratamento de exceções de negócio)
+            // 2. Validações Básicas dos campos de Usuário
             if (nome.isEmpty() || cpf.isEmpty() || email.isEmpty() || senha.isEmpty()) {
-                view.exibeMensagem("Todos os campos são obrigatórios!");
+                view.exibeMensagem("Todos os campos de cadastro são obrigatórios!");
                 return;
             }
 
-            // Validação simples de CPF (apenas para garantir que não está em branco e tem 11 dígitos)
-            String cpfLimpoAntigo = cpf.replaceAll("[.\\-]", "");
-            if (cpfLimpoAntigo.length() != 11) {
+            // --- [CORREÇÃO] VALIDAÇÃO E LIMPEZA DO CEP ---
+            // 1. Verifica se está vazio (Banco exige NOT NULL)
+            if (rawCep == null || rawCep.trim().isEmpty()) {
+                view.exibeMensagem("Erro: O CEP é obrigatório.");
+                return;
+            }
+
+            // 2. Verifica formato (Só números ou com traço)
+            if (!rawCep.matches("\\d{8}|\\d{5}-\\d{3}")) {
+                view.exibeMensagem("Erro: CEP inválido.\nUse apenas números (Ex: 36000000) ou o formato com traço (Ex: 36000-000).");
+                return; 
+            }
+            // ---------------------------------------------
+
+            // Chamada do Validador de Usuário (Regras de negócio)
+            new ValidadorUsuario().validarCadastro(nome, cpf, email, senha, usuarioDAO);
+
+            // Validação simples de CPF (11 dígitos)
+            String cpfLimpo = cpf.replaceAll("[^0-9]", ""); 
+            if (cpfLimpo.length() != 11) {
                 view.exibeMensagem("CPF inválido! Deve conter 11 dígitos.");
                 return;
             }
-
-            // Verificar se o usuário já existe
-            if (usuarioDAO.findByEmailOrCpf(email) != null || usuarioDAO.findByEmailOrCpf(cpfLimpoAntigo) != null) {
-                view.exibeMensagem("Erro: CPF ou Email já cadastrado no sistema.");
+            
+            // Verificar duplicidade
+            if (usuarioDAO.findByEmailOrCpf(email) != null) {
+                view.exibeMensagem("Erro: Email já cadastrado.");
                 return;
             }
+            if (usuarioDAO.findByEmailOrCpf(cpfLimpo) != null) {
+                view.exibeMensagem("Erro: CPF já cadastrado.");
+                return;
+            }
+
+            // 3. Montar o Endereço (AGORA SEGURO)
+            Endereco endereco = new Endereco();
+            
+            // [IMPORTANTE] Removemos o traço aqui!
+            // O banco recebe "36000000" (8 chars), resolvendo o erro 'Data too long'
+            endereco.setCep(rawCep.replaceAll("[^0-9]", "")); 
+            
+            endereco.setCidade(cidade);
+            endereco.setBairro(bairro);
+            endereco.setNumero(numero);
+            endereco.setLogradouro(logradouro);
+
+            // Validador de endereço (se houver regras extras)
             new ValidadorEndereco().validar(endereco);
-            // Precisamos limpar o CPF novamente para salvar no objeto, pois a variável 'cpfLimpo' 
-            // estava dentro do bloco comentado ou no validador.
-            String cpfParaSalvar = cpf.replaceAll("[.\\-]", "");
 
             // 4. Criptografar a senha
             String senhaComHash = BCrypt.hashpw(senha, BCrypt.gensalt());
+            
+            // 5. Instanciar o Usuário
             Usuario novoUsuario;
 
             if (isGestor) {
-                Gestor gestor = new Gestor();
-                // Se o Gestor tivesse campos extras, você os definiria aqui
-                novoUsuario = gestor; 
-                System.out.println("Criando um novo GESTOR."); 
+                novoUsuario = new Gestor();
             } else {
-                Cliente cliente = new Cliente();
-                // Se o Cliente tivesse campos extras, você os definiria aqui
-                novoUsuario = cliente; 
-                System.out.println("Criando um novo CLIENTE."); 
+                novoUsuario = new Cliente();
             }
 
-            // Criar o novo objeto (Preencher dados)
+            // Preencher o Usuário
             novoUsuario.setNome(nome);
-            novoUsuario.setCpf(cpfParaSalvar);
+            novoUsuario.setCpf(cpfLimpo); // Salva CPF limpo
             novoUsuario.setEmail(email);
             novoUsuario.setSenha(senhaComHash);
+            
+            // [VÍNCULO] Coloca o endereço dentro do usuário
+            novoUsuario.setEndereco(endereco);
 
-            // Salvar no banco de dados
+            // 6. Salvar
             usuarioDAO.salvar(novoUsuario);
             
-            // Se chegou até aqui sem erro, mostra sucesso
             view.exibeMensagem("Cadastro realizado com sucesso!");
             navegarParaLogin();
 
         } catch (UsuarioException e) {
-            // A mensagem (ex: "CPF Inválido") vem de dentro da Exception
             view.exibeMensagem(e.getMessage());
             
         } catch (EnderecoException e) {
-            // Erros de CEP, Rua, Bairro
             view.exibeMensagem("Erro no Endereço: " + e.getMessage());
             
         } catch (Exception e) {
-            // Banco fora do ar, erro de código, etc
             view.exibeMensagem("Ocorreu um erro inesperado: " + e.getMessage());
             e.printStackTrace(); 
         }

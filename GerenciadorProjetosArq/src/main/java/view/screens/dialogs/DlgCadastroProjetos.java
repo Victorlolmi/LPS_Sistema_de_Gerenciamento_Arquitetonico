@@ -128,7 +128,7 @@ public class DlgCadastroProjetos extends javax.swing.JDialog {
         });
         jPanel1.add(cbCliente, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 110, 280, -1));
 
-        getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 580, 450));
+        getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 490, 450));
 
         pack();
     }// </editor-fold>//GEN-END:initComponents

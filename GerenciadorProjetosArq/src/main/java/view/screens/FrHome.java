@@ -4,6 +4,14 @@
  */
 package view.screens;
 import view.screens.dialogs.DlgCadastroProjetos;
+import view.screens.dialogs.DlgCadastroCliente;
+import model.dao.ClienteDAO;
+import model.entities.Cliente;
+import model.dao.ProjetoDAO;
+import model.entities.Projeto;
+import java.util.List;
+import javax.swing.table.DefaultTableModel;
+import java.time.format.DateTimeFormatter;
 /**
  *
  * @author juans
@@ -18,8 +26,97 @@ public class FrHome extends javax.swing.JFrame {
     public FrHome() {
         initComponents();
         setLocationRelativeTo(null);
+        
+        configurarTabelaClientes();
+        carregarTabelaClientes();
+        
+        configurarTabelaProjetos();
+        carregarTabelaProjetos();
+    }
+    
+    private void configurarTabelaClientes() {
+        DefaultTableModel modelo = (DefaultTableModel) jTClientes.getModel();
+        modelo.setColumnCount(0); // Limpa colunas padrão "Title 1, Title 2..."
+        
+        // Adiciona as colunas que você quer mostrar
+        modelo.addColumn("ID");
+        modelo.addColumn("Nome");
+        modelo.addColumn("CPF");
+        modelo.addColumn("E-mail");
+        modelo.addColumn("Cidade");
+        
+        // Ajuste opcional de largura (Ex: ID menor, Nome maior)
+        jTClientes.getColumnModel().getColumn(0).setPreferredWidth(30); 
+        jTClientes.getColumnModel().getColumn(1).setPreferredWidth(200);
+    }
+    
+    public void carregarTabelaClientes() {
+        // 1. Instancia o DAO
+        ClienteDAO dao = new ClienteDAO();
+        
+        // 2. Busca a lista do banco
+        List<Cliente> lista = dao.listarTodos();
+        
+        // 3. Pega o modelo da tabela para manipular
+        DefaultTableModel modelo = (DefaultTableModel) jTClientes.getModel();
+        modelo.setNumRows(0); // Limpa a tabela para não duplicar dados ao recarregar
+        
+        // 4. Adiciona linha por linha
+        for (Cliente c : lista) {
+            modelo.addRow(new Object[]{
+                c.getId(),
+                c.getNome(),
+                c.getCpf(),
+                c.getEmail(),
+                // Verifica se tem endereço antes de pegar cidade para não dar erro
+                (c.getEndereco() != null) ? c.getEndereco().getCidade() : "N/A"
+            });
+        }
+    }
+    private void configurarTabelaProjetos() {
+        DefaultTableModel modelo = (DefaultTableModel) jTProjetos.getModel();
+        modelo.setColumnCount(0); // Limpa tudo
+        
+        // Adiciona APENAS as 3 colunas pedidas
+        modelo.addColumn("Nome do Projeto");
+        modelo.addColumn("Cliente");
+        modelo.addColumn("Status");
+        
+        // Ajuste de largura (Estética)
+        // Coluna 0 (Nome) fica maior
+        jTProjetos.getColumnModel().getColumn(0).setPreferredWidth(250);
+        // Coluna 1 (Cliente)
+        jTProjetos.getColumnModel().getColumn(1).setPreferredWidth(200);
+        // Coluna 2 (Status)
+        jTProjetos.getColumnModel().getColumn(2).setPreferredWidth(100);
     }
 
+    public void carregarTabelaProjetos() {
+        // 1. Busca os dados
+        ProjetoDAO dao = new ProjetoDAO();
+        List<Projeto> lista = dao.listarTodos();
+        
+        // 2. Limpa a tabela
+        DefaultTableModel modelo = (DefaultTableModel) jTProjetos.getModel();
+        modelo.setNumRows(0);
+        
+        // 3. Preenche as linhas
+        for (Projeto p : lista) {
+            
+            // Tratamento para não dar erro se o cliente for nulo
+            String nomeCliente = (p.getCliente() != null) ? p.getCliente().getNome() : "---";
+            
+            // Tratamento para Status
+            String statusTexto = (p.getStatus() != null) ? p.getStatus() : "Indefinido";
+
+            // Adiciona apenas as 3 informações na ordem das colunas
+            modelo.addRow(new Object[]{
+                p.getNome(),   // Coluna 1: Nome do Projeto
+                nomeCliente,   // Coluna 2: Nome do Cliente
+                statusTexto    // Coluna 3: Status
+            });
+        }
+    }
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -31,11 +128,17 @@ public class FrHome extends javax.swing.JFrame {
 
         jPanel1 = new javax.swing.JPanel();
         jPanel2 = new javax.swing.JPanel();
+        btnClientes = new javax.swing.JButton();
         btnProjetos = new javax.swing.JButton();
         jTabbedPane2 = new javax.swing.JTabbedPane();
         jPanel3 = new javax.swing.JPanel();
         btnCadastrarprojetos = new javax.swing.JButton();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        jTProjetos = new javax.swing.JTable();
         jPanel4 = new javax.swing.JPanel();
+        btnCadastrarCliente = new javax.swing.JButton();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        jTClientes = new javax.swing.JTable();
         jPanel5 = new javax.swing.JPanel();
         jPanel6 = new javax.swing.JPanel();
 
@@ -43,6 +146,13 @@ public class FrHome extends javax.swing.JFrame {
 
         jPanel1.setBackground(new java.awt.Color(255, 255, 255));
         jPanel1.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+
+        btnClientes.setText("Clientes");
+        btnClientes.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnClientesActionPerformed(evt);
+            }
+        });
 
         btnProjetos.setText("Projetos");
         btnProjetos.addActionListener(new java.awt.event.ActionListener() {
@@ -57,15 +167,25 @@ public class FrHome extends javax.swing.JFrame {
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(btnProjetos, javax.swing.GroupLayout.DEFAULT_SIZE, 185, Short.MAX_VALUE)
+                .addComponent(btnClientes, javax.swing.GroupLayout.DEFAULT_SIZE, 185, Short.MAX_VALUE)
                 .addContainerGap())
+            .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(jPanel2Layout.createSequentialGroup()
+                    .addContainerGap()
+                    .addComponent(btnProjetos, javax.swing.GroupLayout.DEFAULT_SIZE, 185, Short.MAX_VALUE)
+                    .addContainerGap()))
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel2Layout.createSequentialGroup()
-                .addGap(20, 20, 20)
-                .addComponent(btnProjetos, javax.swing.GroupLayout.PREFERRED_SIZE, 72, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGap(121, 121, 121)
+                .addComponent(btnClientes, javax.swing.GroupLayout.PREFERRED_SIZE, 72, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(454, Short.MAX_VALUE))
+            .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(jPanel2Layout.createSequentialGroup()
+                    .addGap(30, 30, 30)
+                    .addComponent(btnProjetos, javax.swing.GroupLayout.PREFERRED_SIZE, 72, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addContainerGap(545, Short.MAX_VALUE)))
         );
 
         jPanel1.add(jPanel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 111, -1, 647));
@@ -80,20 +200,49 @@ public class FrHome extends javax.swing.JFrame {
         });
         jPanel3.add(btnCadastrarprojetos, new org.netbeans.lib.awtextra.AbsoluteConstraints(910, 10, -1, -1));
 
+        jTProjetos.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null}
+            },
+            new String [] {
+                "Title 1", "Title 2", "Title 3", "Title 4"
+            }
+        ));
+        jScrollPane2.setViewportView(jTProjetos);
+
+        jPanel3.add(jScrollPane2, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 10, 870, 470));
+
         jTabbedPane2.addTab("Projetos", jPanel3);
 
-        javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
-        jPanel4.setLayout(jPanel4Layout);
-        jPanel4Layout.setHorizontalGroup(
-            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 1048, Short.MAX_VALUE)
-        );
-        jPanel4Layout.setVerticalGroup(
-            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 612, Short.MAX_VALUE)
-        );
+        jPanel4.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        jTabbedPane2.addTab("tab2", jPanel4);
+        btnCadastrarCliente.setText("Novo Cliente");
+        btnCadastrarCliente.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnCadastrarClienteActionPerformed(evt);
+            }
+        });
+        jPanel4.add(btnCadastrarCliente, new org.netbeans.lib.awtextra.AbsoluteConstraints(930, 20, -1, -1));
+
+        jTClientes.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null}
+            },
+            new String [] {
+                "Title 1", "Title 2", "Title 3", "Title 4"
+            }
+        ));
+        jScrollPane1.setViewportView(jTClientes);
+
+        jPanel4.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 910, 490));
+
+        jTabbedPane2.addTab("Clientes", jPanel4);
 
         javax.swing.GroupLayout jPanel5Layout = new javax.swing.GroupLayout(jPanel5);
         jPanel5.setLayout(jPanel5Layout);
@@ -140,9 +289,10 @@ public class FrHome extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void btnProjetosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnProjetosActionPerformed
-        jTabbedPane2.setSelectedIndex(0);
-    }//GEN-LAST:event_btnProjetosActionPerformed
+    private void btnClientesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnClientesActionPerformed
+        jTabbedPane2.setSelectedIndex(1);
+        carregarTabelaClientes();
+    }//GEN-LAST:event_btnClientesActionPerformed
 
     private void btnCadastrarprojetosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCadastrarprojetosActionPerformed
         DlgCadastroProjetos dlg = new DlgCadastroProjetos(this, true);
@@ -152,7 +302,24 @@ public class FrHome extends javax.swing.JFrame {
     
         // 3. Exibe o diálogo
         dlg.setVisible(true);
+        carregarTabelaProjetos();
     }//GEN-LAST:event_btnCadastrarprojetosActionPerformed
+
+    private void btnProjetosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnProjetosActionPerformed
+        jTabbedPane2.setSelectedIndex(0);
+        carregarTabelaProjetos();
+    }//GEN-LAST:event_btnProjetosActionPerformed
+
+    private void btnCadastrarClienteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCadastrarClienteActionPerformed
+        DlgCadastroCliente dlg = new DlgCadastroCliente(this, true);
+    
+        // 2. Centraliza a janela na tela (opcional, mas recomendado)
+        dlg.setLocationRelativeTo(null);
+    
+        // 3. Exibe o diálogo
+        dlg.setVisible(true);
+        carregarTabelaClientes();
+    }//GEN-LAST:event_btnCadastrarClienteActionPerformed
 
     /**
      * @param args the command line arguments
@@ -180,7 +347,9 @@ public class FrHome extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnCadastrarCliente;
     private javax.swing.JButton btnCadastrarprojetos;
+    private javax.swing.JButton btnClientes;
     private javax.swing.JButton btnProjetos;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
@@ -188,6 +357,10 @@ public class FrHome extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel5;
     private javax.swing.JPanel jPanel6;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JTable jTClientes;
+    private javax.swing.JTable jTProjetos;
     private javax.swing.JTabbedPane jTabbedPane2;
     // End of variables declaration//GEN-END:variables
 }
