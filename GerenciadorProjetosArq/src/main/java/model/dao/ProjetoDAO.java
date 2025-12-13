@@ -55,6 +55,16 @@ public class ProjetoDAO extends GenericDAO<Projeto> {
             em.close();
         }
     }
+    
+    public Projeto buscarPorId(Long id) {
+        EntityManager em = JPAUtil.getEntityManager();
+        try {
+            // O find já resolve tudo
+            return em.find(Projeto.class, id);
+        } finally {
+            em.close();
+        }
+    }
 
     /**
      * Filtra projetos por Status.

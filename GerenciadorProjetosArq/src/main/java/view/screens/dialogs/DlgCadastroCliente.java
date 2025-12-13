@@ -11,6 +11,7 @@ import javax.swing.JOptionPane;
  */
 public class DlgCadastroCliente extends javax.swing.JDialog {
     private final ClienteController controller;
+    
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(DlgCadastroCliente.class.getName());
 
     /**

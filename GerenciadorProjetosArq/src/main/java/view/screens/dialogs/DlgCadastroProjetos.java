@@ -5,12 +5,15 @@
 package view.screens.dialogs;
 import controller.ProjetoController;
 import model.entities.Cliente;
+import model.entities.Projeto; 
+import java.time.format.DateTimeFormatter; 
 /**
  *
  * @author Viktin
  */
 public class DlgCadastroProjetos extends javax.swing.JDialog {
     private final ProjetoController controller;
+    private Projeto projetoEmEdicao = null;
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(DlgCadastroProjetos.class.getName());
     
     /**
@@ -22,6 +25,55 @@ public class DlgCadastroProjetos extends javax.swing.JDialog {
         this.controller = new ProjetoController(this);
         this.setLocationRelativeTo(null);
         
+    }
+    public void setProjetoParaEdicao(Projeto p) {
+        this.projetoEmEdicao = p; // Guarda o projeto na variável global
+        
+        if (p != null) {
+            this.setTitle("Editar Projeto: " + p.getNome()); 
+            
+            // 1. Textos Simples
+            edtNomeProjeto.setText(p.getNome());
+            edtDescricao.setText(p.getDescricao());
+            
+            // 2. Orçamento (Formatado)
+            if (p.getOrcamento() != null) {
+                // Formata para String (substitui ponto por vírgula se necessário pelo seu Locale)
+                edtOrcamento.setText(String.format("%.2f", p.getOrcamento()).replace('.', ','));
+            }
+
+            // 3. Status (Seleciona no ComboBox)
+            if (p.getStatus() != null) {
+                cbStatus.setSelectedItem(p.getStatus());
+            }
+
+            // 4. Datas (LocalDate -> String)
+            DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+            
+            if (p.getDataInicio() != null) {
+                edtDataInicio.setText(p.getDataInicio().format(dtf));
+            }
+            if (p.getDataPrevisao() != null) { 
+                // Nota: Verifique se no seu model é getPrevisaoTermino() ou getDataPrevisao()
+                edtPrevisao.setText(p.getDataPrevisao().format(dtf));
+            }
+
+            // 5. Cliente (Percorre a lista para selecionar o correto)
+            if (p.getCliente() != null) {
+                for (int i = 0; i < cbCliente.getItemCount(); i++) {
+                    Cliente c = cbCliente.getItemAt(i);
+                    // Compara os IDs para ter certeza
+                    if (c.getId().equals(p.getCliente().getId())) {
+                        cbCliente.setSelectedIndex(i);
+                        break;
+                    }
+                }
+            }
+        }
+    }
+    
+    public Projeto getProjetoEmEdicao() {
+        return this.projetoEmEdicao;
     }
 
     /**
