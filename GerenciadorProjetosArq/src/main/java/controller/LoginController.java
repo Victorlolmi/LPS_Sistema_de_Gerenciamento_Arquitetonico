@@ -10,12 +10,13 @@ import org.mindrot.jbcrypt.BCrypt;
 import view.screens.FrLogin;
 import view.screens.FrCadastro;
 import view.screens.FrRecuperacaoSenha;
+import view.screens.FrHome;
 /**
  *
  * @author Viktin
  */
 public class LoginController {
-     private final FrLogin view;
+    private final FrLogin view;
     private final UsuarioDAO usuarioDAO;
 
     public LoginController(FrLogin view) {
@@ -49,13 +50,12 @@ public class LoginController {
             if (BCrypt.checkpw(senhaDigitada, usuarioDoBanco.getSenha())) {
                 // Sucesso!
                 
-                //FrMain telaCadastro = new FrMain();
+                FrHome telaPrincipal = new FrHome();
         
-                // Torna a nova tela visível
-                //telaCadastro.setVisible(true);
+                telaPrincipal.setVisible(true);
         
                 // Fecha e libera os recursos da tela de login atual
-                //view.dispose();
+                view.dispose();
             } else {
                 // Senha incorreta
                 view.exibeMensagem("Falha no login: Senha incorreta.");

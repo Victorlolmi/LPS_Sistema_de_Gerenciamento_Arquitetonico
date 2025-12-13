@@ -10,6 +10,7 @@ import javax.swing.SwingUtilities;
 import view.screens.FrLogin;
 import com.formdev.flatlaf.FlatLightLaf; // Para o tema claro
 import com.formdev.flatlaf.FlatDarkLaf;
+import view.screens.FrHome;
 /**
  *
  * @author Viktin
@@ -21,7 +22,7 @@ public class GerenciadorProjetosArq {
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
-                FrLogin telaLogin = new FrLogin();
+                FrHome telaLogin = new FrHome();
                 telaLogin.setVisible(true);
             }
         });

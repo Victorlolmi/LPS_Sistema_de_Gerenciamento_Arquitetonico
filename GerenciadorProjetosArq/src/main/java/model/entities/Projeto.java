@@ -44,7 +44,7 @@ public class Projeto {
     private Double orcamento;
     
     // Relacionamento com Cliente (Muitos projetos para um cliente)
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.EAGER)// no nosso sistema nao tem problema
     @JoinColumn(name = "cliente_id", nullable = false)
     private Cliente cliente;
 
@@ -58,27 +58,67 @@ public class Projeto {
     }
     
     
-    public String getDescricao() { return descricao; }
-    public void setDescricao(String descricao) { this.descricao = descricao; }
-
-    public LocalDate getDataInicio() { return dataInicio; }
-    public void setDataInicio(LocalDate dataInicio) { this.dataInicio = dataInicio; }
-
-    public LocalDate getDataPrevisao() { return dataPrevisao; }
-    public void setDataPrevisao(LocalDate dataPrevisao) { this.dataPrevisao = dataPrevisao; }
-
-    public Double getOrcamento() { return orcamento; }
-    public void setOrcamento(Double orcamento) { this.orcamento = orcamento; }
+    public String getDescricao() { 
+        return descricao; 
+    }
     
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
+    public void setDescricao(String descricao) {
+        this.descricao = descricao; 
+    }
 
-    public String getNome() { return nome; }
-    public void setNome(String nome) { this.nome = nome; }
+    public LocalDate getDataInicio() {
+        return dataInicio; 
+    }
+    
+    public void setDataInicio(LocalDate dataInicio) {
+        this.dataInicio = dataInicio; 
+    }
 
-    public String getStatus() { return status; }
-    public void setStatus(String status) { this.status = status; }
+    public LocalDate getDataPrevisao() {
+        return dataPrevisao; 
+    }
+    
+    public void setDataPrevisao(LocalDate dataPrevisao) {
+        this.dataPrevisao = dataPrevisao; 
+    }
 
-    public Cliente getCliente() { return cliente; }
-    public void setCliente(Cliente cliente) { this.cliente = cliente; }
+    public Double getOrcamento() {
+        return orcamento; 
+    }
+    
+    public void setOrcamento(Double orcamento) { 
+        this.orcamento = orcamento;
+    }
+    
+    public Long getId() { 
+        return id; 
+    }
+    
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getNome() { 
+        return nome; 
+    }
+    
+    public void setNome(String nome) {
+        this.nome = nome;
+    }
+
+    public String getStatus() {
+        return status; 
+    }
+    
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public Cliente getCliente() {
+        return cliente; 
+    }
+    
+    public void setCliente(Cliente cliente) {
+        this.cliente = cliente; 
+    }
 }

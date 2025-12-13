@@ -1,100 +1,121 @@
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
+ */
 package controller;
-
-import controller.tableModel.TMProjeto;
-import model.dao.GenericDAO;
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import model.dao.ProjetoDAO;
+import model.dao.ClienteDAO;
+import model.entities.Cliente;
 import model.entities.Projeto;
-import view.screens.FrProjetos; // Supondo que você criou essa tela
-import java.util.List;
-import javax.persistence.EntityManager;
-import factory.JPAUtil;
-import javax.persistence.TypedQuery;
-import javax.swing.JOptionPane;
-
+import view.screens.dialogs.DlgCadastroProjetos;
 /**
+ *
  * @author Viktin
  */
 public class ProjetoController {
+    private final DlgCadastroProjetos view;
+    private final ProjetoDAO projetoDAO;
 
-    private final FrProjetos view;
-    private final GenericDAO<Projeto> projetoDAO;
-
-    public ProjetoController(FrProjetos view) {
+    public ProjetoController(DlgCadastroProjetos view) {
         this.view = view;
-        this.projetoDAO = new GenericDAO<>(Projeto.class);
-        initController();
+        this.projetoDAO = new ProjetoDAO();
+        ClienteDAO clienteDAO = new ClienteDAO();
+        java.util.List<Cliente> lista = clienteDAO.listarTodos(); // Supondo que exista o findAll
+        view.atualizarComboClientes(lista);
     }
+    
+    public void salvarProjeto() {
+        // 1. Obter dados da View (Assumindo que sua View tenha esses getters)
+        String nome = view.getNome();
+        String desc = view.getDescricao();
+        String strOrcamento = view.getOrcamento(); // Vem como String, ex: "1500,00"
+        String strDataInicio = view.getDataInicio();
+        String strDataPrev = view.getDataPrevisao();
+        Cliente clienteSelecionado = view.getClienteSelecionado(); // Pega do ComboBox
+        // Supondo que o status venha de um ComboBox ou seja fixo no início
+        String status = view.getStatus(); 
 
-    private void initController() {
-        // Ao iniciar, já carrega a tabela
-        atualizarTabela();
-    }
-
-    public void atualizarTabela() {
-        // Como o GenericDAO padrão não tem um "findAll", 
-        // geralmente fazemos uma busca manual ou adicionamos no DAO.
-        // Aqui vou fazer manual para exemplo:
-        EntityManager em = JPAUtil.getEntityManager();
-        try {
-            String jpql = "SELECT p FROM Projeto p";
-            TypedQuery<Projeto> query = em.createQuery(jpql, Projeto.class);
-            List<Projeto> lista = query.getResultList();
-            
-            // Cria o Table Model com a lista do banco
-            TMProjeto tableModel = new TMProjeto(lista);
-            
-            // Define o modelo na JTable da sua View
-            //view.getTbProjetos().setModel(tableModel);
-            
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            em.close();
+        // 2. Validar dados de entrada (Campos Obrigatórios)
+        if (nome.isEmpty()) {
+            view.exibeMensagem("Erro: O nome do projeto é obrigatório.");
+            return;
         }
-    }
-    public void excluirProjetoSelecionado() {
-    // 1. Verifica se tem linha selecionada
-        int linha = view.getTbProjetos().getSelectedRow();
-        if (linha == -1) {
-            JOptionPane.showMessageDialog(view, "Selecione um projeto para excluir!");
+        
+        if (clienteSelecionado == null) {
+            view.exibeMensagem("Erro: Selecione um cliente para o projeto.");
             return;
         }
 
-        // 2. Pega o objeto
-        TMProjeto model = (TMProjeto) view.getTbProjetos().getModel();
-        Projeto projeto = model.getObjeto(linha);
+        // 3. Instanciar e preencher o Objeto Projeto
+        Projeto projeto = new Projeto();
+        projeto.setNome(nome);
+        projeto.setDescricao(desc);
+        projeto.setStatus(status);
+        projeto.setCliente(clienteSelecionado);
 
-        // 3. PERGUNTA DE CONFIRMAÇÃO (Muito Importante)
-        int resposta = JOptionPane.showConfirmDialog(view, 
-                "Tem certeza que deseja excluir o projeto '" + projeto.getNome() + "'?\nIsso não pode ser desfeito.", 
-                "Confirmar Exclusão", 
-                JOptionPane.YES_NO_OPTION, 
-                JOptionPane.WARNING_MESSAGE);
-
-        if (resposta == JOptionPane.YES_OPTION) {
-            try {
-                // 4. Chama o DAO para remover do banco
-                // Como seu GenericDAO não tem delete explícito no exemplo, 
-                // você precisaria adicionar um método delete no GenericDAO ou fazer manual:
-                EntityManager em = JPAUtil.getEntityManager();
-                em.getTransaction().begin();
-                // O merge é necessário se o objeto não estiver "atachado" na sessão atual
-                projeto = em.merge(projeto); 
-                em.remove(projeto);
-                em.getTransaction().commit();
-                em.close();
-
-                // 5. Atualiza a tabela na tela
-                atualizarTabela();
-                JOptionPane.showMessageDialog(view, "Projeto excluído com sucesso!");
-
-            } catch (Exception e) {
-                JOptionPane.showMessageDialog(view, "Erro ao excluir: " + e.getMessage());
+        // 4. Conversão e Tratamento de Tipos (Números e Datas)
+        try {
+            // -- Conversão do Orçamento (Double) --
+            if (!strOrcamento.isEmpty()) {
+                projeto.setOrcamento(Double.parseDouble(strOrcamento));
             }
+
+            // -- Lógica Completa de Datas --
+            java.time.LocalDate dataIni = null;
+            java.time.LocalDate dataPrev = null;
+            java.time.format.DateTimeFormatter formatter = java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy");
+            
+            // 1. Tenta converter Data de Início
+            if (!strDataInicio.isEmpty()) {
+                dataIni = java.time.LocalDate.parse(strDataInicio, formatter);
+            }
+            
+            // 2. Tenta converter Data de Previsão
+            if (!strDataPrev.isEmpty()) {
+                dataPrev = java.time.LocalDate.parse(strDataPrev, formatter);
+            }
+
+            // 3. VERIFICAÇÃO LÓGICA: Previsão vs Início
+            // Só faz sentido comparar se as duas datas foram preenchidas
+            if (dataIni != null && dataPrev != null) {
+                if (dataPrev.isBefore(dataIni)) {
+                    view.exibeMensagem("Erro de Lógica: A data de previsão não pode ser anterior à data de início.");
+                    return; // Para o salvamento aqui mesmo!
+                }
+            }
+
+            // Se passou na verificação, joga para o objeto
+            projeto.setDataInicio(dataIni);
+            projeto.setDataPrevisao(dataPrev);
+
+
+            // 5. Salvar no Banco
+            projetoDAO.salvar(projeto);
+            
+            view.exibeMensagem("Projeto salvo com sucesso!");
+            view.dispose();
+
+        } catch (NumberFormatException e) {
+            view.exibeMensagem("Erro: O orçamento deve ser um número válido (Ex: 1500.00)");
+        } catch (java.time.format.DateTimeParseException e) {
+            // Esse erro dispara se o usuário digitar "01/13/2025" (mês 13 não existe) ou texto errado
+            view.exibeMensagem("Erro: Data inválida. Verifique se o dia/mês existem e use o formato dd/MM/yyyy.");
+        } catch (Exception e) {
+            view.exibeMensagem("Erro ao salvar: " + e.getMessage());
+            e.printStackTrace();
         }
+
     }
     
-    // Exemplo para o filtro de busca "Buscar projeto..." da imagem
-    public void buscarPorNome(String nome) {
-        // Lógica similar ao atualizarTabela, mas com WHERE nome LIKE ...
+    /**
+     * Método auxiliar para fechar a tela sem salvar
+     */
+    public void cancelar() {
+        view.dispose();
     }
+    
 }
