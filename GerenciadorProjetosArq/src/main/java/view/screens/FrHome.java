@@ -322,8 +322,6 @@ public class FrHome extends javax.swing.JFrame {
         btnCadastrarprojetos = new javax.swing.JButton();
         jScrollPane2 = new javax.swing.JScrollPane();
         jTProjetos = new javax.swing.JTable();
-        btnProjetos = new javax.swing.JButton();
-        btnClientes = new javax.swing.JButton();
         jPanel4 = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
         jTClientes = new javax.swing.JTable();
@@ -375,25 +373,6 @@ public class FrHome extends javax.swing.JFrame {
         jScrollPane2.setViewportView(jTProjetos);
 
         jPanel3.add(jScrollPane2, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 10, 1140, 410));
-
-        btnProjetos.setText("Projetos");
-        btnProjetos.setContentAreaFilled(false);
-        btnProjetos.setInheritsPopupMenu(true);
-        btnProjetos.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnProjetosActionPerformed(evt);
-            }
-        });
-        jPanel3.add(btnProjetos, new org.netbeans.lib.awtextra.AbsoluteConstraints(80, 430, 218, 50));
-
-        btnClientes.setText("Clientes");
-        btnClientes.setContentAreaFilled(false);
-        btnClientes.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnClientesActionPerformed(evt);
-            }
-        });
-        jPanel3.add(btnClientes, new org.netbeans.lib.awtextra.AbsoluteConstraints(290, 450, 218, 50));
 
         jTabbedPane2.addTab("Projetos", jPanel3);
 
@@ -494,11 +473,6 @@ public class FrHome extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void btnClientesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnClientesActionPerformed
-        jTabbedPane2.setSelectedIndex(1);
-        carregarTabelaClientes();
-    }//GEN-LAST:event_btnClientesActionPerformed
-
     private void btnCadastrarprojetosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCadastrarprojetosActionPerformed
         DlgCadastroProjetos dlg = new DlgCadastroProjetos(this, true);
     
@@ -509,11 +483,6 @@ public class FrHome extends javax.swing.JFrame {
         dlg.setVisible(true);
         carregarTabelaProjetos();
     }//GEN-LAST:event_btnCadastrarprojetosActionPerformed
-
-    private void btnProjetosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnProjetosActionPerformed
-        jTabbedPane2.setSelectedIndex(0);
-        carregarTabelaProjetos();
-    }//GEN-LAST:event_btnProjetosActionPerformed
 
     private void btnCadastrarClienteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCadastrarClienteActionPerformed
         DlgCadastroCliente dlg = new DlgCadastroCliente(this, true);
@@ -587,8 +556,6 @@ public class FrHome extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnCadastrarCliente;
     private javax.swing.JButton btnCadastrarprojetos;
-    private javax.swing.JButton btnClientes;
-    private javax.swing.JButton btnProjetos;
     private javax.swing.border.EtchedBorder etchedBorder1;
     private javax.swing.border.EtchedBorder etchedBorder2;
     private javax.swing.border.EtchedBorder etchedBorder3;

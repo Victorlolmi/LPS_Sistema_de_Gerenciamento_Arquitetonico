@@ -25,6 +25,10 @@ import java.awt.Desktop;
 import java.io.File;
 import java.util.List;
 import model.entities.Documento;
+import controller.DespesaController;
+import controller.tableModel.DespesaTableModel;
+import model.entities.Despesa;
+
 
 /**
  *
@@ -38,6 +42,9 @@ public class DlgVisualizarProjeto extends javax.swing.JDialog {
     
     private final DocumentoController docController;
     private final DocumentoTableModel docModel;
+    
+    private final DespesaController despesaController;
+    private final DespesaTableModel despesaModel;
     /**
      * Creates new form DlgVisualizarProjeto
      */
@@ -50,9 +57,12 @@ public class DlgVisualizarProjeto extends javax.swing.JDialog {
         this.controller = new ProjetoController();
         this.docController = new DocumentoController();
         this.docModel = new DocumentoTableModel();
+        this.despesaController = new DespesaController();
+        this.despesaModel = new DespesaTableModel();
         
         // Vincula o Model à Tabela visual
         jTDocs.setModel(docModel);
+        jTable1.setModel(despesaModel);
     }
     private void estilizarAbasModernas() {
         // 1. Cores e Fontes Globais do Painel
@@ -68,7 +78,7 @@ public class DlgVisualizarProjeto extends javax.swing.JDialog {
             @Override
             protected void installDefaults() {
                 super.installDefaults();
-                tabInsets = new java.awt.Insets(10, 40, 10, 40); // Mais gordinha e espaçada
+                tabInsets = new java.awt.Insets(10, 30, 10, 30); // Mais gordinha e espaçada
                 selectedTabPadInsets = new java.awt.Insets(0, 0, 0, 0);
                 contentBorderInsets = new java.awt.Insets(0, 0, 0, 0); // Remove borda do conteúdo
             }
@@ -138,16 +148,85 @@ public class DlgVisualizarProjeto extends javax.swing.JDialog {
             
             // CHAMA O MÉTODO QUE PREENCHE OS CAMPOS
             atualizarDadosTerreno(p.getTerreno());
+            controlarVisibilidadeCamposTerreno(true);
             
         } else {
             btnAdicionarTerreno.setText("Adicionar Terreno");
             btnExcluirTerreno.setVisible(false);
             
-            // LIMPA OS CAMPOS SE NÃO TIVER TERRENO
-            limparDadosTerreno();
+            controlarVisibilidadeCamposTerreno(false);
+            
+            // 2. DEFINE A MENSAGEM DE STATUS
+            lblNomeTerreno.setText("Nenhum terreno vinculado");
         }
         
         atualizarTabelaDocumentos();
+        atualizarAbaFinanceiro();
+    }
+   
+   private void atualizarAbaFinanceiro() {
+        if (this.projetoAtual == null || this.projetoAtual.getId() == null) return;
+
+        // 1. Carrega a Tabela
+        List<Despesa> despesas = despesaController.listarDespesasDoProjeto(this.projetoAtual.getId());
+        despesaModel.setDados(despesas);
+
+        // 2. Busca Totais
+        Double orcamento = (this.projetoAtual.getOrcamento() != null) ? this.projetoAtual.getOrcamento() : 0.0;
+        Double totalGasto = despesaController.buscarTotalGasto(this.projetoAtual.getId());
+        Double saldo = orcamento - totalGasto;
+
+        // 3. Formata Moeda
+        NumberFormat nf = NumberFormat.getCurrencyInstance(new Locale("pt", "BR"));
+        
+        lblResumoOrcamento.setText(nf.format(orcamento));
+        lblResumoGasto.setText(nf.format(totalGasto));
+        lblResumoSaldo.setText(nf.format(saldo));
+
+        // 4. Cor do Saldo
+        if (saldo < 0) {
+            lblResumoSaldo.setForeground(Color.RED);
+        } else {
+            lblResumoSaldo.setForeground(new Color(0, 153, 51)); // Verde
+        }
+
+        // 5. Barra de Progresso
+        if (orcamento > 0) {
+            int percentual = (int) ((totalGasto / orcamento) * 100);
+            barProgressoFinanceiro.setValue(percentual);
+            barProgressoFinanceiro.setString(percentual + "% Usado");
+            
+            // Se passar de 100%, pinta a barra de vermelho
+            if (percentual > 100) {
+                barProgressoFinanceiro.setForeground(Color.RED);
+            } else {
+                barProgressoFinanceiro.setForeground(new Color(64, 86, 213)); // Azul padrão
+            }
+        } else {
+            barProgressoFinanceiro.setValue(0);
+            barProgressoFinanceiro.setString("Sem Orçamento");
+        }
+    }
+   
+   private void controlarVisibilidadeCamposTerreno(boolean visivel) {
+        // Rótulos Fixos (Labels como "Topografia:", "C.A.:", etc)
+        ref.setVisible(visivel);
+        lblTopgrafia.setVisible(visivel);
+        lblTipoSolo.setVisible(visivel);
+        lblCA.setVisible(visivel);
+        lblAreaTotal.setVisible(visivel);
+        lblValor.setVisible(visivel);
+        lbldescricao.setVisible(visivel);
+        
+        // Campos de Valor (Onde aparecem os dados)
+        lblReferenciaTerreno.setVisible(visivel);
+        lblCidadeBairroRuaNumero.setVisible(visivel);
+        lblTopografiaTerreno.setVisible(visivel);
+        lblTipoSoloTerreno.setVisible(visivel);
+        lblCATerreno.setVisible(visivel);
+        lblAreaTotalTerreno.setVisible(visivel);
+        lblValorTerreno.setVisible(visivel);
+        jScrollPane2.setVisible(visivel); // Área da descrição
     }
    
    private void atualizarTabelaDocumentos() {
@@ -263,6 +342,18 @@ public class DlgVisualizarProjeto extends javax.swing.JDialog {
         lbldescricao = new javax.swing.JLabel();
         jScrollPane2 = new javax.swing.JScrollPane();
         jTDescricaoTerreno = new javax.swing.JTextArea();
+        jPanel6 = new javax.swing.JPanel();
+        lblResumoSaldo = new javax.swing.JLabel();
+        jLabel5 = new javax.swing.JLabel();
+        jLabel11 = new javax.swing.JLabel();
+        lblResumoOrcamento = new javax.swing.JLabel();
+        jLabel12 = new javax.swing.JLabel();
+        lblResumoGasto = new javax.swing.JLabel();
+        barProgressoFinanceiro = new javax.swing.JProgressBar();
+        JTDespesa = new javax.swing.JScrollPane();
+        jTable1 = new javax.swing.JTable();
+        btnExcluirDespesa = new javax.swing.JToggleButton();
+        btnLancarDespesa = new javax.swing.JToggleButton();
         jPanel2 = new javax.swing.JPanel();
         jScrollPane3 = new javax.swing.JScrollPane();
         jTDocs = new javax.swing.JTable();
@@ -270,6 +361,7 @@ public class DlgVisualizarProjeto extends javax.swing.JDialog {
         btnAdicionarDoc = new javax.swing.JButton();
         btnAbrirDoc = new javax.swing.JButton();
         jPanel4 = new javax.swing.JPanel();
+        jPanel7 = new javax.swing.JPanel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
@@ -328,7 +420,7 @@ public class DlgVisualizarProjeto extends javax.swing.JDialog {
         jTDescricao.setRows(5);
         jScrollPane1.setViewportView(jTDescricao);
 
-        jPanel3.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(80, 120, 900, 190));
+        jPanel3.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 140, 420, 190));
 
         bntEditar.setText("Editar");
         bntEditar.addActionListener(new java.awt.event.ActionListener() {
@@ -336,7 +428,7 @@ public class DlgVisualizarProjeto extends javax.swing.JDialog {
                 bntEditarActionPerformed(evt);
             }
         });
-        jPanel3.add(bntEditar, new org.netbeans.lib.awtextra.AbsoluteConstraints(720, 30, 110, -1));
+        jPanel3.add(bntEditar, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 350, 110, -1));
 
         btnExcluirProjeto.setText("Excluir Projeto");
         btnExcluirProjeto.addActionListener(new java.awt.event.ActionListener() {
@@ -344,7 +436,7 @@ public class DlgVisualizarProjeto extends javax.swing.JDialog {
                 btnExcluirProjetoActionPerformed(evt);
             }
         });
-        jPanel3.add(btnExcluirProjeto, new org.netbeans.lib.awtextra.AbsoluteConstraints(850, 30, 130, -1));
+        jPanel3.add(btnExcluirProjeto, new org.netbeans.lib.awtextra.AbsoluteConstraints(170, 350, 130, -1));
 
         jTabbedPane2.addTab("Visão Geral", jPanel3);
 
@@ -357,7 +449,7 @@ public class DlgVisualizarProjeto extends javax.swing.JDialog {
                 btnAdicionarTerrenoActionPerformed(evt);
             }
         });
-        jPanel5.add(btnAdicionarTerreno, new org.netbeans.lib.awtextra.AbsoluteConstraints(840, 20, -1, -1));
+        jPanel5.add(btnAdicionarTerreno, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 360, -1, -1));
 
         btnExcluirTerreno.setText("Excluir Terreno");
         btnExcluirTerreno.setToolTipText("");
@@ -366,7 +458,7 @@ public class DlgVisualizarProjeto extends javax.swing.JDialog {
                 btnExcluirTerrenoActionPerformed(evt);
             }
         });
-        jPanel5.add(btnExcluirTerreno, new org.netbeans.lib.awtextra.AbsoluteConstraints(680, 20, 130, -1));
+        jPanel5.add(btnExcluirTerreno, new org.netbeans.lib.awtextra.AbsoluteConstraints(170, 360, 130, -1));
 
         lblNomeTerreno.setText("Terreno Casas Nobres");
         jPanel5.add(lblNomeTerreno, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 20, -1, -1));
@@ -417,9 +509,65 @@ public class DlgVisualizarProjeto extends javax.swing.JDialog {
         jTDescricaoTerreno.setRows(5);
         jScrollPane2.setViewportView(jTDescricaoTerreno);
 
-        jPanel5.add(jScrollPane2, new org.netbeans.lib.awtextra.AbsoluteConstraints(80, 200, 380, 110));
+        jPanel5.add(jScrollPane2, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 220, 380, 110));
 
         jTabbedPane2.addTab("Terreno", jPanel5);
+
+        jPanel6.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+
+        lblResumoSaldo.setText("$R$ 0,00");
+        jPanel6.add(lblResumoSaldo, new org.netbeans.lib.awtextra.AbsoluteConstraints(110, 120, 150, -1));
+
+        jLabel5.setText("Orçamento Total:");
+        jPanel6.add(jLabel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 60, -1, -1));
+
+        jLabel11.setText("Saldo DIsponivel:");
+        jPanel6.add(jLabel11, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 120, -1, -1));
+
+        lblResumoOrcamento.setText("$R$ 0,00");
+        jPanel6.add(lblResumoOrcamento, new org.netbeans.lib.awtextra.AbsoluteConstraints(110, 60, 100, -1));
+
+        jLabel12.setText("Total Gasto:");
+        jPanel6.add(jLabel12, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 90, -1, -1));
+
+        lblResumoGasto.setText("$R$ 0,00");
+        jPanel6.add(lblResumoGasto, new org.netbeans.lib.awtextra.AbsoluteConstraints(80, 90, 150, -1));
+
+        barProgressoFinanceiro.setStringPainted(true);
+        jPanel6.add(barProgressoFinanceiro, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 240, 230, -1));
+
+        jTable1.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null}
+            },
+            new String [] {
+                "Title 1", "Title 2", "Title 3", "Title 4"
+            }
+        ));
+        JTDespesa.setViewportView(jTable1);
+
+        jPanel6.add(JTDespesa, new org.netbeans.lib.awtextra.AbsoluteConstraints(280, 70, 590, 310));
+
+        btnExcluirDespesa.setText("Excluir Despesa");
+        btnExcluirDespesa.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnExcluirDespesaActionPerformed(evt);
+            }
+        });
+        jPanel6.add(btnExcluirDespesa, new org.netbeans.lib.awtextra.AbsoluteConstraints(740, 30, -1, -1));
+
+        btnLancarDespesa.setText("Lançar Despesa");
+        btnLancarDespesa.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnLancarDespesaActionPerformed(evt);
+            }
+        });
+        jPanel6.add(btnLancarDespesa, new org.netbeans.lib.awtextra.AbsoluteConstraints(590, 30, -1, -1));
+
+        jTabbedPane2.addTab("Controle de Gastos", jPanel6);
 
         jPanel2.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
@@ -436,7 +584,7 @@ public class DlgVisualizarProjeto extends javax.swing.JDialog {
         ));
         jScrollPane3.setViewportView(jTDocs);
 
-        jPanel2.add(jScrollPane3, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 10, 536, 316));
+        jPanel2.add(jScrollPane3, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 10, 510, 316));
 
         btnExcluirDoc.setText("Excluir");
         btnExcluirDoc.addActionListener(new java.awt.event.ActionListener() {
@@ -444,7 +592,7 @@ public class DlgVisualizarProjeto extends javax.swing.JDialog {
                 btnExcluirDocActionPerformed(evt);
             }
         });
-        jPanel2.add(btnExcluirDoc, new org.netbeans.lib.awtextra.AbsoluteConstraints(600, 80, 120, -1));
+        jPanel2.add(btnExcluirDoc, new org.netbeans.lib.awtextra.AbsoluteConstraints(360, 340, 120, -1));
 
         btnAdicionarDoc.setText("Novo Documento");
         btnAdicionarDoc.addActionListener(new java.awt.event.ActionListener() {
@@ -452,7 +600,7 @@ public class DlgVisualizarProjeto extends javax.swing.JDialog {
                 btnAdicionarDocActionPerformed(evt);
             }
         });
-        jPanel2.add(btnAdicionarDoc, new org.netbeans.lib.awtextra.AbsoluteConstraints(600, 20, -1, -1));
+        jPanel2.add(btnAdicionarDoc, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 340, -1, -1));
 
         btnAbrirDoc.setText("Abrir");
         btnAbrirDoc.addActionListener(new java.awt.event.ActionListener() {
@@ -460,7 +608,7 @@ public class DlgVisualizarProjeto extends javax.swing.JDialog {
                 btnAbrirDocActionPerformed(evt);
             }
         });
-        jPanel2.add(btnAbrirDoc, new org.netbeans.lib.awtextra.AbsoluteConstraints(600, 50, 120, -1));
+        jPanel2.add(btnAbrirDoc, new org.netbeans.lib.awtextra.AbsoluteConstraints(210, 340, 120, -1));
 
         jTabbedPane2.addTab("Documentos", jPanel2);
 
@@ -468,19 +616,32 @@ public class DlgVisualizarProjeto extends javax.swing.JDialog {
         jPanel4.setLayout(jPanel4Layout);
         jPanel4Layout.setHorizontalGroup(
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 1000, Short.MAX_VALUE)
+            .addGap(0, 900, Short.MAX_VALUE)
         );
         jPanel4Layout.setVerticalGroup(
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 335, Short.MAX_VALUE)
+            .addGap(0, 415, Short.MAX_VALUE)
         );
 
         jTabbedPane2.addTab("Visualizador 3D", jPanel4);
 
-        jPanel1.add(jTabbedPane2, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 140, 1000, 370));
+        javax.swing.GroupLayout jPanel7Layout = new javax.swing.GroupLayout(jPanel7);
+        jPanel7.setLayout(jPanel7Layout);
+        jPanel7Layout.setHorizontalGroup(
+            jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 900, Short.MAX_VALUE)
+        );
+        jPanel7Layout.setVerticalGroup(
+            jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 415, Short.MAX_VALUE)
+        );
+
+        jTabbedPane2.addTab("Feedback", jPanel7);
+
+        jPanel1.add(jTabbedPane2, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 140, 900, 450));
         jTabbedPane2.getAccessibleContext().setAccessibleName("Visão Geral");
 
-        getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 1060, 530));
+        getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 930, 610));
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -639,6 +800,37 @@ public class DlgVisualizarProjeto extends javax.swing.JDialog {
         atualizarTabelaDocumentos();
     }//GEN-LAST:event_btnAdicionarDocActionPerformed
 
+    private void btnExcluirDespesaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnExcluirDespesaActionPerformed
+        int linha = jTable1.getSelectedRow();
+        if (linha == -1) {
+            JOptionPane.showMessageDialog(this, "Selecione uma despesa para excluir.");
+            return;
+        }
+        
+        Despesa d = despesaModel.getDespesa(linha);
+        
+        int confirm = JOptionPane.showConfirmDialog(this, 
+                "Deseja excluir a despesa: " + d.getDescricao() + "?", 
+                "Excluir Gasto", JOptionPane.YES_NO_OPTION);
+        
+        if (confirm == JOptionPane.YES_OPTION) {
+            boolean sucesso = despesaController.excluirDespesa(d.getId());
+            if (sucesso) {
+                atualizarAbaFinanceiro(); // Recalcula tudo
+                JOptionPane.showMessageDialog(this, "Despesa excluída.");
+            }
+        }
+    }//GEN-LAST:event_btnExcluirDespesaActionPerformed
+
+    private void btnLancarDespesaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLancarDespesaActionPerformed
+        DlgCadastroDespesa dlg = new DlgCadastroDespesa(null, true);
+        dlg.setProjetoVinculado(this.projetoAtual);
+        dlg.setVisible(true);
+        
+        // Ao voltar, atualiza o dashboard financeiro
+        atualizarAbaFinanceiro();
+    }//GEN-LAST:event_btnLancarDespesaActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -677,17 +869,24 @@ public class DlgVisualizarProjeto extends javax.swing.JDialog {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JScrollPane JTDespesa;
+    private javax.swing.JProgressBar barProgressoFinanceiro;
     private javax.swing.JButton bntEditar;
     private javax.swing.JButton btnAbrirDoc;
     private javax.swing.JButton btnAdicionarDoc;
     private javax.swing.JButton btnAdicionarTerreno;
+    private javax.swing.JToggleButton btnExcluirDespesa;
     private javax.swing.JButton btnExcluirDoc;
     private javax.swing.JButton btnExcluirProjeto;
     private javax.swing.JButton btnExcluirTerreno;
+    private javax.swing.JToggleButton btnLancarDespesa;
     private javax.swing.JFileChooser jFileChooser1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
+    private javax.swing.JLabel jLabel11;
+    private javax.swing.JLabel jLabel12;
     private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
@@ -697,6 +896,8 @@ public class DlgVisualizarProjeto extends javax.swing.JDialog {
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel5;
+    private javax.swing.JPanel jPanel6;
+    private javax.swing.JPanel jPanel7;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
@@ -705,6 +906,7 @@ public class DlgVisualizarProjeto extends javax.swing.JDialog {
     private javax.swing.JTable jTDocs;
     private javax.swing.JTabbedPane jTabbedPane1;
     private javax.swing.JTabbedPane jTabbedPane2;
+    private javax.swing.JTable jTable1;
     private javax.swing.JLabel lblAreaTotal;
     private javax.swing.JLabel lblAreaTotalTerreno;
     private javax.swing.JLabel lblCA;
@@ -717,6 +919,9 @@ public class DlgVisualizarProjeto extends javax.swing.JDialog {
     private javax.swing.JLabel lblOrcamento;
     private javax.swing.JLabel lblPrevisao;
     private javax.swing.JLabel lblReferenciaTerreno;
+    private javax.swing.JLabel lblResumoGasto;
+    private javax.swing.JLabel lblResumoOrcamento;
+    private javax.swing.JLabel lblResumoSaldo;
     private javax.swing.JLabel lblStatus;
     private javax.swing.JLabel lblTipoSolo;
     private javax.swing.JLabel lblTipoSoloTerreno;

@@ -118,16 +118,38 @@ public class DlgCadastroDocumento extends javax.swing.JDialog {
     }//GEN-LAST:event_edtNomeDocumentoActionPerformed
 
     private void btnSelecionarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSelecionarActionPerformed
-        JFileChooser fileChooser = new JFileChooser();
-        fileChooser.setDialogTitle("Selecione o documento do projeto");
+       // --- 1. FORÇA O VISUAL DO WINDOWS AGORA ---
+        try {
+            // Isso garante que o FileChooser tenha a cara do Windows 10/11
+            javax.swing.UIManager.setLookAndFeel(javax.swing.UIManager.getSystemLookAndFeelClassName());
+            
+            // Atualiza os componentes internos para pegarem o novo visual
+            javax.swing.SwingUtilities.updateComponentTreeUI(this);
+        } catch (Exception e) {
+            e.printStackTrace(); // Se der erro, apenas ignora e usa o padrão
+        }
+        // ------------------------------------------
+
+        // 2. Instancia o seletor (agora com o visual novo)
+        javax.swing.JFileChooser fileChooser = new javax.swing.JFileChooser();
+        fileChooser.setDialogTitle("Selecione o documento");
         
-        // Abre a janela de seleção
-        int resultado = fileChooser.showOpenDialog(this);
+        // 3. Filtros
+        javax.swing.filechooser.FileNameExtensionFilter filtro = 
+            new javax.swing.filechooser.FileNameExtensionFilter(
+                "Arquivos de Projeto (PDF, Imagens, DWG)", "pdf", "jpg", "jpeg", "png", "dwg");
+        fileChooser.setFileFilter(filtro);
         
-        if (resultado == JFileChooser.APPROVE_OPTION) {
+        // 4. Abre a janela
+        int retorno = fileChooser.showOpenDialog(this);
+        
+        if (retorno == javax.swing.JFileChooser.APPROVE_OPTION) {
             this.arquivoSelecionado = fileChooser.getSelectedFile();
-            // Mostra o caminho no campo de texto para o usuário ver
             edtCaminhoArquivo.setText(this.arquivoSelecionado.getAbsolutePath());
+            
+            if (edtNomeDocumento.getText().isEmpty()) {
+                edtNomeDocumento.setText(this.arquivoSelecionado.getName());
+            }
         }
     }//GEN-LAST:event_btnSelecionarActionPerformed
 
