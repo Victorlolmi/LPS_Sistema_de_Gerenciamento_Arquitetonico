@@ -5,6 +5,7 @@
 package model.entities;
 
 import java.time.LocalDate;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -13,6 +14,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 /**
@@ -22,6 +24,8 @@ import javax.persistence.Table;
 @Entity
 @Table(name = "projetos")
 public class Projeto {
+
+   
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -43,8 +47,12 @@ public class Projeto {
 
     private Double orcamento;
     
-    // Relacionamento com Cliente (Muitos projetos para um cliente)
-    @ManyToOne(fetch = FetchType.EAGER)// no nosso sistema nao tem problema
+    @OneToOne(cascade = javax.persistence.CascadeType.ALL)
+    @JoinColumn(name = "terreno_id", referencedColumnName = "id", nullable = true)
+    private Terreno terreno;
+    
+    // Relacionamento com Cliente (Correto)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "cliente_id", nullable = false)
     private Cliente cliente;
 
@@ -120,5 +128,19 @@ public class Projeto {
     
     public void setCliente(Cliente cliente) {
         this.cliente = cliente; 
+    }
+    
+     /**
+     * @return the terreno
+     */
+    public Terreno getTerreno() {
+        return terreno;
+    }
+
+    /**
+     * @param terreno the terreno to set
+     */
+    public void setTerreno(Terreno terreno) {
+        this.terreno = terreno;
     }
 }

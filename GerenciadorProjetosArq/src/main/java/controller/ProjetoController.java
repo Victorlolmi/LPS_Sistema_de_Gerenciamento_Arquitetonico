@@ -35,6 +35,16 @@ public class ProjetoController {
         List<Cliente> clientes = clienteDAO.listarTodos();
         view.atualizarComboClientes(clientes);
     }
+    
+    public ProjetoController() {
+        this.view = null; // Não tem tela vinculada
+        this.dao = new ProjetoDAO();
+        this.clienteDAO = new ClienteDAO();
+    }
+    
+    public Projeto buscarPorId(Long id) {
+        return dao.buscarPorId(id);
+    }
 
     public void salvarProjeto() {
         // 1. Validar campos obrigatórios

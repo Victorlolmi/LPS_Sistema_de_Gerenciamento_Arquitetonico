@@ -17,7 +17,7 @@ public class ValidadorEndereco {
         }
 
         // 3. Campos Obrigatórios
-        if (endereco.getLogadouro() == null || endereco.getLogadouro().trim().isEmpty()) {
+        if (endereco.getLogradouro() == null || endereco.getLogradouro().trim().isEmpty()) {
             throw new EnderecoException("O Logradouro (Rua/Av) é obrigatório.");
         }
 

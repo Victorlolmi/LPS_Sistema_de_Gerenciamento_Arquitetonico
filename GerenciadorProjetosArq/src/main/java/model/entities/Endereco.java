@@ -18,7 +18,7 @@ public class Endereco {
     private Long id;
 
     @Column(nullable = false)
-    private String logadouro; 
+    private String logradouro; 
 
     @Column(nullable = false)
     private String bairro;
@@ -42,12 +42,12 @@ public class Endereco {
         this.id = id;
     }
 
-    public String getLogadouro() {
-        return logadouro;
+    public String getLogradouro() {
+        return logradouro;
     }
 
-    public void setLogradouro(String logadouro) {
-        this.logadouro = logadouro;
+    public void setLogradouro(String logradouro) {
+        this.logradouro = logradouro;
     }
 
     public String getBairro() {

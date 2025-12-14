@@ -57,7 +57,7 @@ public class FrHome extends javax.swing.JFrame {
             @Override
             protected void installDefaults() {
                 super.installDefaults();
-                tabInsets = new java.awt.Insets(10, 25, 10, 25); // Mais gordinha e espaçada
+                tabInsets = new java.awt.Insets(10, 40, 10, 40); // Mais gordinha e espaçada
                 selectedTabPadInsets = new java.awt.Insets(0, 0, 0, 0);
                 contentBorderInsets = new java.awt.Insets(0, 0, 0, 0); // Remove borda do conteúdo
             }
@@ -317,14 +317,13 @@ public class FrHome extends javax.swing.JFrame {
         etchedBorder2 = (javax.swing.border.EtchedBorder)javax.swing.BorderFactory.createEtchedBorder();
         etchedBorder3 = (javax.swing.border.EtchedBorder)javax.swing.BorderFactory.createEtchedBorder();
         jPanel1 = new javax.swing.JPanel();
-        jPanel2 = new javax.swing.JPanel();
-        btnClientes = new javax.swing.JButton();
-        btnProjetos = new javax.swing.JButton();
         jTabbedPane2 = new javax.swing.JTabbedPane();
         jPanel3 = new javax.swing.JPanel();
         btnCadastrarprojetos = new javax.swing.JButton();
         jScrollPane2 = new javax.swing.JScrollPane();
         jTProjetos = new javax.swing.JTable();
+        btnProjetos = new javax.swing.JButton();
+        btnClientes = new javax.swing.JButton();
         jPanel4 = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
         jTClientes = new javax.swing.JTable();
@@ -342,30 +341,6 @@ public class FrHome extends javax.swing.JFrame {
         jPanel1.setBackground(new java.awt.Color(255, 255, 255));
         jPanel1.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        jPanel2.setBackground(new java.awt.Color(255, 255, 255));
-        jPanel2.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
-
-        btnClientes.setText("Clientes");
-        btnClientes.setContentAreaFilled(false);
-        btnClientes.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnClientesActionPerformed(evt);
-            }
-        });
-        jPanel2.add(btnClientes, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 140, 218, 50));
-
-        btnProjetos.setText("Projetos");
-        btnProjetos.setContentAreaFilled(false);
-        btnProjetos.setInheritsPopupMenu(true);
-        btnProjetos.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnProjetosActionPerformed(evt);
-            }
-        });
-        jPanel2.add(btnProjetos, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 80, 218, 50));
-
-        jPanel1.add(jPanel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 90, 230, 680));
-
         jTabbedPane2.setBackground(new java.awt.Color(249, 250, 251));
 
         jPanel3.setBackground(new java.awt.Color(249, 250, 251));
@@ -379,7 +354,7 @@ public class FrHome extends javax.swing.JFrame {
                 btnCadastrarprojetosActionPerformed(evt);
             }
         });
-        jPanel3.add(btnCadastrarprojetos, new org.netbeans.lib.awtextra.AbsoluteConstraints(980, 10, 130, 40));
+        jPanel3.add(btnCadastrarprojetos, new org.netbeans.lib.awtextra.AbsoluteConstraints(1200, 20, 130, 40));
 
         jTProjetos.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -399,7 +374,26 @@ public class FrHome extends javax.swing.JFrame {
         });
         jScrollPane2.setViewportView(jTProjetos);
 
-        jPanel3.add(jScrollPane2, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 10, 950, 410));
+        jPanel3.add(jScrollPane2, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 10, 1140, 410));
+
+        btnProjetos.setText("Projetos");
+        btnProjetos.setContentAreaFilled(false);
+        btnProjetos.setInheritsPopupMenu(true);
+        btnProjetos.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnProjetosActionPerformed(evt);
+            }
+        });
+        jPanel3.add(btnProjetos, new org.netbeans.lib.awtextra.AbsoluteConstraints(80, 430, 218, 50));
+
+        btnClientes.setText("Clientes");
+        btnClientes.setContentAreaFilled(false);
+        btnClientes.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnClientesActionPerformed(evt);
+            }
+        });
+        jPanel3.add(btnClientes, new org.netbeans.lib.awtextra.AbsoluteConstraints(290, 450, 218, 50));
 
         jTabbedPane2.addTab("Projetos", jPanel3);
 
@@ -419,7 +413,7 @@ public class FrHome extends javax.swing.JFrame {
         ));
         jScrollPane1.setViewportView(jTClientes);
 
-        jPanel4.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 10, 950, 410));
+        jPanel4.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 10, 1170, 410));
 
         btnCadastrarCliente.setBackground(new java.awt.Color(64, 86, 213));
         btnCadastrarCliente.setForeground(new java.awt.Color(255, 255, 255));
@@ -429,7 +423,7 @@ public class FrHome extends javax.swing.JFrame {
                 btnCadastrarClienteActionPerformed(evt);
             }
         });
-        jPanel4.add(btnCadastrarCliente, new org.netbeans.lib.awtextra.AbsoluteConstraints(980, 10, 130, 40));
+        jPanel4.add(btnCadastrarCliente, new org.netbeans.lib.awtextra.AbsoluteConstraints(1210, 20, 130, 40));
 
         jTabbedPane2.addTab("Clientes", jPanel4);
 
@@ -437,7 +431,7 @@ public class FrHome extends javax.swing.JFrame {
         jPanel5.setLayout(jPanel5Layout);
         jPanel5Layout.setHorizontalGroup(
             jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 1120, Short.MAX_VALUE)
+            .addGap(0, 1360, Short.MAX_VALUE)
         );
         jPanel5Layout.setVerticalGroup(
             jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -450,7 +444,7 @@ public class FrHome extends javax.swing.JFrame {
         jPanel6.setLayout(jPanel6Layout);
         jPanel6Layout.setHorizontalGroup(
             jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 1120, Short.MAX_VALUE)
+            .addGap(0, 1360, Short.MAX_VALUE)
         );
         jPanel6Layout.setVerticalGroup(
             jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -459,7 +453,7 @@ public class FrHome extends javax.swing.JFrame {
 
         jTabbedPane2.addTab("tab4", jPanel6);
 
-        jPanel1.add(jTabbedPane2, new org.netbeans.lib.awtextra.AbsoluteConstraints(240, 90, 1120, 630));
+        jPanel1.add(jTabbedPane2, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 100, 1360, 630));
         jTabbedPane2.getAccessibleContext().setAccessibleName("Projetos");
 
         jPanel7.setBackground(new java.awt.Color(255, 255, 255));
@@ -489,7 +483,7 @@ public class FrHome extends javax.swing.JFrame {
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 1389, Short.MAX_VALUE)
+                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -603,7 +597,6 @@ public class FrHome extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JPanel jPanel1;
-    private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel5;

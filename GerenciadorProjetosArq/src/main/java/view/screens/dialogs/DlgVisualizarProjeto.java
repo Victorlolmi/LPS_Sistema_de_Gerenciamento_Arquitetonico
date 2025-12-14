@@ -11,6 +11,21 @@ import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 import javax.swing.JOptionPane;
 import model.dao.ProjetoDAO;
+import view.screens.dialogs.DlgCadastroTerreno;
+import model.entities.Terreno;
+import controller.DocumentoController; 
+import controller.tableModel.DocumentoTableModel;
+import model.dao.TerrenoDAO;
+import controller.ProjetoController;
+import java.awt.Color; 
+import java.awt.Graphics;
+import model.entities.Endereco;
+import model.entities.Terreno;
+import java.awt.Desktop; 
+import java.io.File;
+import java.util.List;
+import model.entities.Documento;
+
 /**
  *
  * @author Viktin
@@ -19,6 +34,10 @@ public class DlgVisualizarProjeto extends javax.swing.JDialog {
     
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(DlgVisualizarProjeto.class.getName());
     private Projeto projetoAtual;
+    private final ProjetoController controller;
+    
+    private final DocumentoController docController;
+    private final DocumentoTableModel docModel;
     /**
      * Creates new form DlgVisualizarProjeto
      */
@@ -26,37 +45,173 @@ public class DlgVisualizarProjeto extends javax.swing.JDialog {
         super(parent, modal);
         initComponents();
         setLocationRelativeTo(null);
+        estilizarAbasModernas();
+        
+        this.controller = new ProjetoController();
+        this.docController = new DocumentoController();
+        this.docModel = new DocumentoTableModel();
+        
+        // Vincula o Model à Tabela visual
+        jTDocs.setModel(docModel);
+    }
+    private void estilizarAbasModernas() {
+        // 1. Cores e Fontes Globais do Painel
+        jTabbedPane2.setBackground(Color.WHITE);
+        jTabbedPane2.setForeground(new Color(64, 86, 213)); // Azul do seu tema
+        jTabbedPane2.setFont(new java.awt.Font("Segoe UI", java.awt.Font.BOLD, 14));
+        jTabbedPane2.setOpaque(true);
+        
+        // 2. Customização Profunda (UI Manager)
+        jTabbedPane2.setUI(new javax.swing.plaf.basic.BasicTabbedPaneUI() {
+            
+            // Define o Padding (Espaçamento interno) da aba
+            @Override
+            protected void installDefaults() {
+                super.installDefaults();
+                tabInsets = new java.awt.Insets(10, 40, 10, 40); // Mais gordinha e espaçada
+                selectedTabPadInsets = new java.awt.Insets(0, 0, 0, 0);
+                contentBorderInsets = new java.awt.Insets(0, 0, 0, 0); // Remove borda do conteúdo
+            }
+
+            // Pinta o Fundo da Aba
+            @Override
+            protected void paintTabBackground(Graphics g, int tabPlacement, int tabIndex, 
+                                            int x, int y, int w, int h, boolean isSelected) {
+                if (isSelected) {
+                    g.setColor(new Color(240, 245, 255)); // Azul bem clarinho quando selecionado
+                } else {
+                    g.setColor(Color.WHITE);
+                }
+                g.fillRect(x, y, w, h);
+            }
+
+            // Remove as bordas 3D antigas e faz a linha azul embaixo
+            @Override
+            protected void paintTabBorder(Graphics g, int tabPlacement, int tabIndex, 
+                                        int x, int y, int w, int h, boolean isSelected) {
+                // Desenha apenas uma linha azul embaixo se estiver selecionado
+                if (isSelected) {
+                    g.setColor(new Color(64, 86, 213));
+                    g.fillRect(x, h - 3, w, 3); // Linha grossa azul na base
+                }
+            }
+            
+            @Override
+            protected void paintContentBorder(Graphics g, int tabPlacement, int selectedIndex) {
+               // Não desenha borda ao redor do painel principal (clean)
+            }
+        });
     }
     
-    public void setProjeto(Projeto p) {
+   public void setProjeto(Projeto p) {
         if (p == null) return;
         this.projetoAtual = p;
-        // Formata datas
+        
+        // --- ABA 1: VISÃO GERAL ---
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd/MM/yyyy");
         String inicio = (p.getDataInicio() != null) ? dtf.format(p.getDataInicio()) : "-";
         String fim = (p.getDataPrevisao() != null) ? dtf.format(p.getDataPrevisao()) : "-";
         
-        // Preenche os Labels (Supondo que você criou lblNome, lblCliente, etc.)
         lblNomeProjeto.setText(p.getNome());
         lblNomeCliente.setText((p.getCliente() != null) ? p.getCliente().getNome() : "Sem Cliente");
         lblStatus.setText((p.getStatus() != null) ? p.getStatus() : "-");
         lblDataInicio.setText(inicio);
         lblPrevisao.setText(fim);
+        
         Double valor = p.getOrcamento();
         if (valor != null) {
-            // Cria um formatador para o Brasil (pt-BR)
             NumberFormat nf = NumberFormat.getCurrencyInstance(new Locale("pt", "BR"));
-            lblOrcamento.setText(nf.format(valor)); // Exibe: R$ 30.232,00
+            lblOrcamento.setText(nf.format(valor));
         } else {
             lblOrcamento.setText("R$ 0,00");
         }
-        // Se tiver descrição
+        
         jTDescricao.setEditable(false);
         jTDescricao.setLineWrap(true); 
         jTDescricao.setWrapStyleWord(true);
         jTDescricao.setText(p.getDescricao());
+
+        // --- ABA 2: TERRENO (Atualiza os botões e os dados) ---
+        if (p.getTerreno() != null) {
+            btnAdicionarTerreno.setText("Editar Terreno");
+            btnExcluirTerreno.setVisible(true);
+            
+            // CHAMA O MÉTODO QUE PREENCHE OS CAMPOS
+            atualizarDadosTerreno(p.getTerreno());
+            
+        } else {
+            btnAdicionarTerreno.setText("Adicionar Terreno");
+            btnExcluirTerreno.setVisible(false);
+            
+            // LIMPA OS CAMPOS SE NÃO TIVER TERRENO
+            limparDadosTerreno();
+        }
+        
+        atualizarTabelaDocumentos();
+    }
+   
+   private void atualizarTabelaDocumentos() {
+        if (this.projetoAtual != null && this.projetoAtual.getId() != null) {
+            List<Documento> lista = docController.listarDocumentosDoProjeto(this.projetoAtual.getId());
+            docModel.setDados(lista);
+        } else {
+            docModel.limpar();
+        }
+    }
+    
+    // --- NOVO MÉTODO: Preenche os labels da aba Terreno ---
+    private void atualizarDadosTerreno(Terreno t) {
+        lblNomeTerreno.setText(t.getNome());
+        lblReferenciaTerreno.setText(t.getReferencia() != null ? t.getReferencia() : "-");
+        lblTopografiaTerreno.setText(t.getTopografia());
+        lblTipoSoloTerreno.setText(t.getTipoSolo());
+        
+        // Números
+        lblCATerreno.setText(t.getCoeficienteAproveitamento() != null ? String.valueOf(t.getCoeficienteAproveitamento()) : "-");
+        lblAreaTotalTerreno.setText(t.getAreaTotal() != null ? t.getAreaTotal() + " m²" : "-");
+        
+        // Valor Monetário
+        if (t.getValorCompra() != null) {
+             NumberFormat nf = NumberFormat.getCurrencyInstance(new Locale("pt", "BR"));
+             lblValorTerreno.setText(nf.format(t.getValorCompra()));
+        } else {
+            lblValorTerreno.setText("-");
+        }
+        
+        // Descrição
+        jTDescricaoTerreno.setText(t.getDescricao());
+        jTDescricaoTerreno.setEditable(false);
+        jTDescricaoTerreno.setLineWrap(true);
+        jTDescricaoTerreno.setWrapStyleWord(true);
+        
+        // Montagem do Endereço Completo
+        Endereco e = t.getEndereco();
+        if (e != null) {
+            String enderecoCompleto = String.format("%s, %s, %s, %s", 
+                    e.getCidade(), 
+                    e.getBairro(), 
+                    e.getLogradouro(), 
+                    (e.getNumero() != null && !e.getNumero().isEmpty() ? e.getNumero() : "S/N")
+            );
+            lblCidadeBairroRuaNumero.setText(enderecoCompleto);
+        } else {
+            lblCidadeBairroRuaNumero.setText("Endereço não cadastrado");
+        }
     }
 
+    // --- NOVO MÉTODO: Limpa os labels se o terreno for excluído ---
+    private void limparDadosTerreno() {
+        lblNomeTerreno.setText("Nenhum terreno vinculado");
+        lblReferenciaTerreno.setText("-");
+        lblCidadeBairroRuaNumero.setText("-");
+        lblTopografiaTerreno.setText("-");
+        lblTipoSoloTerreno.setText("-");
+        lblCATerreno.setText("-");
+        lblAreaTotalTerreno.setText("-");
+        lblValorTerreno.setText("-");
+        jTDescricaoTerreno.setText("");
+    }
+    
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -66,6 +221,7 @@ public class DlgVisualizarProjeto extends javax.swing.JDialog {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        jFileChooser1 = new javax.swing.JFileChooser();
         jPanel1 = new javax.swing.JPanel();
         lblNomeCliente = new javax.swing.JLabel();
         lblNomeProjeto = new javax.swing.JLabel();
@@ -87,7 +243,32 @@ public class DlgVisualizarProjeto extends javax.swing.JDialog {
         jTDescricao = new javax.swing.JTextArea();
         bntEditar = new javax.swing.JButton();
         btnExcluirProjeto = new javax.swing.JButton();
+        jPanel5 = new javax.swing.JPanel();
+        btnAdicionarTerreno = new javax.swing.JButton();
+        btnExcluirTerreno = new javax.swing.JButton();
+        lblNomeTerreno = new javax.swing.JLabel();
+        lblReferenciaTerreno = new javax.swing.JLabel();
+        lblCidadeBairroRuaNumero = new javax.swing.JLabel();
+        lblTopografiaTerreno = new javax.swing.JLabel();
+        ref = new javax.swing.JLabel();
+        lblTopgrafia = new javax.swing.JLabel();
+        lblTipoSoloTerreno = new javax.swing.JLabel();
+        lblTipoSolo = new javax.swing.JLabel();
+        lblCA = new javax.swing.JLabel();
+        lblCATerreno = new javax.swing.JLabel();
+        lblAreaTotal = new javax.swing.JLabel();
+        lblAreaTotalTerreno = new javax.swing.JLabel();
+        lblValor = new javax.swing.JLabel();
+        lblValorTerreno = new javax.swing.JLabel();
+        lbldescricao = new javax.swing.JLabel();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        jTDescricaoTerreno = new javax.swing.JTextArea();
         jPanel2 = new javax.swing.JPanel();
+        jScrollPane3 = new javax.swing.JScrollPane();
+        jTDocs = new javax.swing.JTable();
+        btnExcluirDoc = new javax.swing.JButton();
+        btnAdicionarDoc = new javax.swing.JButton();
+        btnAbrirDoc = new javax.swing.JButton();
         jPanel4 = new javax.swing.JPanel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
@@ -101,13 +282,15 @@ public class DlgVisualizarProjeto extends javax.swing.JDialog {
 
         lblNomeProjeto.setFont(new java.awt.Font("Segoe UI", 0, 36)); // NOI18N
         lblNomeProjeto.setText("Casas Duplas");
-        jPanel1.add(lblNomeProjeto, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 40, 240, -1));
+        jPanel1.add(lblNomeProjeto, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 40, 570, -1));
 
         jLabel3.setText("Cliente:");
         jPanel1.add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 100, -1, -1));
         jPanel1.add(jTabbedPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(610, 260, -1, -1));
 
-        jPanel3.setBackground(new java.awt.Color(255, 255, 255));
+        jTabbedPane2.setBackground(new java.awt.Color(249, 250, 251));
+
+        jPanel3.setBackground(new java.awt.Color(249, 250, 251));
         jPanel3.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         jLabel1.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
@@ -115,10 +298,10 @@ public class DlgVisualizarProjeto extends javax.swing.JDialog {
         jPanel3.add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 20, -1, -1));
 
         jLabel7.setText("Status:");
-        jPanel3.add(jLabel7, new org.netbeans.lib.awtextra.AbsoluteConstraints(160, 80, -1, -1));
+        jPanel3.add(jLabel7, new org.netbeans.lib.awtextra.AbsoluteConstraints(170, 80, -1, -1));
 
         lblStatus.setText("Status");
-        jPanel3.add(lblStatus, new org.netbeans.lib.awtextra.AbsoluteConstraints(210, 80, 120, -1));
+        jPanel3.add(lblStatus, new org.netbeans.lib.awtextra.AbsoluteConstraints(220, 80, 120, -1));
 
         jLabel9.setText("Descrição:");
         jPanel3.add(jLabel9, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 120, -1, -1));
@@ -165,16 +348,119 @@ public class DlgVisualizarProjeto extends javax.swing.JDialog {
 
         jTabbedPane2.addTab("Visão Geral", jPanel3);
 
-        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
-        jPanel2.setLayout(jPanel2Layout);
-        jPanel2Layout.setHorizontalGroup(
-            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 1000, Short.MAX_VALUE)
-        );
-        jPanel2Layout.setVerticalGroup(
-            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 335, Short.MAX_VALUE)
-        );
+        jPanel5.setBackground(new java.awt.Color(249, 250, 251));
+        jPanel5.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+
+        btnAdicionarTerreno.setText("Adicionar Terreno");
+        btnAdicionarTerreno.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnAdicionarTerrenoActionPerformed(evt);
+            }
+        });
+        jPanel5.add(btnAdicionarTerreno, new org.netbeans.lib.awtextra.AbsoluteConstraints(840, 20, -1, -1));
+
+        btnExcluirTerreno.setText("Excluir Terreno");
+        btnExcluirTerreno.setToolTipText("");
+        btnExcluirTerreno.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnExcluirTerrenoActionPerformed(evt);
+            }
+        });
+        jPanel5.add(btnExcluirTerreno, new org.netbeans.lib.awtextra.AbsoluteConstraints(680, 20, 130, -1));
+
+        lblNomeTerreno.setText("Terreno Casas Nobres");
+        jPanel5.add(lblNomeTerreno, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 20, -1, -1));
+
+        lblReferenciaTerreno.setText("Perto do Hospital");
+        jPanel5.add(lblReferenciaTerreno, new org.netbeans.lib.awtextra.AbsoluteConstraints(70, 80, -1, -1));
+
+        lblCidadeBairroRuaNumero.setText("Rio Pomba, Centro, Rua alves de Castro, 98");
+        jPanel5.add(lblCidadeBairroRuaNumero, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 50, -1, -1));
+
+        lblTopografiaTerreno.setText("Plano");
+        jPanel5.add(lblTopografiaTerreno, new org.netbeans.lib.awtextra.AbsoluteConstraints(80, 110, -1, -1));
+
+        ref.setText("Referência:");
+        jPanel5.add(ref, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 80, -1, -1));
+
+        lblTopgrafia.setText("Topografia: ");
+        jPanel5.add(lblTopgrafia, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 110, -1, -1));
+
+        lblTipoSoloTerreno.setText("Arenoso");
+        jPanel5.add(lblTipoSoloTerreno, new org.netbeans.lib.awtextra.AbsoluteConstraints(260, 110, -1, -1));
+
+        lblTipoSolo.setText("Tipo de Solo: ");
+        jPanel5.add(lblTipoSolo, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 110, -1, -1));
+
+        lblCA.setText("C.A.: ");
+        jPanel5.add(lblCA, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 140, -1, -1));
+
+        lblCATerreno.setText("1,5");
+        jPanel5.add(lblCATerreno, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 140, -1, -1));
+
+        lblAreaTotal.setText("Área Total: ");
+        jPanel5.add(lblAreaTotal, new org.netbeans.lib.awtextra.AbsoluteConstraints(80, 140, -1, -1));
+
+        lblAreaTotalTerreno.setText("245 m²");
+        jPanel5.add(lblAreaTotalTerreno, new org.netbeans.lib.awtextra.AbsoluteConstraints(150, 140, 80, -1));
+
+        lblValor.setText("Valor do Terreno:");
+        jPanel5.add(lblValor, new org.netbeans.lib.awtextra.AbsoluteConstraints(250, 140, -1, -1));
+
+        lblValorTerreno.setText("234,00");
+        jPanel5.add(lblValorTerreno, new org.netbeans.lib.awtextra.AbsoluteConstraints(350, 140, 80, -1));
+
+        lbldescricao.setText("Descrição:");
+        jPanel5.add(lbldescricao, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 190, -1, -1));
+
+        jTDescricaoTerreno.setColumns(20);
+        jTDescricaoTerreno.setRows(5);
+        jScrollPane2.setViewportView(jTDescricaoTerreno);
+
+        jPanel5.add(jScrollPane2, new org.netbeans.lib.awtextra.AbsoluteConstraints(80, 200, 380, 110));
+
+        jTabbedPane2.addTab("Terreno", jPanel5);
+
+        jPanel2.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+
+        jTDocs.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null}
+            },
+            new String [] {
+                "Title 1", "Title 2", "Title 3", "Title 4"
+            }
+        ));
+        jScrollPane3.setViewportView(jTDocs);
+
+        jPanel2.add(jScrollPane3, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 10, 536, 316));
+
+        btnExcluirDoc.setText("Excluir");
+        btnExcluirDoc.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnExcluirDocActionPerformed(evt);
+            }
+        });
+        jPanel2.add(btnExcluirDoc, new org.netbeans.lib.awtextra.AbsoluteConstraints(600, 80, 120, -1));
+
+        btnAdicionarDoc.setText("Novo Documento");
+        btnAdicionarDoc.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnAdicionarDocActionPerformed(evt);
+            }
+        });
+        jPanel2.add(btnAdicionarDoc, new org.netbeans.lib.awtextra.AbsoluteConstraints(600, 20, -1, -1));
+
+        btnAbrirDoc.setText("Abrir");
+        btnAbrirDoc.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnAbrirDocActionPerformed(evt);
+            }
+        });
+        jPanel2.add(btnAbrirDoc, new org.netbeans.lib.awtextra.AbsoluteConstraints(600, 50, 120, -1));
 
         jTabbedPane2.addTab("Documentos", jPanel2);
 
@@ -194,7 +480,7 @@ public class DlgVisualizarProjeto extends javax.swing.JDialog {
         jPanel1.add(jTabbedPane2, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 140, 1000, 370));
         jTabbedPane2.getAccessibleContext().setAccessibleName("Visão Geral");
 
-        getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 1020, 530));
+        getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 1060, 530));
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -250,6 +536,109 @@ public class DlgVisualizarProjeto extends javax.swing.JDialog {
         }
     }//GEN-LAST:event_btnExcluirProjetoActionPerformed
 
+    private void btnAdicionarTerrenoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAdicionarTerrenoActionPerformed
+        DlgCadastroTerreno dlg = new DlgCadastroTerreno(null, true);
+        
+        dlg.setProjetoVinculado(this.projetoAtual);
+        
+        if (this.projetoAtual.getTerreno() != null) {
+            dlg.carregarTerreno(this.projetoAtual.getTerreno());
+        } 
+        
+        dlg.setLocationRelativeTo(null);
+        dlg.setVisible(true); 
+        
+        if (this.projetoAtual.getId() != null) {
+            Projeto projetoAtualizado = controller.buscarPorId(this.projetoAtual.getId());
+            this.setProjeto(projetoAtualizado);
+        }
+    }//GEN-LAST:event_btnAdicionarTerrenoActionPerformed
+
+    private void btnExcluirTerrenoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnExcluirTerrenoActionPerformed
+        if (this.projetoAtual.getTerreno() == null) return;
+
+        int confirmacao = JOptionPane.showConfirmDialog(this, 
+                "Tem certeza que deseja remover o terreno deste projeto?\nTodos os dados do terreno serão perdidos.",
+                "Excluir Terreno",
+                JOptionPane.YES_NO_OPTION,
+                JOptionPane.WARNING_MESSAGE);
+
+        if (confirmacao == JOptionPane.YES_OPTION) {
+            try {
+                Long idTerreno = this.projetoAtual.getTerreno().getId();
+
+                this.projetoAtual.setTerreno(null);
+                new ProjetoDAO().salvar(this.projetoAtual);
+                new TerrenoDAO().remover(idTerreno);
+
+                JOptionPane.showMessageDialog(this, "Terreno removido com sucesso!");
+
+                Projeto projetoAtualizado = controller.buscarPorId(this.projetoAtual.getId());
+                this.setProjeto(projetoAtualizado);
+
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(this, "Erro ao excluir terreno: " + e.getMessage());
+                e.printStackTrace();
+            }
+        }
+    }//GEN-LAST:event_btnExcluirTerrenoActionPerformed
+
+    private void btnExcluirDocActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnExcluirDocActionPerformed
+        int linhaSelecionada = jTDocs.getSelectedRow();
+        
+        if (linhaSelecionada == -1) {
+            JOptionPane.showMessageDialog(this, "Selecione um documento para excluir.");
+            return;
+        }
+        
+        Documento doc = docModel.getDocumento(linhaSelecionada);
+        
+        int confirm = JOptionPane.showConfirmDialog(this, 
+                "Deseja excluir o documento '" + doc.getNome() + "'?", 
+                "Excluir", JOptionPane.YES_NO_OPTION);
+        
+        if (confirm == JOptionPane.YES_OPTION) {
+            boolean sucesso = docController.excluirDocumento(doc.getId());
+            if (sucesso) {
+                atualizarTabelaDocumentos();
+                JOptionPane.showMessageDialog(this, "Documento removido.");
+            }
+        }
+    }//GEN-LAST:event_btnExcluirDocActionPerformed
+
+    private void btnAbrirDocActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAbrirDocActionPerformed
+        int linhaSelecionada = jTDocs.getSelectedRow();
+        
+        if (linhaSelecionada == -1) {
+            JOptionPane.showMessageDialog(this, "Selecione um documento na tabela para abrir.");
+            return;
+        }
+        
+        Documento doc = docModel.getDocumento(linhaSelecionada);
+        File arquivo = new File(doc.getCaminhoArquivo());
+        
+        if (arquivo.exists()) {
+            try {
+                // Comando mágico do Java para abrir o arquivo com o programa padrão do Windows
+                Desktop.getDesktop().open(arquivo);
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(this, "Erro ao tentar abrir o arquivo: " + e.getMessage());
+            }
+        } else {
+            JOptionPane.showMessageDialog(this, "Arquivo não encontrado no computador!\nCaminho: " + doc.getCaminhoArquivo());
+        }
+    }//GEN-LAST:event_btnAbrirDocActionPerformed
+
+    private void btnAdicionarDocActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAdicionarDocActionPerformed
+        DlgCadastroDocumento dlg = new DlgCadastroDocumento(null, true);
+        dlg.setProjetoVinculado(this.projetoAtual);
+        dlg.setLocationRelativeTo(null);
+        dlg.setVisible(true);
+        
+        // Ao voltar, atualiza a tabela
+        atualizarTabelaDocumentos();
+    }//GEN-LAST:event_btnAdicionarDocActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -289,7 +678,13 @@ public class DlgVisualizarProjeto extends javax.swing.JDialog {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton bntEditar;
+    private javax.swing.JButton btnAbrirDoc;
+    private javax.swing.JButton btnAdicionarDoc;
+    private javax.swing.JButton btnAdicionarTerreno;
+    private javax.swing.JButton btnExcluirDoc;
     private javax.swing.JButton btnExcluirProjeto;
+    private javax.swing.JButton btnExcluirTerreno;
+    private javax.swing.JFileChooser jFileChooser1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel3;
@@ -301,15 +696,35 @@ public class DlgVisualizarProjeto extends javax.swing.JDialog {
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
+    private javax.swing.JPanel jPanel5;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JTextArea jTDescricao;
+    private javax.swing.JTextArea jTDescricaoTerreno;
+    private javax.swing.JTable jTDocs;
     private javax.swing.JTabbedPane jTabbedPane1;
     private javax.swing.JTabbedPane jTabbedPane2;
+    private javax.swing.JLabel lblAreaTotal;
+    private javax.swing.JLabel lblAreaTotalTerreno;
+    private javax.swing.JLabel lblCA;
+    private javax.swing.JLabel lblCATerreno;
+    private javax.swing.JLabel lblCidadeBairroRuaNumero;
     private javax.swing.JLabel lblDataInicio;
     private javax.swing.JLabel lblNomeCliente;
     private javax.swing.JLabel lblNomeProjeto;
+    private javax.swing.JLabel lblNomeTerreno;
     private javax.swing.JLabel lblOrcamento;
     private javax.swing.JLabel lblPrevisao;
+    private javax.swing.JLabel lblReferenciaTerreno;
     private javax.swing.JLabel lblStatus;
+    private javax.swing.JLabel lblTipoSolo;
+    private javax.swing.JLabel lblTipoSoloTerreno;
+    private javax.swing.JLabel lblTopgrafia;
+    private javax.swing.JLabel lblTopografiaTerreno;
+    private javax.swing.JLabel lblValor;
+    private javax.swing.JLabel lblValorTerreno;
+    private javax.swing.JLabel lbldescricao;
+    private javax.swing.JLabel ref;
     // End of variables declaration//GEN-END:variables
 }
