@@ -19,7 +19,11 @@ public class DespesaTableModel extends AbstractTableModel {
     private List<Despesa> dados = new ArrayList<>();
     
     // As colunas que vão aparecer na tabela
-    private final String[] colunas = {"Data", "Descrição", "Fornecedor", "Categoria", "Valor", "Status"};
+    private final String[] colunas = {"Data", "Descrição", "Fornecedor", "Categoria", "Status", "Valor", "Observação"};
+
+    // Formatadores (Instanciados aqui para não criar um novo a cada célula)
+    private final DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+    private final NumberFormat nf = NumberFormat.getCurrencyInstance(new Locale("pt", "BR"));
 
     @Override
     public String getColumnName(int column) {
@@ -42,10 +46,7 @@ public class DespesaTableModel extends AbstractTableModel {
         
         switch (coluna) {
             case 0: // Data
-                if (d.getDataDespesa() != null) {
-                    return d.getDataDespesa().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
-                }
-                return "-";
+                return (d.getDataDespesa() != null) ? d.getDataDespesa().format(dtf) : "-";
                 
             case 1: // Descrição
                 return d.getDescricao();
@@ -56,28 +57,25 @@ public class DespesaTableModel extends AbstractTableModel {
             case 3: // Categoria
                 return d.getCategoria();
                 
-            case 4: // Valor (Formatado em Reais)
-                if (d.getValor() != null) {
-                    NumberFormat nf = NumberFormat.getCurrencyInstance(new Locale("pt", "BR"));
-                    return nf.format(d.getValor());
-                }
-                return "R$ 0,00";
-                
-            case 5: // Status
+            case 4: // Status
                 return d.getStatus(); // "Pago" ou "Pendente"
+                
+            case 5: // Valor
+                return (d.getValor() != null) ? nf.format(d.getValor()) : "R$ 0,00";
+                
+            case 6: // Observação (NOVA COLUNA NO FINAL)
+                return (d.getObservacoes() != null) ? d.getObservacoes() : "";
                 
             default:
                 return null;
         }
     }
 
-    // Método para atualizar a lista inteira de uma vez
     public void setDados(List<Despesa> lista) {
         this.dados = lista;
-        fireTableDataChanged(); // Avisa a JTable para se redesenhar
+        fireTableDataChanged(); 
     }
     
-    // Recupera o objeto da linha clicada (útil para excluir)
     public Despesa getDespesa(int linha) {
         return dados.get(linha);
     }

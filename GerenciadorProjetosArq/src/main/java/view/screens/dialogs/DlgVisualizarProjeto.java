@@ -28,7 +28,17 @@ import model.entities.Documento;
 import controller.DespesaController;
 import controller.tableModel.DespesaTableModel;
 import model.entities.Despesa;
-
+import java.awt.Font;
+import java.awt.Dimension;
+import javax.swing.SwingConstants;
+import javax.swing.JTable;
+import javax.swing.JLabel;
+import javax.swing.JScrollPane;
+import javax.swing.table.DefaultTableCellRenderer;
+import java.awt.Component;
+import controller.FeedbackController;
+import controller.tableModel.FeedbackTableModel;
+import model.entities.Feedback;
 
 /**
  *
@@ -40,11 +50,22 @@ public class DlgVisualizarProjeto extends javax.swing.JDialog {
     private Projeto projetoAtual;
     private final ProjetoController controller;
     
+    // Documentos
     private final DocumentoController docController;
     private final DocumentoTableModel docModel;
     
+    // Despesas
     private final DespesaController despesaController;
     private final DespesaTableModel despesaModel;
+    
+    // Feedback
+    private final FeedbackController feedbackController;
+    private final FeedbackTableModel feedbackModel;
+    
+    // CORES E BORDAS PADRÃO
+    private final Color corAzulHeader = new Color(64, 86, 213);
+    private final Color corFundoSelecao = new Color(240, 245, 255);
+    private final javax.swing.border.Border bordaInferior = javax.swing.BorderFactory.createMatteBorder(0, 0, 1, 0, new Color(230, 230, 230));
     /**
      * Creates new form DlgVisualizarProjeto
      */
@@ -54,70 +75,341 @@ public class DlgVisualizarProjeto extends javax.swing.JDialog {
         setLocationRelativeTo(null);
         estilizarAbasModernas();
         
+        // Inicializa Controllers e Models
         this.controller = new ProjetoController();
+        
         this.docController = new DocumentoController();
         this.docModel = new DocumentoTableModel();
+        
         this.despesaController = new DespesaController();
         this.despesaModel = new DespesaTableModel();
         
-        // Vincula o Model à Tabela visual
-        jTDocs.setModel(docModel);
-        jTable1.setModel(despesaModel);
-    }
-    private void estilizarAbasModernas() {
-        // 1. Cores e Fontes Globais do Painel
-        jTabbedPane2.setBackground(Color.WHITE);
-        jTabbedPane2.setForeground(new Color(64, 86, 213)); // Azul do seu tema
-        jTabbedPane2.setFont(new java.awt.Font("Segoe UI", java.awt.Font.BOLD, 14));
-        jTabbedPane2.setOpaque(true);
+        this.feedbackController = new FeedbackController();
+        this.feedbackModel = new FeedbackTableModel();
         
-        // 2. Customização Profunda (UI Manager)
-        jTabbedPane2.setUI(new javax.swing.plaf.basic.BasicTabbedPaneUI() {
-            
-            // Define o Padding (Espaçamento interno) da aba
-            @Override
-            protected void installDefaults() {
-                super.installDefaults();
-                tabInsets = new java.awt.Insets(10, 30, 10, 30); // Mais gordinha e espaçada
-                selectedTabPadInsets = new java.awt.Insets(0, 0, 0, 0);
-                contentBorderInsets = new java.awt.Insets(0, 0, 0, 0); // Remove borda do conteúdo
-            }
-
-            // Pinta o Fundo da Aba
-            @Override
-            protected void paintTabBackground(Graphics g, int tabPlacement, int tabIndex, 
-                                            int x, int y, int w, int h, boolean isSelected) {
-                if (isSelected) {
-                    g.setColor(new Color(240, 245, 255)); // Azul bem clarinho quando selecionado
-                } else {
-                    g.setColor(Color.WHITE);
-                }
-                g.fillRect(x, y, w, h);
-            }
-
-            // Remove as bordas 3D antigas e faz a linha azul embaixo
-            @Override
-            protected void paintTabBorder(Graphics g, int tabPlacement, int tabIndex, 
-                                        int x, int y, int w, int h, boolean isSelected) {
-                // Desenha apenas uma linha azul embaixo se estiver selecionado
-                if (isSelected) {
-                    g.setColor(new Color(64, 86, 213));
-                    g.fillRect(x, h - 3, w, 3); // Linha grossa azul na base
+        // Vincula Models às Tabelas
+        jTDocs.setModel(docModel);
+        jTable1.setModel(despesaModel); // Tabela de Despesas
+        jTable2.setModel(feedbackModel); // Tabela de Feedback
+        
+        // --- APLICA A PADRONIZAÇÃO VISUAL ---
+        configurarTabelaDocs();
+        configurarTabelaFinanceiro();
+        configurarTabelaFeedback();
+        
+        jTabbedPane2.addChangeListener(new javax.swing.event.ChangeListener() {
+            public void stateChanged(javax.swing.event.ChangeEvent evt) {
+                // Pega o índice da aba selecionada (0=Visão Geral, 1=Terreno, 2=Doc, 3=Financeiro, 4=Feedback)
+                int index = jTabbedPane2.getSelectedIndex();
+                
+                if (projetoAtual != null && projetoAtual.getId() != null) {
+                    switch (index) {
+                        case 2: // Documentos
+                            atualizarTabelaDocumentos();
+                            break;
+                        case 3: // Financeiro
+                            atualizarAbaFinanceiro();
+                            break;
+                        case 4: // Feedback
+                            atualizarAbaFeedback();
+                            break;
+                    }
                 }
             }
-            
+        });
+        
+    }
+    private void padronizarTabela(JTable table, JScrollPane scroll) {
+        // Layout Geral
+        table.setRowHeight(40); // Um pouco menor que a Home para caber mais dados
+        table.setShowVerticalLines(false);
+        table.setGridColor(new Color(230, 230, 230));
+        table.setIntercellSpacing(new Dimension(0, 0));
+        table.setSelectionBackground(corFundoSelecao);
+        table.setSelectionForeground(Color.BLACK);
+        table.setFont(new Font("Segoe UI", Font.PLAIN, 13));
+        
+        // Remove bordas do ScrollPane
+        if (scroll != null) {
+            scroll.setBorder(javax.swing.BorderFactory.createEmptyBorder());
+            scroll.getViewport().setBackground(Color.WHITE);
+        }
+
+        // Cabeçalho
+        table.getTableHeader().setDefaultRenderer(new DefaultTableCellRenderer() {
             @Override
-            protected void paintContentBorder(Graphics g, int tabPlacement, int selectedIndex) {
-               // Não desenha borda ao redor do painel principal (clean)
+            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+                JLabel label = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+                label.setBackground(corAzulHeader);
+                label.setForeground(Color.WHITE);
+                label.setFont(new Font("Segoe UI", Font.BOLD, 13));
+                label.setHorizontalAlignment(SwingConstants.CENTER);
+                label.setPreferredSize(new Dimension(100, 35));
+                return label;
             }
         });
     }
     
-   public void setProjeto(Projeto p) {
+    // --- 2. CONFIGURAÇÃO ESPECÍFICA: DOCUMENTOS ---
+    private void configurarTabelaDocs() {
+        padronizarTabela(jTDocs, jScrollPane3);
+        
+        // Ajuste de Colunas (Nome mais largo)
+        // Supondo colunas: ID, Nome, Caminho
+        if (jTDocs.getColumnCount() > 1) {
+             jTDocs.getColumnModel().getColumn(0).setPreferredWidth(50); // ID
+             jTDocs.getColumnModel().getColumn(1).setPreferredWidth(300); // Nome
+        }
+        
+        // Renderer com Padding
+        DefaultTableCellRenderer renderTexto = new DefaultTableCellRenderer() {
+            @Override
+            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+                super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+                setBorder(javax.swing.BorderFactory.createCompoundBorder(bordaInferior, javax.swing.BorderFactory.createEmptyBorder(0, 10, 0, 0)));
+                return this;
+            }
+        };
+        jTDocs.setDefaultRenderer(Object.class, renderTexto);
+    }
+    
+    // --- 3. CONFIGURAÇÃO ESPECÍFICA: FINANCEIRO (Atualizado para novas colunas) ---
+    private void configurarTabelaFinanceiro() {
+        // 1. Estilo Base
+        padronizarTabela(jTable1, JTDespesa); 
+        
+        // 2. Larguras das Colunas (Ajustado para o novo Model)
+        // Índices: 0:Data, 1:Descrição, 2:Fornecedor, 3:Categoria, 4:Status, 5:Valor, 6:Observação
+        jTable1.getColumnModel().getColumn(0).setPreferredWidth(90);  // Data
+        jTable1.getColumnModel().getColumn(1).setPreferredWidth(150); // Descrição
+        jTable1.getColumnModel().getColumn(2).setPreferredWidth(120); // Fornecedor
+        jTable1.getColumnModel().getColumn(3).setPreferredWidth(100); // Categoria
+        jTable1.getColumnModel().getColumn(4).setPreferredWidth(80);  // Status
+        jTable1.getColumnModel().getColumn(5).setPreferredWidth(100); // Valor
+        jTable1.getColumnModel().getColumn(6).setPreferredWidth(300); // Observação (Grande)
+
+        // 3. RENDERIZADOR CENTRALIZADO (Para colunas normais: 0 a 5)
+        DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer() {
+            @Override
+            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+                super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+                setHorizontalAlignment(SwingConstants.CENTER);
+                setBorder(bordaInferior);
+                
+                if (isSelected) {
+                    setForeground(Color.BLACK);
+                } else {
+                    // Destaque visual: Status "Pendente" em vermelho
+                    if (column == 4 && "Pendente".equals(value)) {
+                        setForeground(new Color(200, 0, 0)); // Vermelho escuro
+                        setFont(new Font("Segoe UI", Font.BOLD, 13));
+                    } else {
+                        setForeground(new Color(50, 50, 50));
+                        setFont(new Font("Segoe UI", Font.PLAIN, 13));
+                    }
+                }
+                return this;
+            }
+        };
+        
+        // Aplica o renderizador nas colunas 0 a 5
+        for (int i = 0; i <= 5; i++) {
+            jTable1.getColumnModel().getColumn(i).setCellRenderer(centerRenderer);
+        }
+
+        // 4. RENDERIZADOR DINÂMICO (Para Observação - Coluna 6)
+        jTable1.getColumnModel().getColumn(6).setCellRenderer(new javax.swing.table.TableCellRenderer() {
+            final javax.swing.JTextArea textArea = new javax.swing.JTextArea();
+
+            {
+                textArea.setLineWrap(true);      
+                textArea.setWrapStyleWord(true); 
+                textArea.setOpaque(true);
+                textArea.setFont(new Font("Segoe UI", Font.PLAIN, 13));
+                // Margem interna para o texto respirar
+                textArea.setBorder(javax.swing.BorderFactory.createCompoundBorder(
+                    bordaInferior, 
+                    javax.swing.BorderFactory.createEmptyBorder(5, 10, 5, 10)
+                ));
+            }
+
+            @Override
+            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+                if (isSelected) {
+                    textArea.setBackground(corFundoSelecao);
+                } else {
+                    textArea.setBackground(Color.WHITE);
+                }
+                
+                textArea.setText((value != null) ? value.toString() : "");
+                
+                // --- CÁLCULO DE ALTURA AUTOMÁTICO ---
+                int larguraColuna = table.getColumnModel().getColumn(column).getWidth();
+                // Define tamanho temporário para calcular altura necessária
+                textArea.setSize(new Dimension(larguraColuna, Short.MAX_VALUE)); 
+                
+                int alturaPreferida = textArea.getPreferredSize().height;
+                
+                // Se a linha for muito pequena para o texto, aumenta. 
+                // Se o texto for pequeno, mantém o padrão (40px).
+                if (table.getRowHeight(row) != Math.max(alturaPreferida, 40)) {
+                    table.setRowHeight(row, Math.max(alturaPreferida, 40)); 
+                }
+                
+                return textArea;
+            }
+        });
+    }
+    
+    // --- 4. CONFIGURAÇÃO ESPECÍFICA: FEEDBACK (Chat Style) ---
+    private void configurarTabelaFeedback() {
+        // 1. Aplica o estilo base (sem mexer na altura ainda)
+        jTable2.setShowVerticalLines(false);
+        jTable2.setGridColor(new Color(230, 230, 230));
+        jTable2.setIntercellSpacing(new Dimension(0, 0));
+        jTable2.setSelectionBackground(corFundoSelecao);
+        jTable2.setSelectionForeground(Color.BLACK);
+        jTable2.setFont(new Font("Segoe UI", Font.PLAIN, 13));
+        
+        // Remove bordas do ScrollPane
+        jTFeedback.setBorder(javax.swing.BorderFactory.createEmptyBorder());
+        jTFeedback.getViewport().setBackground(Color.WHITE);
+
+        // Cabeçalho Azul
+        jTable2.getTableHeader().setDefaultRenderer(new DefaultTableCellRenderer() {
+            @Override
+            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+                JLabel label = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+                label.setBackground(corAzulHeader);
+                label.setForeground(Color.WHITE);
+                label.setFont(new Font("Segoe UI", Font.BOLD, 13));
+                label.setHorizontalAlignment(SwingConstants.CENTER);
+                label.setPreferredSize(new Dimension(100, 35));
+                return label;
+            }
+        });
+
+        // 2. Ajuste de Larguras (Baseado na nova ordem: Autor, Mensagem, Tipo, Data)
+        jTable2.getColumnModel().getColumn(0).setPreferredWidth(80);  // Autor
+        jTable2.getColumnModel().getColumn(1).setPreferredWidth(400); // Mensagem (Maior espaço)
+        jTable2.getColumnModel().getColumn(2).setPreferredWidth(100); // Tipo
+        jTable2.getColumnModel().getColumn(3).setPreferredWidth(100); // Data
+
+        // 3. RENDERIZADOR PADRÃO (Para Autor, Tipo e Data) - Centralizado e com Cores
+        DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer() {
+            @Override
+            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+                super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+                setHorizontalAlignment(SwingConstants.CENTER);
+                setBorder(bordaInferior); // Linha cinza embaixo
+
+                // Lógica de Cor do Autor (Coluna 0)
+                if (column == 0) {
+                    String autor = (value != null) ? value.toString() : "";
+                    if ("Gestor".equals(autor)) {
+                        setForeground(new Color(30, 60, 160)); // Azul
+                        setFont(new Font("Segoe UI", Font.BOLD, 12));
+                    } else if ("Cliente".equals(autor)) {
+                        setForeground(new Color(0, 100, 0)); // Verde
+                        setFont(new Font("Segoe UI", Font.BOLD, 12));
+                    }
+                } else {
+                    setForeground(Color.BLACK);
+                    setFont(new Font("Segoe UI", Font.PLAIN, 13));
+                }
+                return this;
+            }
+        };
+        
+        // Aplica esse renderizador nas colunas 0 (Autor), 2 (Tipo) e 3 (Data)
+        jTable2.getColumnModel().getColumn(0).setCellRenderer(centerRenderer);
+        jTable2.getColumnModel().getColumn(2).setCellRenderer(centerRenderer);
+        jTable2.getColumnModel().getColumn(3).setCellRenderer(centerRenderer);
+
+        // 4. RENDERIZADOR ESPECIAL PARA MENSAGEM (Coluna 1) - QUEBRA DE LINHA
+        jTable2.getColumnModel().getColumn(1).setCellRenderer(new javax.swing.table.TableCellRenderer() {
+            // Usamos JTextArea em vez de JLabel para permitir quebra de linha
+            final javax.swing.JTextArea textArea = new javax.swing.JTextArea();
+
+            {
+                textArea.setLineWrap(true);      // Quebra a linha se atingir a borda
+                textArea.setWrapStyleWord(true); // Quebra apenas palavras inteiras
+                textArea.setOpaque(true);
+                textArea.setFont(new Font("Segoe UI", Font.PLAIN, 13));
+                // Margem interna para o texto não colar na borda
+                textArea.setBorder(javax.swing.BorderFactory.createCompoundBorder(
+                    bordaInferior, 
+                    javax.swing.BorderFactory.createEmptyBorder(5, 10, 5, 10) // Top, Left, Bottom, Right
+                ));
+            }
+
+            @Override
+            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+                if (isSelected) {
+                    textArea.setBackground(corFundoSelecao);
+                } else {
+                    textArea.setBackground(Color.WHITE);
+                }
+                
+                textArea.setText((value != null) ? value.toString() : "");
+                
+                // MÁGICA DO AJUSTE DE ALTURA
+                // Define a largura do componente igual à largura da coluna
+                int larguraColuna = table.getColumnModel().getColumn(column).getWidth();
+                textArea.setSize(larguraColuna, Short.MAX_VALUE); // Altura infinita temporária para calcular
+                
+                // Calcula qual seria a altura ideal para esse texto
+                int alturaPreferida = textArea.getPreferredSize().height;
+                
+                // Se a altura atual da linha for menor que a necessária, aumenta a linha
+                // (Adicionamos um pouco de margem extra se quiser)
+                if (table.getRowHeight(row) != alturaPreferida) {
+                    table.setRowHeight(row, Math.max(alturaPreferida, 40)); // Mínimo de 40px
+                }
+                
+                return textArea;
+            }
+        });
+    }
+
+    private void estilizarAbasModernas() {
+        jTabbedPane2.setBackground(Color.WHITE);
+        jTabbedPane2.setForeground(corAzulHeader);
+        jTabbedPane2.setFont(new java.awt.Font("Segoe UI", java.awt.Font.BOLD, 18));
+        jTabbedPane2.setOpaque(true);
+        
+        jTabbedPane2.setUI(new javax.swing.plaf.basic.BasicTabbedPaneUI() {
+            @Override
+            protected void installDefaults() {
+                super.installDefaults();
+                tabInsets = new java.awt.Insets(10, 50, 10, 50);
+                selectedTabPadInsets = new java.awt.Insets(0, 0, 0, 0);
+                contentBorderInsets = new java.awt.Insets(0, 0, 0, 0);
+            }
+            @Override
+            protected void paintTabBackground(Graphics g, int tabPlacement, int tabIndex, int x, int y, int w, int h, boolean isSelected) {
+                if (isSelected) g.setColor(corFundoSelecao);
+                else g.setColor(Color.WHITE);
+                g.fillRect(x, y, w, h);
+            }
+            @Override
+            protected void paintTabBorder(Graphics g, int tabPlacement, int tabIndex, int x, int y, int w, int h, boolean isSelected) {
+                if (isSelected) {
+                    g.setColor(corAzulHeader);
+                    g.fillRect(x, h - 3, w, 3);
+                }
+            }
+            @Override
+            protected void paintContentBorder(Graphics g, int tabPlacement, int selectedIndex) {}
+        });
+    }
+    
+    // --- LÓGICA DO PROJETO ---
+    public void setProjeto(Projeto p) {
         if (p == null) return;
         this.projetoAtual = p;
         
-        // --- ABA 1: VISÃO GERAL ---
+        // Preencher Labels (Visão Geral)
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd/MM/yyyy");
         String inicio = (p.getDataInicio() != null) ? dtf.format(p.getDataInicio()) : "-";
         String fim = (p.getDataPrevisao() != null) ? dtf.format(p.getDataPrevisao()) : "-";
@@ -141,75 +433,63 @@ public class DlgVisualizarProjeto extends javax.swing.JDialog {
         jTDescricao.setWrapStyleWord(true);
         jTDescricao.setText(p.getDescricao());
 
-        // --- ABA 2: TERRENO (Atualiza os botões e os dados) ---
+        // Aba Terreno
         if (p.getTerreno() != null) {
             btnAdicionarTerreno.setText("Editar Terreno");
             btnExcluirTerreno.setVisible(true);
-            
-            // CHAMA O MÉTODO QUE PREENCHE OS CAMPOS
             atualizarDadosTerreno(p.getTerreno());
             controlarVisibilidadeCamposTerreno(true);
-            
         } else {
             btnAdicionarTerreno.setText("Adicionar Terreno");
             btnExcluirTerreno.setVisible(false);
-            
             controlarVisibilidadeCamposTerreno(false);
-            
-            // 2. DEFINE A MENSAGEM DE STATUS
             lblNomeTerreno.setText("Nenhum terreno vinculado");
         }
         
+        // Atualizar Tabelas
         atualizarTabelaDocumentos();
         atualizarAbaFinanceiro();
+        atualizarAbaFeedback();
     }
-   
-   private void atualizarAbaFinanceiro() {
+    
+    private void atualizarAbaFinanceiro() {
         if (this.projetoAtual == null || this.projetoAtual.getId() == null) return;
 
-        // 1. Carrega a Tabela
         List<Despesa> despesas = despesaController.listarDespesasDoProjeto(this.projetoAtual.getId());
         despesaModel.setDados(despesas);
 
-        // 2. Busca Totais
         Double orcamento = (this.projetoAtual.getOrcamento() != null) ? this.projetoAtual.getOrcamento() : 0.0;
         Double totalGasto = despesaController.buscarTotalGasto(this.projetoAtual.getId());
         Double saldo = orcamento - totalGasto;
 
-        // 3. Formata Moeda
         NumberFormat nf = NumberFormat.getCurrencyInstance(new Locale("pt", "BR"));
-        
         lblResumoOrcamento.setText(nf.format(orcamento));
         lblResumoGasto.setText(nf.format(totalGasto));
         lblResumoSaldo.setText(nf.format(saldo));
 
-        // 4. Cor do Saldo
-        if (saldo < 0) {
-            lblResumoSaldo.setForeground(Color.RED);
-        } else {
-            lblResumoSaldo.setForeground(new Color(0, 153, 51)); // Verde
-        }
+        if (saldo < 0) lblResumoSaldo.setForeground(Color.RED);
+        else lblResumoSaldo.setForeground(new Color(0, 153, 51));
 
-        // 5. Barra de Progresso
         if (orcamento > 0) {
             int percentual = (int) ((totalGasto / orcamento) * 100);
             barProgressoFinanceiro.setValue(percentual);
             barProgressoFinanceiro.setString(percentual + "% Usado");
-            
-            // Se passar de 100%, pinta a barra de vermelho
-            if (percentual > 100) {
-                barProgressoFinanceiro.setForeground(Color.RED);
-            } else {
-                barProgressoFinanceiro.setForeground(new Color(64, 86, 213)); // Azul padrão
-            }
+            if (percentual > 100) barProgressoFinanceiro.setForeground(Color.RED);
+            else barProgressoFinanceiro.setForeground(corAzulHeader);
         } else {
             barProgressoFinanceiro.setValue(0);
             barProgressoFinanceiro.setString("Sem Orçamento");
         }
     }
-   
-   private void controlarVisibilidadeCamposTerreno(boolean visivel) {
-        // Rótulos Fixos (Labels como "Topografia:", "C.A.:", etc)
+    
+    private void atualizarAbaFeedback() {
+         if (this.projetoAtual == null || this.projetoAtual.getId() == null) return;
+         List<Feedback> lista = feedbackController.listar(this.projetoAtual.getId());
+         feedbackModel.setDados(lista);
+         edtComentario.setText("");
+    }
+    
+    private void controlarVisibilidadeCamposTerreno(boolean visivel) {
         ref.setVisible(visivel);
         lblTopgrafia.setVisible(visivel);
         lblTipoSolo.setVisible(visivel);
@@ -218,7 +498,6 @@ public class DlgVisualizarProjeto extends javax.swing.JDialog {
         lblValor.setVisible(visivel);
         lbldescricao.setVisible(visivel);
         
-        // Campos de Valor (Onde aparecem os dados)
         lblReferenciaTerreno.setVisible(visivel);
         lblCidadeBairroRuaNumero.setVisible(visivel);
         lblTopografiaTerreno.setVisible(visivel);
@@ -226,10 +505,10 @@ public class DlgVisualizarProjeto extends javax.swing.JDialog {
         lblCATerreno.setVisible(visivel);
         lblAreaTotalTerreno.setVisible(visivel);
         lblValorTerreno.setVisible(visivel);
-        jScrollPane2.setVisible(visivel); // Área da descrição
+        jScrollPane2.setVisible(visivel);
     }
-   
-   private void atualizarTabelaDocumentos() {
+    
+    private void atualizarTabelaDocumentos() {
         if (this.projetoAtual != null && this.projetoAtual.getId() != null) {
             List<Documento> lista = docController.listarDocumentosDoProjeto(this.projetoAtual.getId());
             docModel.setDados(lista);
@@ -238,18 +517,14 @@ public class DlgVisualizarProjeto extends javax.swing.JDialog {
         }
     }
     
-    // --- NOVO MÉTODO: Preenche os labels da aba Terreno ---
     private void atualizarDadosTerreno(Terreno t) {
         lblNomeTerreno.setText(t.getNome());
         lblReferenciaTerreno.setText(t.getReferencia() != null ? t.getReferencia() : "-");
         lblTopografiaTerreno.setText(t.getTopografia());
         lblTipoSoloTerreno.setText(t.getTipoSolo());
-        
-        // Números
         lblCATerreno.setText(t.getCoeficienteAproveitamento() != null ? String.valueOf(t.getCoeficienteAproveitamento()) : "-");
         lblAreaTotalTerreno.setText(t.getAreaTotal() != null ? t.getAreaTotal() + " m²" : "-");
         
-        // Valor Monetário
         if (t.getValorCompra() != null) {
              NumberFormat nf = NumberFormat.getCurrencyInstance(new Locale("pt", "BR"));
              lblValorTerreno.setText(nf.format(t.getValorCompra()));
@@ -257,38 +532,20 @@ public class DlgVisualizarProjeto extends javax.swing.JDialog {
             lblValorTerreno.setText("-");
         }
         
-        // Descrição
         jTDescricaoTerreno.setText(t.getDescricao());
         jTDescricaoTerreno.setEditable(false);
         jTDescricaoTerreno.setLineWrap(true);
         jTDescricaoTerreno.setWrapStyleWord(true);
         
-        // Montagem do Endereço Completo
         Endereco e = t.getEndereco();
         if (e != null) {
             String enderecoCompleto = String.format("%s, %s, %s, %s", 
-                    e.getCidade(), 
-                    e.getBairro(), 
-                    e.getLogradouro(), 
-                    (e.getNumero() != null && !e.getNumero().isEmpty() ? e.getNumero() : "S/N")
-            );
+                    e.getCidade(), e.getBairro(), e.getLogradouro(), 
+                    (e.getNumero() != null && !e.getNumero().isEmpty() ? e.getNumero() : "S/N"));
             lblCidadeBairroRuaNumero.setText(enderecoCompleto);
         } else {
             lblCidadeBairroRuaNumero.setText("Endereço não cadastrado");
         }
-    }
-
-    // --- NOVO MÉTODO: Limpa os labels se o terreno for excluído ---
-    private void limparDadosTerreno() {
-        lblNomeTerreno.setText("Nenhum terreno vinculado");
-        lblReferenciaTerreno.setText("-");
-        lblCidadeBairroRuaNumero.setText("-");
-        lblTopografiaTerreno.setText("-");
-        lblTipoSoloTerreno.setText("-");
-        lblCATerreno.setText("-");
-        lblAreaTotalTerreno.setText("-");
-        lblValorTerreno.setText("-");
-        jTDescricaoTerreno.setText("");
     }
     
     /**
@@ -304,7 +561,6 @@ public class DlgVisualizarProjeto extends javax.swing.JDialog {
         jPanel1 = new javax.swing.JPanel();
         lblNomeCliente = new javax.swing.JLabel();
         lblNomeProjeto = new javax.swing.JLabel();
-        jLabel3 = new javax.swing.JLabel();
         jTabbedPane1 = new javax.swing.JTabbedPane();
         jTabbedPane2 = new javax.swing.JTabbedPane();
         jPanel3 = new javax.swing.JPanel();
@@ -343,17 +599,17 @@ public class DlgVisualizarProjeto extends javax.swing.JDialog {
         jScrollPane2 = new javax.swing.JScrollPane();
         jTDescricaoTerreno = new javax.swing.JTextArea();
         jPanel6 = new javax.swing.JPanel();
+        btnLancarDespesa = new javax.swing.JToggleButton();
+        btnExcluirDespesa = new javax.swing.JToggleButton();
         lblResumoSaldo = new javax.swing.JLabel();
-        jLabel5 = new javax.swing.JLabel();
         jLabel11 = new javax.swing.JLabel();
-        lblResumoOrcamento = new javax.swing.JLabel();
-        jLabel12 = new javax.swing.JLabel();
         lblResumoGasto = new javax.swing.JLabel();
+        jLabel12 = new javax.swing.JLabel();
+        lblResumoOrcamento = new javax.swing.JLabel();
+        jLabel5 = new javax.swing.JLabel();
         barProgressoFinanceiro = new javax.swing.JProgressBar();
         JTDespesa = new javax.swing.JScrollPane();
         jTable1 = new javax.swing.JTable();
-        btnExcluirDespesa = new javax.swing.JToggleButton();
-        btnLancarDespesa = new javax.swing.JToggleButton();
         jPanel2 = new javax.swing.JPanel();
         jScrollPane3 = new javax.swing.JScrollPane();
         jTDocs = new javax.swing.JTable();
@@ -362,22 +618,31 @@ public class DlgVisualizarProjeto extends javax.swing.JDialog {
         btnAbrirDoc = new javax.swing.JButton();
         jPanel4 = new javax.swing.JPanel();
         jPanel7 = new javax.swing.JPanel();
+        jTFeedback = new javax.swing.JScrollPane();
+        jTable2 = new javax.swing.JTable();
+        btnAdicionarFeedback = new javax.swing.JButton();
+        btnExcluirFeedback = new javax.swing.JButton();
+        jLabel2 = new javax.swing.JLabel();
+        jComboBox1 = new javax.swing.JComboBox<>();
+        jLabel4 = new javax.swing.JLabel();
+        jScrollPane4 = new javax.swing.JScrollPane();
+        edtComentario = new javax.swing.JTextArea();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setMinimumSize(new java.awt.Dimension(1370, 760));
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         jPanel1.setBackground(new java.awt.Color(255, 255, 255));
+        jPanel1.setMinimumSize(new java.awt.Dimension(1300, 470));
         jPanel1.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
+        lblNomeCliente.setFont(new java.awt.Font("Segoe UI", 2, 18)); // NOI18N
         lblNomeCliente.setText("Victor Emmanuel");
-        jPanel1.add(lblNomeCliente, new org.netbeans.lib.awtextra.AbsoluteConstraints(70, 100, 230, -1));
+        jPanel1.add(lblNomeCliente, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 50, 230, -1));
 
-        lblNomeProjeto.setFont(new java.awt.Font("Segoe UI", 0, 36)); // NOI18N
+        lblNomeProjeto.setFont(new java.awt.Font("Segoe UI", 1, 36)); // NOI18N
         lblNomeProjeto.setText("Casas Duplas");
-        jPanel1.add(lblNomeProjeto, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 40, 570, -1));
-
-        jLabel3.setText("Cliente:");
-        jPanel1.add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 100, -1, -1));
+        jPanel1.add(lblNomeProjeto, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 0, 870, 50));
         jPanel1.add(jTabbedPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(610, 260, -1, -1));
 
         jTabbedPane2.setBackground(new java.awt.Color(249, 250, 251));
@@ -449,7 +714,7 @@ public class DlgVisualizarProjeto extends javax.swing.JDialog {
                 btnAdicionarTerrenoActionPerformed(evt);
             }
         });
-        jPanel5.add(btnAdicionarTerreno, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 360, -1, -1));
+        jPanel5.add(btnAdicionarTerreno, new org.netbeans.lib.awtextra.AbsoluteConstraints(150, 360, -1, -1));
 
         btnExcluirTerreno.setText("Excluir Terreno");
         btnExcluirTerreno.setToolTipText("");
@@ -458,83 +723,100 @@ public class DlgVisualizarProjeto extends javax.swing.JDialog {
                 btnExcluirTerrenoActionPerformed(evt);
             }
         });
-        jPanel5.add(btnExcluirTerreno, new org.netbeans.lib.awtextra.AbsoluteConstraints(170, 360, 130, -1));
+        jPanel5.add(btnExcluirTerreno, new org.netbeans.lib.awtextra.AbsoluteConstraints(290, 360, 130, -1));
 
         lblNomeTerreno.setText("Terreno Casas Nobres");
-        jPanel5.add(lblNomeTerreno, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 20, -1, -1));
+        jPanel5.add(lblNomeTerreno, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 20, -1, -1));
 
         lblReferenciaTerreno.setText("Perto do Hospital");
-        jPanel5.add(lblReferenciaTerreno, new org.netbeans.lib.awtextra.AbsoluteConstraints(70, 80, -1, -1));
+        jPanel5.add(lblReferenciaTerreno, new org.netbeans.lib.awtextra.AbsoluteConstraints(190, 80, -1, -1));
 
         lblCidadeBairroRuaNumero.setText("Rio Pomba, Centro, Rua alves de Castro, 98");
-        jPanel5.add(lblCidadeBairroRuaNumero, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 50, -1, -1));
+        jPanel5.add(lblCidadeBairroRuaNumero, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 50, -1, -1));
 
         lblTopografiaTerreno.setText("Plano");
-        jPanel5.add(lblTopografiaTerreno, new org.netbeans.lib.awtextra.AbsoluteConstraints(80, 110, -1, -1));
+        jPanel5.add(lblTopografiaTerreno, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 110, -1, -1));
 
         ref.setText("Referência:");
-        jPanel5.add(ref, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 80, -1, -1));
+        jPanel5.add(ref, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 80, -1, -1));
 
         lblTopgrafia.setText("Topografia: ");
-        jPanel5.add(lblTopgrafia, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 110, -1, -1));
+        jPanel5.add(lblTopgrafia, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 110, -1, -1));
 
         lblTipoSoloTerreno.setText("Arenoso");
-        jPanel5.add(lblTipoSoloTerreno, new org.netbeans.lib.awtextra.AbsoluteConstraints(260, 110, -1, -1));
+        jPanel5.add(lblTipoSoloTerreno, new org.netbeans.lib.awtextra.AbsoluteConstraints(380, 110, -1, -1));
 
         lblTipoSolo.setText("Tipo de Solo: ");
-        jPanel5.add(lblTipoSolo, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 110, -1, -1));
+        jPanel5.add(lblTipoSolo, new org.netbeans.lib.awtextra.AbsoluteConstraints(300, 110, -1, -1));
 
         lblCA.setText("C.A.: ");
-        jPanel5.add(lblCA, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 140, -1, -1));
+        jPanel5.add(lblCA, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 140, -1, -1));
 
         lblCATerreno.setText("1,5");
-        jPanel5.add(lblCATerreno, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 140, -1, -1));
+        jPanel5.add(lblCATerreno, new org.netbeans.lib.awtextra.AbsoluteConstraints(160, 140, -1, -1));
 
         lblAreaTotal.setText("Área Total: ");
-        jPanel5.add(lblAreaTotal, new org.netbeans.lib.awtextra.AbsoluteConstraints(80, 140, -1, -1));
+        jPanel5.add(lblAreaTotal, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 140, -1, -1));
 
         lblAreaTotalTerreno.setText("245 m²");
-        jPanel5.add(lblAreaTotalTerreno, new org.netbeans.lib.awtextra.AbsoluteConstraints(150, 140, 80, -1));
+        jPanel5.add(lblAreaTotalTerreno, new org.netbeans.lib.awtextra.AbsoluteConstraints(270, 140, 80, -1));
 
         lblValor.setText("Valor do Terreno:");
-        jPanel5.add(lblValor, new org.netbeans.lib.awtextra.AbsoluteConstraints(250, 140, -1, -1));
+        jPanel5.add(lblValor, new org.netbeans.lib.awtextra.AbsoluteConstraints(370, 140, -1, -1));
 
         lblValorTerreno.setText("234,00");
-        jPanel5.add(lblValorTerreno, new org.netbeans.lib.awtextra.AbsoluteConstraints(350, 140, 80, -1));
+        jPanel5.add(lblValorTerreno, new org.netbeans.lib.awtextra.AbsoluteConstraints(470, 140, 80, -1));
 
         lbldescricao.setText("Descrição:");
-        jPanel5.add(lbldescricao, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 190, -1, -1));
+        jPanel5.add(lbldescricao, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 190, -1, -1));
 
         jTDescricaoTerreno.setColumns(20);
         jTDescricaoTerreno.setRows(5);
         jScrollPane2.setViewportView(jTDescricaoTerreno);
 
-        jPanel5.add(jScrollPane2, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 220, 380, 110));
+        jPanel5.add(jScrollPane2, new org.netbeans.lib.awtextra.AbsoluteConstraints(140, 220, 380, 110));
 
         jTabbedPane2.addTab("Terreno", jPanel5);
 
+        jPanel6.setBackground(new java.awt.Color(249, 250, 251));
         jPanel6.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        lblResumoSaldo.setText("$R$ 0,00");
-        jPanel6.add(lblResumoSaldo, new org.netbeans.lib.awtextra.AbsoluteConstraints(110, 120, 150, -1));
+        btnLancarDespesa.setText("Lançar Despesa");
+        btnLancarDespesa.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnLancarDespesaActionPerformed(evt);
+            }
+        });
+        jPanel6.add(btnLancarDespesa, new org.netbeans.lib.awtextra.AbsoluteConstraints(1200, 90, -1, -1));
 
-        jLabel5.setText("Orçamento Total:");
-        jPanel6.add(jLabel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 60, -1, -1));
+        btnExcluirDespesa.setText("Excluir Despesa");
+        btnExcluirDespesa.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnExcluirDespesaActionPerformed(evt);
+            }
+        });
+        jPanel6.add(btnExcluirDespesa, new org.netbeans.lib.awtextra.AbsoluteConstraints(1030, 80, -1, -1));
+
+        lblResumoSaldo.setText("$R$ 0,00");
+        jPanel6.add(lblResumoSaldo, new org.netbeans.lib.awtextra.AbsoluteConstraints(910, 30, 150, -1));
 
         jLabel11.setText("Saldo DIsponivel:");
-        jPanel6.add(jLabel11, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 120, -1, -1));
-
-        lblResumoOrcamento.setText("$R$ 0,00");
-        jPanel6.add(lblResumoOrcamento, new org.netbeans.lib.awtextra.AbsoluteConstraints(110, 60, 100, -1));
-
-        jLabel12.setText("Total Gasto:");
-        jPanel6.add(jLabel12, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 90, -1, -1));
+        jPanel6.add(jLabel11, new org.netbeans.lib.awtextra.AbsoluteConstraints(790, 30, -1, -1));
 
         lblResumoGasto.setText("$R$ 0,00");
-        jPanel6.add(lblResumoGasto, new org.netbeans.lib.awtextra.AbsoluteConstraints(80, 90, 150, -1));
+        jPanel6.add(lblResumoGasto, new org.netbeans.lib.awtextra.AbsoluteConstraints(490, 30, 150, -1));
+
+        jLabel12.setText("Total Gasto:");
+        jPanel6.add(jLabel12, new org.netbeans.lib.awtextra.AbsoluteConstraints(410, 30, -1, -1));
+
+        lblResumoOrcamento.setText("$R$ 0,00");
+        jPanel6.add(lblResumoOrcamento, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 30, 100, -1));
+
+        jLabel5.setText("Orçamento Total:");
+        jPanel6.add(jLabel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 30, -1, -1));
 
         barProgressoFinanceiro.setStringPainted(true);
-        jPanel6.add(barProgressoFinanceiro, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 240, 230, -1));
+        jPanel6.add(barProgressoFinanceiro, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 580, 1340, -1));
 
         jTable1.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -549,26 +831,11 @@ public class DlgVisualizarProjeto extends javax.swing.JDialog {
         ));
         JTDespesa.setViewportView(jTable1);
 
-        jPanel6.add(JTDespesa, new org.netbeans.lib.awtextra.AbsoluteConstraints(280, 70, 590, 310));
-
-        btnExcluirDespesa.setText("Excluir Despesa");
-        btnExcluirDespesa.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnExcluirDespesaActionPerformed(evt);
-            }
-        });
-        jPanel6.add(btnExcluirDespesa, new org.netbeans.lib.awtextra.AbsoluteConstraints(740, 30, -1, -1));
-
-        btnLancarDespesa.setText("Lançar Despesa");
-        btnLancarDespesa.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnLancarDespesaActionPerformed(evt);
-            }
-        });
-        jPanel6.add(btnLancarDespesa, new org.netbeans.lib.awtextra.AbsoluteConstraints(590, 30, -1, -1));
+        jPanel6.add(JTDespesa, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 130, 1350, 430));
 
         jTabbedPane2.addTab("Controle de Gastos", jPanel6);
 
+        jPanel2.setBackground(new java.awt.Color(249, 250, 251));
         jPanel2.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         jTDocs.setModel(new javax.swing.table.DefaultTableModel(
@@ -584,7 +851,7 @@ public class DlgVisualizarProjeto extends javax.swing.JDialog {
         ));
         jScrollPane3.setViewportView(jTDocs);
 
-        jPanel2.add(jScrollPane3, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 10, 510, 316));
+        jPanel2.add(jScrollPane3, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 30, 1140, 560));
 
         btnExcluirDoc.setText("Excluir");
         btnExcluirDoc.addActionListener(new java.awt.event.ActionListener() {
@@ -592,7 +859,7 @@ public class DlgVisualizarProjeto extends javax.swing.JDialog {
                 btnExcluirDocActionPerformed(evt);
             }
         });
-        jPanel2.add(btnExcluirDoc, new org.netbeans.lib.awtextra.AbsoluteConstraints(360, 340, 120, -1));
+        jPanel2.add(btnExcluirDoc, new org.netbeans.lib.awtextra.AbsoluteConstraints(1190, 140, 120, -1));
 
         btnAdicionarDoc.setText("Novo Documento");
         btnAdicionarDoc.addActionListener(new java.awt.event.ActionListener() {
@@ -600,7 +867,7 @@ public class DlgVisualizarProjeto extends javax.swing.JDialog {
                 btnAdicionarDocActionPerformed(evt);
             }
         });
-        jPanel2.add(btnAdicionarDoc, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 340, -1, -1));
+        jPanel2.add(btnAdicionarDoc, new org.netbeans.lib.awtextra.AbsoluteConstraints(1190, 40, -1, -1));
 
         btnAbrirDoc.setText("Abrir");
         btnAbrirDoc.addActionListener(new java.awt.event.ActionListener() {
@@ -608,7 +875,7 @@ public class DlgVisualizarProjeto extends javax.swing.JDialog {
                 btnAbrirDocActionPerformed(evt);
             }
         });
-        jPanel2.add(btnAbrirDoc, new org.netbeans.lib.awtextra.AbsoluteConstraints(210, 340, 120, -1));
+        jPanel2.add(btnAbrirDoc, new org.netbeans.lib.awtextra.AbsoluteConstraints(1190, 90, 120, -1));
 
         jTabbedPane2.addTab("Documentos", jPanel2);
 
@@ -616,50 +883,84 @@ public class DlgVisualizarProjeto extends javax.swing.JDialog {
         jPanel4.setLayout(jPanel4Layout);
         jPanel4Layout.setHorizontalGroup(
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 900, Short.MAX_VALUE)
+            .addGap(0, 1390, Short.MAX_VALUE)
         );
         jPanel4Layout.setVerticalGroup(
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 415, Short.MAX_VALUE)
+            .addGap(0, 625, Short.MAX_VALUE)
         );
 
         jTabbedPane2.addTab("Visualizador 3D", jPanel4);
 
-        javax.swing.GroupLayout jPanel7Layout = new javax.swing.GroupLayout(jPanel7);
-        jPanel7.setLayout(jPanel7Layout);
-        jPanel7Layout.setHorizontalGroup(
-            jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 900, Short.MAX_VALUE)
-        );
-        jPanel7Layout.setVerticalGroup(
-            jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 415, Short.MAX_VALUE)
-        );
+        jPanel7.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+
+        jTable2.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null}
+            },
+            new String [] {
+                "Title 1", "Title 2", "Title 3", "Title 4"
+            }
+        ));
+        jTFeedback.setViewportView(jTable2);
+
+        jPanel7.add(jTFeedback, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 30, 730, 280));
+
+        btnAdicionarFeedback.setText("Adicionar");
+        btnAdicionarFeedback.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnAdicionarFeedbackActionPerformed(evt);
+            }
+        });
+        jPanel7.add(btnAdicionarFeedback, new org.netbeans.lib.awtextra.AbsoluteConstraints(660, 340, 100, 30));
+
+        btnExcluirFeedback.setText("Excluir");
+        btnExcluirFeedback.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnExcluirFeedbackActionPerformed(evt);
+            }
+        });
+        jPanel7.add(btnExcluirFeedback, new org.netbeans.lib.awtextra.AbsoluteConstraints(780, 40, 90, 30));
+
+        jLabel2.setText("Comentário:");
+        jPanel7.add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(190, 320, -1, -1));
+
+        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Diário", "problema", "Elogio", "Alteração", "Outro" }));
+        jComboBox1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jComboBox1ActionPerformed(evt);
+            }
+        });
+        jPanel7.add(jComboBox1, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 340, 120, 30));
+
+        jLabel4.setText("Tipo de Apontamento");
+        jPanel7.add(jLabel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 320, -1, -1));
+
+        edtComentario.setColumns(20);
+        edtComentario.setLineWrap(true);
+        edtComentario.setRows(5);
+        jScrollPane4.setViewportView(edtComentario);
+
+        jPanel7.add(jScrollPane4, new org.netbeans.lib.awtextra.AbsoluteConstraints(190, 340, 450, 30));
 
         jTabbedPane2.addTab("Feedback", jPanel7);
 
-        jPanel1.add(jTabbedPane2, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 140, 900, 450));
+        jPanel1.add(jTabbedPane2, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 100, 1390, 660));
         jTabbedPane2.getAccessibleContext().setAccessibleName("Visão Geral");
 
-        getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 930, 610));
+        getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 1430, 790));
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
     private void bntEditarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bntEditarActionPerformed
         DlgCadastroProjetos dlg = new DlgCadastroProjetos(null, true);
-        
-        // 2. Passa o projeto atual para a tela de cadastro preencher os campos
         dlg.setProjetoParaEdicao(this.projetoAtual);
-        
-        // 3. Centraliza e Exibe
         dlg.setLocationRelativeTo(null);
         dlg.setVisible(true);
-        
-        // 4. ATUALIZAR A TELA DE VISUALIZAÇÃO (Pós-Edição)
-        // Quando o 'dlg' fecha (após salvar), o código continua aqui.
-        // O objeto 'this.projetoAtual' foi modificado na memória pelo Hibernate/Java.
-        // Chamamos o setProjeto de novo para atualizar os Labels com os novos dados.
         this.setProjeto(this.projetoAtual);
     }//GEN-LAST:event_bntEditarActionPerformed
 
@@ -831,6 +1132,35 @@ public class DlgVisualizarProjeto extends javax.swing.JDialog {
         atualizarAbaFinanceiro();
     }//GEN-LAST:event_btnLancarDespesaActionPerformed
 
+    private void jComboBox1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBox1ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jComboBox1ActionPerformed
+
+    private void btnAdicionarFeedbackActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAdicionarFeedbackActionPerformed
+        String tipo = (String) jComboBox1.getSelectedItem();
+        String comentario = edtComentario.getText();
+        // ENVIA COMO GESTOR (Padrão do Sistema Desktop)
+        boolean sucesso = feedbackController.salvarFeedback(tipo, comentario, this.projetoAtual, "Gestor");
+        if (sucesso) {
+            atualizarAbaFeedback();
+            JOptionPane.showMessageDialog(this, "Feedback registrado!");
+        }
+    }//GEN-LAST:event_btnAdicionarFeedbackActionPerformed
+
+    private void btnExcluirFeedbackActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnExcluirFeedbackActionPerformed
+        int linha = jTable2.getSelectedRow();
+        if (linha == -1) {
+            JOptionPane.showMessageDialog(this, "Selecione um comentário.");
+            return;
+        }
+        Feedback f = feedbackModel.getFeedback(linha);
+        int confirm = JOptionPane.showConfirmDialog(this, "Excluir este comentário?", "Confirmar", JOptionPane.YES_NO_OPTION);
+        if (confirm == JOptionPane.YES_OPTION) {
+            feedbackController.excluir(f.getId());
+            atualizarAbaFeedback();
+        }
+    }//GEN-LAST:event_btnExcluirFeedbackActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -874,18 +1204,23 @@ public class DlgVisualizarProjeto extends javax.swing.JDialog {
     private javax.swing.JButton bntEditar;
     private javax.swing.JButton btnAbrirDoc;
     private javax.swing.JButton btnAdicionarDoc;
+    private javax.swing.JButton btnAdicionarFeedback;
     private javax.swing.JButton btnAdicionarTerreno;
     private javax.swing.JToggleButton btnExcluirDespesa;
     private javax.swing.JButton btnExcluirDoc;
+    private javax.swing.JButton btnExcluirFeedback;
     private javax.swing.JButton btnExcluirProjeto;
     private javax.swing.JButton btnExcluirTerreno;
     private javax.swing.JToggleButton btnLancarDespesa;
+    private javax.swing.JTextArea edtComentario;
+    private javax.swing.JComboBox<String> jComboBox1;
     private javax.swing.JFileChooser jFileChooser1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
     private javax.swing.JLabel jLabel12;
-    private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
@@ -901,12 +1236,15 @@ public class DlgVisualizarProjeto extends javax.swing.JDialog {
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
+    private javax.swing.JScrollPane jScrollPane4;
     private javax.swing.JTextArea jTDescricao;
     private javax.swing.JTextArea jTDescricaoTerreno;
     private javax.swing.JTable jTDocs;
+    private javax.swing.JScrollPane jTFeedback;
     private javax.swing.JTabbedPane jTabbedPane1;
     private javax.swing.JTabbedPane jTabbedPane2;
     private javax.swing.JTable jTable1;
+    private javax.swing.JTable jTable2;
     private javax.swing.JLabel lblAreaTotal;
     private javax.swing.JLabel lblAreaTotalTerreno;
     private javax.swing.JLabel lblCA;

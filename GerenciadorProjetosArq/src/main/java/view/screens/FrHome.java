@@ -22,8 +22,10 @@ import javax.swing.JButton;
 import javax.swing.JPanel; // O Container
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableCellRenderer;
-import controller.tableModel.ProjetoTableModel;
 import javax.swing.JLabel;
+import controller.tableModel.ProjetoTableModel;
+import controller.tableModel.ClienteTableModel;
+import javax.swing.JScrollPane;
 /**
  *
  * @author juans
@@ -32,6 +34,12 @@ public class FrHome extends javax.swing.JFrame {
     
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(FrHome.class.getName());
     private final ProjetoTableModel projetoModel;
+    private final ClienteTableModel clienteModel;
+    
+    private final Color corAzulEscuro = new Color(30, 60, 160);
+    private final Color corSelecao = new Color(240, 247, 255);
+    private final javax.swing.border.Border bordaInferior = javax.swing.BorderFactory.createMatteBorder(0, 0, 1, 0, new Color(230, 230, 230));
+    
     private javax.swing.JTextField txtBusca;
     /**
      * Creates new form FrProjetos
@@ -41,236 +49,120 @@ public class FrHome extends javax.swing.JFrame {
         setLocationRelativeTo(null);
         estilizarAbasModernas();
         
+        // 1. Inicializa Models
         this.projetoModel = new ProjetoTableModel();
-        jTProjetos.setModel(projetoModel);
+        this.clienteModel = new ClienteTableModel();
         
+        jTProjetos.setModel(projetoModel);
+        jTClientes.setModel(clienteModel);
+        
+        // 2. Configura Layout (Agora usando a função padronizada)
+        configurarTabelaProjetos();
+        configurarTabelaClientes();
+        
+        // 3. Configura Funcionalidades
         configurarPlaceholder();
         
-        configurarTabelaClientes();
+        // 4. Carrega Dados
         carregarTabelaClientes();
-        
-        configurarTabelaProjetos();
         carregarTabelaProjetos();
     }
-    private void estilizarAbasModernas() {
-        // 1. Cores e Fontes Globais do Painel
-        jTabbedPane2.setBackground(Color.WHITE);
-        jTabbedPane2.setForeground(new Color(64, 86, 213)); // Azul do seu tema
-        jTabbedPane2.setFont(new java.awt.Font("Segoe UI", java.awt.Font.BOLD, 18));
-        jTabbedPane2.setOpaque(true);
+    private void padronizarLayoutTabela(JTable table, JScrollPane scroll) {
+        // Configurações Gerais
+        table.setRowHeight(50);
+        table.setShowGrid(false);
+        table.setIntercellSpacing(new Dimension(0, 0));
+        table.setSelectionBackground(corSelecao);
+        table.setSelectionForeground(Color.BLACK);
         
-        // 2. Customização Profunda (UI Manager)
-        jTabbedPane2.setUI(new javax.swing.plaf.basic.BasicTabbedPaneUI() {
-            
-            // Define o Padding (Espaçamento interno) da aba
-            @Override
-            protected void installDefaults() {
-                super.installDefaults();
-                tabInsets = new java.awt.Insets(10, 60, 10, 60); // Mais gordinha e espaçada
-                selectedTabPadInsets = new java.awt.Insets(0, 0, 0, 0);
-                contentBorderInsets = new java.awt.Insets(0, 0, 0, 0); // Remove borda do conteúdo
-            }
-
-            // Pinta o Fundo da Aba
-            @Override
-            protected void paintTabBackground(java.awt.Graphics g, int tabPlacement, int tabIndex, 
-                                            int x, int y, int w, int h, boolean isSelected) {
-                if (isSelected) {
-                    g.setColor(new Color(240, 245, 255)); // Azul bem clarinho quando selecionado
-                } else {
-                    g.setColor(Color.WHITE);
-                }
-                g.fillRect(x, y, w, h);
-            }
-
-            // Remove as bordas 3D antigas
-            @Override
-            protected void paintTabBorder(java.awt.Graphics g, int tabPlacement, int tabIndex, 
-                                        int x, int y, int w, int h, boolean isSelected) {
-                // Desenha apenas uma linha azul embaixo se estiver selecionado
-                if (isSelected) {
-                    g.setColor(new Color(64, 86, 213));
-                    g.fillRect(x, h - 3, w, 3); // Linha grossa azul na base
-                }
-            }
-            
-            @Override
-            protected void paintContentBorder(java.awt.Graphics g, int tabPlacement, int selectedIndex) {
-               // Não desenha borda ao redor do painel principal
-            }
-        });
-    }
-    
-    private void configurarTabelaClientes() {
-        DefaultTableModel modelo = new DefaultTableModel() {
-            @Override
-            public boolean isCellEditable(int row, int column) {
-                return false;
-            }
-        };
-        
-        jTClientes.setModel(modelo);
-        modelo.setColumnCount(0); 
-        
-        // Definição das Colunas
-        modelo.addColumn("ID");      // 0: Oculto
-        modelo.addColumn("Nome");    // 1: Botão Azul
-        modelo.addColumn("CPF");     // 2: Centralizado
-        modelo.addColumn("E-mail");  // 3: Centralizado
-        modelo.addColumn("Cidade");  // 4: Centralizado
-        
-        // --- ESCONDER COLUNA ID ---
-        jTClientes.getColumnModel().getColumn(0).setMinWidth(0);
-        jTClientes.getColumnModel().getColumn(0).setMaxWidth(0);
-        jTClientes.getColumnModel().getColumn(0).setWidth(0);
-        
-        // --- LARGURAS ---
-        jTClientes.getColumnModel().getColumn(1).setPreferredWidth(250); // Nome
-        jTClientes.getColumnModel().getColumn(2).setPreferredWidth(120); // CPF
-        jTClientes.getColumnModel().getColumn(3).setPreferredWidth(200); // Email
-        jTClientes.getColumnModel().getColumn(4).setPreferredWidth(150); // Cidade
-
-        // --- RENDERIZADOR DO BOTÃO (Coluna 1 - Nome) ---
-        jTClientes.getColumnModel().getColumn(1).setCellRenderer(new DefaultTableCellRenderer() {
-            final JPanel panel = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 7));
-            final JButton btn = new JButton();
-
-            {
-                // Estilo igual ao de Projetos
-                btn.setPreferredSize(new Dimension(220, 30)); 
-                btn.setBackground(new Color(64, 86, 213));    
-                btn.setForeground(Color.WHITE);               
-                btn.setFont(new Font("Segoe UI", Font.BOLD, 12)); 
-                btn.setFocusPainted(false);
-                btn.setBorderPainted(false); 
-                panel.add(btn);
-            }
-
-            @Override
-            public Component getTableCellRendererComponent(JTable table, Object value,
-                    boolean isSelected, boolean hasFocus, int row, int column) {
-                
-                // Texto do botão é o Nome do Cliente
-                btn.setText((value != null) ? value.toString() : "Cliente");
-                
-                if (isSelected) {
-                    panel.setBackground(table.getSelectionBackground());
-                } else {
-                    panel.setBackground(table.getBackground());
-                }
-                return panel; 
-            }
-        });
-
-        // --- CENTRALIZAR DEMAIS COLUNAS ---
-        DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
-        centerRenderer.setHorizontalAlignment(SwingConstants.CENTER);
-        
-        jTClientes.getColumnModel().getColumn(2).setCellRenderer(centerRenderer);
-        jTClientes.getColumnModel().getColumn(3).setCellRenderer(centerRenderer);
-        jTClientes.getColumnModel().getColumn(4).setCellRenderer(centerRenderer);
-        
-        // --- VISUAL GERAL ---
-        jTClientes.setRowHeight(45); // Espaçamento maior
-        jTClientes.setShowVerticalLines(false);
-        jTClientes.setGridColor(new Color(230, 230, 230));
-    }
-    
-    public void carregarTabelaClientes() {
-        // 1. Instancia o DAO
-        ClienteDAO dao = new ClienteDAO();
-        
-        // 2. Busca a lista do banco
-        List<Cliente> lista = dao.listarTodos();
-        
-        // 3. Pega o modelo da tabela para manipular
-        DefaultTableModel modelo = (DefaultTableModel) jTClientes.getModel();
-        modelo.setNumRows(0); // Limpa a tabela para não duplicar dados ao recarregar
-        
-        // 4. Adiciona linha por linha
-        for (Cliente c : lista) {
-            modelo.addRow(new Object[]{
-                c.getId(),
-                c.getNome(),
-                c.getCpf(),
-                c.getEmail(),
-                // Verifica se tem endereço antes de pegar cidade para não dar erro
-                (c.getEndereco() != null) ? c.getEndereco().getCidade() : "N/A"
-            });
+        // ScrollPane Clean
+        if(scroll != null) {
+            scroll.setBorder(javax.swing.BorderFactory.createEmptyBorder());
+            scroll.getViewport().setBackground(Color.WHITE);
         }
-    }
-    private void configurarTabelaProjetos() {
-        // --- 1. CONFIGURAÇÕES GERAIS ---
-        jTProjetos.setRowHeight(50); 
-        
-        jTProjetos.setShowGrid(false); 
-        jTProjetos.setIntercellSpacing(new Dimension(0, 0)); 
-        
-        jTProjetos.setSelectionBackground(new Color(240, 247, 255)); 
-        jTProjetos.setSelectionForeground(Color.BLACK);
-        
-        jScrollPane2.setBorder(javax.swing.BorderFactory.createEmptyBorder());
-        jScrollPane2.getViewport().setBackground(Color.WHITE); 
 
-        // Definimos a cor da linha horizontal aqui para usar em todos os renderizadores
-        Color corLinha = new Color(230, 230, 230);
-        javax.swing.border.Border bordaInferior = javax.swing.BorderFactory.createMatteBorder(0, 0, 1, 0, corLinha);
-
-        // --- 2. CABEÇALHO AZUL ---
-        javax.swing.table.JTableHeader header = jTProjetos.getTableHeader();
-        header.setDefaultRenderer(new DefaultTableCellRenderer() {
+        // Cabeçalho Azul
+        table.getTableHeader().setDefaultRenderer(new DefaultTableCellRenderer() {
             @Override
             public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
                 JLabel label = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-                label.setBackground(new Color(30, 60, 160)); 
-                label.setForeground(Color.WHITE); 
+                label.setBackground(corAzulEscuro);
+                label.setForeground(Color.WHITE);
                 label.setFont(new Font("Segoe UI", Font.BOLD, 14));
-                label.setHorizontalAlignment(SwingConstants.CENTER); // Cabeçalho continua centralizado
-                label.setPreferredSize(new Dimension(100, 40)); 
+                label.setHorizontalAlignment(SwingConstants.CENTER);
+                label.setPreferredSize(new Dimension(100, 40));
                 return label;
             }
         });
+    }
 
-        // --- 3. LARGURAS ---
-        jTProjetos.getColumnModel().getColumn(0).setPreferredWidth(200); 
-        jTProjetos.getColumnModel().getColumn(1).setPreferredWidth(200); 
-        jTProjetos.getColumnModel().getColumn(2).setPreferredWidth(120); 
-        jTProjetos.getColumnModel().getColumn(3).setPreferredWidth(120); 
-
-        // --- 4. RENDERIZADOR DE TEXTO (Projeto e Cliente) - ALTERADO ---
-        DefaultTableCellRenderer textoRenderer = new DefaultTableCellRenderer() {
+    // --- RENDERIZADOR PADRÃO DE TEXTO (Esquerda + Padding + Linha Cinza) ---
+    private DefaultTableCellRenderer criarRendererTexto() {
+        return new DefaultTableCellRenderer() {
             @Override
             public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
                 super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
                 
-                // 1. ALINHAMENTO À ESQUERDA
-                setHorizontalAlignment(SwingConstants.LEFT); 
-                setFont(new Font("Segoe UI", Font.PLAIN, 15));
+                setHorizontalAlignment(SwingConstants.LEFT);
+                setFont(new Font("Segoe UI", Font.PLAIN, 13));
                 
-                if (isSelected) {
-                    setForeground(Color.BLACK);
-                } else {
-                    setForeground(new Color(50, 50, 50)); 
-                }
+                if (isSelected) setForeground(Color.BLACK);
+                else setForeground(new Color(50, 50, 50));
                 
-                // 2. BORDA COMPOSTA: JUNTAR A LINHA DE BAIXO COM O ESPAÇAMENTO
-                // Cria um espaçamento invisível de 20px na esquerda (Top, Left, Bottom, Right)
-                javax.swing.border.Border padding = javax.swing.BorderFactory.createEmptyBorder(0, 30, 0, 0);
-                
-                // Combina: Borda Externa (Linha) + Borda Interna (Espaço)
+                // Borda Composta: Linha Embaixo + Espaço na Esquerda (Padding 20px)
+                javax.swing.border.Border padding = javax.swing.BorderFactory.createEmptyBorder(0, 20, 0, 0);
                 setBorder(javax.swing.BorderFactory.createCompoundBorder(bordaInferior, padding));
                 
                 return this;
             }
         };
+    }
+
+    // --- RENDERIZADOR PADRÃO DE BOTÃO ---
+    private DefaultTableCellRenderer criarRendererBotao() {
+        return new DefaultTableCellRenderer() {
+            final JPanel panel = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 10));
+            final JButton btn = new JButton("Ver Detalhes");
+            {
+                btn.setPreferredSize(new Dimension(110, 30));
+                btn.setBackground(new Color(65, 105, 225));
+                btn.setForeground(Color.WHITE);
+                btn.setFont(new Font("Segoe UI", Font.BOLD, 11));
+                btn.setFocusPainted(false);
+                btn.setBorderPainted(false);
+                btn.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+                panel.add(btn);
+            }
+            @Override
+            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+                panel.setBackground(isSelected ? table.getSelectionBackground() : Color.WHITE);
+                panel.setBorder(bordaInferior);
+                return panel;
+            }
+        };
+    }
+
+    // --- CONFIGURAÇÃO ESPECÍFICA: PROJETOS ---
+    private void configurarTabelaProjetos() {
+        // 1. Aplica o visual base
+        padronizarLayoutTabela(jTProjetos, jScrollPane2);
+
+        // 2. Define larguras
+        jTProjetos.getColumnModel().getColumn(0).setPreferredWidth(200); // Projeto
+        jTProjetos.getColumnModel().getColumn(1).setPreferredWidth(200); // Cliente
+        jTProjetos.getColumnModel().getColumn(2).setPreferredWidth(120); // Status
+        jTProjetos.getColumnModel().getColumn(3).setPreferredWidth(120); // Botão
+
+        // 3. Aplica Renderers
+        DefaultTableCellRenderer textoRenderer = criarRendererTexto();
         jTProjetos.getColumnModel().getColumn(0).setCellRenderer(textoRenderer);
         jTProjetos.getColumnModel().getColumn(1).setCellRenderer(textoRenderer);
+        jTProjetos.getColumnModel().getColumn(3).setCellRenderer(criarRendererBotao());
 
-        // --- 5. RENDERIZADOR DO STATUS ---
+        // Renderer Exclusivo de Status (Pill)
         jTProjetos.getColumnModel().getColumn(2).setCellRenderer(new DefaultTableCellRenderer() {
             final JPanel panel = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 10));
             final JLabel label = new JLabel();
-
             {
                 label.setOpaque(true);
                 label.setFont(new Font("Segoe UI", Font.BOLD, 11));
@@ -279,54 +171,84 @@ public class FrHome extends javax.swing.JFrame {
                 label.setBorder(javax.swing.BorderFactory.createLineBorder(new Color(225, 235, 255), 2));
                 panel.add(label);
             }
-
             @Override
             public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
                 String status = (value != null) ? value.toString() : "-";
                 label.setText(status);
-                
-                label.setBackground(new Color(225, 235, 255)); 
-                label.setForeground(new Color(30, 60, 160));   
-
+                label.setBackground(new Color(225, 235, 255));
+                label.setForeground(corAzulEscuro);
                 panel.setBackground(isSelected ? table.getSelectionBackground() : Color.WHITE);
-                
                 panel.setBorder(bordaInferior);
-                
                 return panel;
             }
         });
-
-        // --- 6. RENDERIZADOR DO BOTÃO ---
-        jTProjetos.getColumnModel().getColumn(3).setCellRenderer(new DefaultTableCellRenderer() {
-            final JPanel panel = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 10)); 
-            final JButton btn = new JButton("Ver Detalhes");
-
-            {
-                btn.setPreferredSize(new Dimension(110, 30)); 
-                btn.setBackground(new Color(65, 105, 225)); 
-                btn.setForeground(Color.WHITE);               
-                btn.setFont(new Font("Segoe UI", Font.BOLD, 11)); 
-                btn.setFocusPainted(false);
-                btn.setBorderPainted(false);
-                btn.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-                panel.add(btn);
-            }
-
-            @Override
-            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-                panel.setBackground(isSelected ? table.getSelectionBackground() : Color.WHITE);
-                
-                panel.setBorder(bordaInferior);
-                
-                return panel; 
-            }
-        });
     }
-    
+
+    // --- CONFIGURAÇÃO ESPECÍFICA: CLIENTES ---
+    private void configurarTabelaClientes() {
+        // 1. Aplica o visual base
+        padronizarLayoutTabela(jTClientes, jScrollPane1);
+
+        // 2. Define larguras
+        // Colunas: Nome(0), CPF(1), Email(2), Cidade(3), Visualizar(4)
+        jTClientes.getColumnModel().getColumn(0).setPreferredWidth(200); 
+        jTClientes.getColumnModel().getColumn(1).setPreferredWidth(120); 
+        jTClientes.getColumnModel().getColumn(2).setPreferredWidth(200); 
+        jTClientes.getColumnModel().getColumn(3).setPreferredWidth(150); 
+        jTClientes.getColumnModel().getColumn(4).setPreferredWidth(120); 
+
+        // 3. Aplica Renderers
+        DefaultTableCellRenderer textoRenderer = criarRendererTexto();
+        jTClientes.getColumnModel().getColumn(0).setCellRenderer(textoRenderer); // Nome
+        jTClientes.getColumnModel().getColumn(1).setCellRenderer(textoRenderer); // CPF
+        jTClientes.getColumnModel().getColumn(2).setCellRenderer(textoRenderer); // Email
+        jTClientes.getColumnModel().getColumn(3).setCellRenderer(textoRenderer); // Cidade
+        
+        jTClientes.getColumnModel().getColumn(4).setCellRenderer(criarRendererBotao()); // Botão
+    }
+
     public void carregarTabelaProjetos() {
         ProjetoDAO dao = new ProjetoDAO();
         List<Projeto> lista = dao.listarTodos();
         projetoModel.setDados(lista);
+    }
+    
+    public void carregarTabelaClientes() {
+        ClienteDAO dao = new ClienteDAO();
+        List<Cliente> lista = dao.listarTodos();
+        clienteModel.setDados(lista); // Agora usa o Model!
+    }
+
+    private void estilizarAbasModernas() {
+        jTabbedPane2.setBackground(Color.WHITE);
+        jTabbedPane2.setForeground(new Color(64, 86, 213)); 
+        jTabbedPane2.setFont(new java.awt.Font("Segoe UI", java.awt.Font.BOLD, 18));
+        jTabbedPane2.setOpaque(true);
+        
+        jTabbedPane2.setUI(new javax.swing.plaf.basic.BasicTabbedPaneUI() {
+            @Override
+            protected void installDefaults() {
+                super.installDefaults();
+                tabInsets = new java.awt.Insets(10, 60, 10, 60); 
+                selectedTabPadInsets = new java.awt.Insets(0, 0, 0, 0);
+                contentBorderInsets = new java.awt.Insets(0, 0, 0, 0); 
+            }
+            @Override
+            protected void paintTabBackground(java.awt.Graphics g, int tabPlacement, int tabIndex, int x, int y, int w, int h, boolean isSelected) {
+                if (isSelected) g.setColor(new Color(240, 245, 255)); 
+                else g.setColor(Color.WHITE);
+                g.fillRect(x, y, w, h);
+            }
+            @Override
+            protected void paintTabBorder(java.awt.Graphics g, int tabPlacement, int tabIndex, int x, int y, int w, int h, boolean isSelected) {
+                if (isSelected) {
+                    g.setColor(new Color(64, 86, 213));
+                    g.fillRect(x, h - 3, w, 3); 
+                }
+            }
+            @Override
+            protected void paintContentBorder(java.awt.Graphics g, int tabPlacement, int selectedIndex) {}
+        });
     }
     
     private void configurarPlaceholder() {
@@ -523,15 +445,13 @@ public class FrHome extends javax.swing.JFrame {
         jLabel4.setText("jLabel4");
         jPanel7.add(jLabel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(1300, 20, 40, 40));
 
-        jPanel1.add(jPanel7, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 1360, 80));
+        jPanel1.add(jPanel7, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 1370, 80));
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addContainerGap())
+            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 1376, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
