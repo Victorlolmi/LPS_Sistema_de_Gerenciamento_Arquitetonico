@@ -56,6 +56,25 @@ public class ProjetoDAO extends GenericDAO<Projeto> {
         }
     }
     
+    public List<Projeto> buscarDinamica(String termo) {
+        EntityManager em = JPAUtil.getEntityManager();
+        try {
+            // JPQL: Verifica se o termo parece com o nome do projeto OU com o nome do cliente
+            String jpql = "SELECT p FROM Projeto p JOIN FETCH p.cliente " +
+                          "WHERE lower(p.nome) LIKE lower(:termo) " +
+                          "OR lower(p.cliente.nome) LIKE lower(:termo) " +
+                          "ORDER BY p.nome";
+            
+            TypedQuery<Projeto> query = em.createQuery(jpql, Projeto.class);
+            query.setParameter("termo", "%" + termo + "%"); // O % faz a busca parcial
+            
+            return query.getResultList();
+            
+        } finally {
+            em.close();
+        }
+    }
+    
     public Projeto buscarPorId(Long id) {
         EntityManager em = JPAUtil.getEntityManager();
         try {

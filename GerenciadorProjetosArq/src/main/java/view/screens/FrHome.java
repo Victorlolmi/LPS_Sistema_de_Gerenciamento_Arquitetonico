@@ -22,6 +22,8 @@ import javax.swing.JButton;
 import javax.swing.JPanel; // O Container
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableCellRenderer;
+import controller.tableModel.ProjetoTableModel;
+import javax.swing.JLabel;
 /**
  *
  * @author juans
@@ -29,7 +31,8 @@ import javax.swing.table.DefaultTableCellRenderer;
 public class FrHome extends javax.swing.JFrame {
     
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(FrHome.class.getName());
-
+    private final ProjetoTableModel projetoModel;
+    private javax.swing.JTextField txtBusca;
     /**
      * Creates new form FrProjetos
      */
@@ -37,6 +40,12 @@ public class FrHome extends javax.swing.JFrame {
         initComponents();
         setLocationRelativeTo(null);
         estilizarAbasModernas();
+        
+        this.projetoModel = new ProjetoTableModel();
+        jTProjetos.setModel(projetoModel);
+        
+        configurarPlaceholder();
+        
         configurarTabelaClientes();
         carregarTabelaClientes();
         
@@ -47,7 +56,7 @@ public class FrHome extends javax.swing.JFrame {
         // 1. Cores e Fontes Globais do Painel
         jTabbedPane2.setBackground(Color.WHITE);
         jTabbedPane2.setForeground(new Color(64, 86, 213)); // Azul do seu tema
-        jTabbedPane2.setFont(new java.awt.Font("Segoe UI", java.awt.Font.BOLD, 14));
+        jTabbedPane2.setFont(new java.awt.Font("Segoe UI", java.awt.Font.BOLD, 18));
         jTabbedPane2.setOpaque(true);
         
         // 2. Customização Profunda (UI Manager)
@@ -57,7 +66,7 @@ public class FrHome extends javax.swing.JFrame {
             @Override
             protected void installDefaults() {
                 super.installDefaults();
-                tabInsets = new java.awt.Insets(10, 40, 10, 40); // Mais gordinha e espaçada
+                tabInsets = new java.awt.Insets(10, 60, 10, 60); // Mais gordinha e espaçada
                 selectedTabPadInsets = new java.awt.Insets(0, 0, 0, 0);
                 contentBorderInsets = new java.awt.Insets(0, 0, 0, 0); // Remove borda do conteúdo
             }
@@ -191,119 +200,162 @@ public class FrHome extends javax.swing.JFrame {
         }
     }
     private void configurarTabelaProjetos() {
-        // 1. Modelo (Mantém igual - bloqueia edição)
-        DefaultTableModel modelo = new DefaultTableModel() {
+        // --- 1. CONFIGURAÇÕES GERAIS ---
+        jTProjetos.setRowHeight(50); 
+        
+        jTProjetos.setShowGrid(false); 
+        jTProjetos.setIntercellSpacing(new Dimension(0, 0)); 
+        
+        jTProjetos.setSelectionBackground(new Color(240, 247, 255)); 
+        jTProjetos.setSelectionForeground(Color.BLACK);
+        
+        jScrollPane2.setBorder(javax.swing.BorderFactory.createEmptyBorder());
+        jScrollPane2.getViewport().setBackground(Color.WHITE); 
+
+        // Definimos a cor da linha horizontal aqui para usar em todos os renderizadores
+        Color corLinha = new Color(230, 230, 230);
+        javax.swing.border.Border bordaInferior = javax.swing.BorderFactory.createMatteBorder(0, 0, 1, 0, corLinha);
+
+        // --- 2. CABEÇALHO AZUL ---
+        javax.swing.table.JTableHeader header = jTProjetos.getTableHeader();
+        header.setDefaultRenderer(new DefaultTableCellRenderer() {
             @Override
-            public boolean isCellEditable(int row, int column) {
-                return false;
+            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+                JLabel label = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+                label.setBackground(new Color(30, 60, 160)); 
+                label.setForeground(Color.WHITE); 
+                label.setFont(new Font("Segoe UI", Font.BOLD, 14));
+                label.setHorizontalAlignment(SwingConstants.CENTER); // Cabeçalho continua centralizado
+                label.setPreferredSize(new Dimension(100, 40)); 
+                return label;
+            }
+        });
+
+        // --- 3. LARGURAS ---
+        jTProjetos.getColumnModel().getColumn(0).setPreferredWidth(200); 
+        jTProjetos.getColumnModel().getColumn(1).setPreferredWidth(200); 
+        jTProjetos.getColumnModel().getColumn(2).setPreferredWidth(120); 
+        jTProjetos.getColumnModel().getColumn(3).setPreferredWidth(120); 
+
+        // --- 4. RENDERIZADOR DE TEXTO (Projeto e Cliente) - ALTERADO ---
+        DefaultTableCellRenderer textoRenderer = new DefaultTableCellRenderer() {
+            @Override
+            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+                super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+                
+                // 1. ALINHAMENTO À ESQUERDA
+                setHorizontalAlignment(SwingConstants.LEFT); 
+                setFont(new Font("Segoe UI", Font.PLAIN, 15));
+                
+                if (isSelected) {
+                    setForeground(Color.BLACK);
+                } else {
+                    setForeground(new Color(50, 50, 50)); 
+                }
+                
+                // 2. BORDA COMPOSTA: JUNTAR A LINHA DE BAIXO COM O ESPAÇAMENTO
+                // Cria um espaçamento invisível de 20px na esquerda (Top, Left, Bottom, Right)
+                javax.swing.border.Border padding = javax.swing.BorderFactory.createEmptyBorder(0, 30, 0, 0);
+                
+                // Combina: Borda Externa (Linha) + Borda Interna (Espaço)
+                setBorder(javax.swing.BorderFactory.createCompoundBorder(bordaInferior, padding));
+                
+                return this;
             }
         };
-        
-        jTProjetos.setModel(modelo);
-        modelo.setColumnCount(0); 
-        
-        // 2. Colunas
-        modelo.addColumn("ID");             
-        modelo.addColumn("Projeto"); 
-        modelo.addColumn("Cliente");       
-        modelo.addColumn("Status");         
-        
-        // 3. Esconder ID
-        jTProjetos.getColumnModel().getColumn(0).setMinWidth(0);
-        jTProjetos.getColumnModel().getColumn(0).setMaxWidth(0);
-        jTProjetos.getColumnModel().getColumn(0).setWidth(0);
-        
-        // 4. Larguras (Ajustei levemente para dar mais espaço ao cliente)
-        jTProjetos.getColumnModel().getColumn(1).setPreferredWidth(200); // Coluna do botão
-        jTProjetos.getColumnModel().getColumn(2).setPreferredWidth(250); // Cliente maior
-        jTProjetos.getColumnModel().getColumn(3).setPreferredWidth(100); // Status
+        jTProjetos.getColumnModel().getColumn(0).setCellRenderer(textoRenderer);
+        jTProjetos.getColumnModel().getColumn(1).setCellRenderer(textoRenderer);
 
-        // --- MÁGICA DO BOTÃO AZUL ---
-        
-        jTProjetos.getColumnModel().getColumn(1).setCellRenderer(new DefaultTableCellRenderer() {
-            // Criamos um Painel para servir de fundo e centralizar
-            final JPanel panel = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 7)); // O '7' ajusta o alinhamento vertical
-            // Criamos o botão
-            final JButton btn = new JButton();
+        // --- 5. RENDERIZADOR DO STATUS ---
+        jTProjetos.getColumnModel().getColumn(2).setCellRenderer(new DefaultTableCellRenderer() {
+            final JPanel panel = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 10));
+            final JLabel label = new JLabel();
 
-            // Bloco de inicialização (roda uma vez na criação)
             {
-                // ESTILO DO BOTÃO
-                btn.setPreferredSize(new Dimension(255, 30)); // Tamanho harmônico
-                btn.setBackground(new Color(64, 86, 213));    // Azul (Mesmo do botão 'Novo Projeto')
-                btn.setForeground(Color.WHITE);               // Texto Branco
-                btn.setFont(new Font("Segoe UI", Font.BOLD, 12)); // Fonte mais bonita e negrito
+                label.setOpaque(true);
+                label.setFont(new Font("Segoe UI", Font.BOLD, 11));
+                label.setPreferredSize(new Dimension(120, 25));
+                label.setHorizontalAlignment(SwingConstants.CENTER);
+                label.setBorder(javax.swing.BorderFactory.createLineBorder(new Color(225, 235, 255), 2));
+                panel.add(label);
+            }
+
+            @Override
+            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+                String status = (value != null) ? value.toString() : "-";
+                label.setText(status);
                 
-                // Remove bordas feias de foco
+                label.setBackground(new Color(225, 235, 255)); 
+                label.setForeground(new Color(30, 60, 160));   
+
+                panel.setBackground(isSelected ? table.getSelectionBackground() : Color.WHITE);
+                
+                panel.setBorder(bordaInferior);
+                
+                return panel;
+            }
+        });
+
+        // --- 6. RENDERIZADOR DO BOTÃO ---
+        jTProjetos.getColumnModel().getColumn(3).setCellRenderer(new DefaultTableCellRenderer() {
+            final JPanel panel = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 10)); 
+            final JButton btn = new JButton("Ver Detalhes");
+
+            {
+                btn.setPreferredSize(new Dimension(110, 30)); 
+                btn.setBackground(new Color(65, 105, 225)); 
+                btn.setForeground(Color.WHITE);               
+                btn.setFont(new Font("Segoe UI", Font.BOLD, 11)); 
                 btn.setFocusPainted(false);
-                btn.setBorderPainted(false); // Deixa o botão "chapado" (flat), mais moderno
-                
-                // Adiciona o botão no painel
+                btn.setBorderPainted(false);
+                btn.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
                 panel.add(btn);
             }
 
             @Override
-            public Component getTableCellRendererComponent(JTable table, Object value,
-                    boolean isSelected, boolean hasFocus, int row, int column) {
+            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+                panel.setBackground(isSelected ? table.getSelectionBackground() : Color.WHITE);
                 
-                // Texto do botão (Nome do Projeto)
-                btn.setText((value != null) ? value.toString() : "Abrir");
-                
-                // --- CONTROLE DE CORES DO FUNDO (Painel) ---
-                if (isSelected) {
-                    panel.setBackground(table.getSelectionBackground());
-                } else {
-                    // Alternar cores das linhas (Zebrado) para facilitar leitura?
-                    // Se quiser linhas alternadas, descomente a lógica abaixo:
-                    /*
-                    if (row % 2 == 0) {
-                        panel.setBackground(Color.WHITE);
-                    } else {
-                        panel.setBackground(new Color(245, 245, 245)); // Cinza bem clarinho
-                    }
-                    */
-                    panel.setBackground(table.getBackground());
-                }
+                panel.setBorder(bordaInferior);
                 
                 return panel; 
             }
         });
-        DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
-        // Definimos o alinhamento horizontal para o CENTRO
-        centerRenderer.setHorizontalAlignment(SwingConstants.CENTER);
-        
-        // Aplicamos esse renderizador nas colunas de Cliente (2) e Status (3)
-        jTProjetos.getColumnModel().getColumn(2).setCellRenderer(centerRenderer);
-        jTProjetos.getColumnModel().getColumn(3).setCellRenderer(centerRenderer);
-        
-        // --- ESPAÇAMENTO DA TABELA ---
-        // Aumenta a altura da linha. 45px deixa o visual muito mais limpo e "respirável"
-        jTProjetos.setRowHeight(45); 
-        
-        // Opcional: Remove as linhas de grade verticais para um visual mais limpo
-        jTProjetos.setShowVerticalLines(false);
-        // Cor da linha de grade horizontal
-        jTProjetos.setGridColor(new Color(230, 230, 230));
     }
+    
     public void carregarTabelaProjetos() {
         ProjetoDAO dao = new ProjetoDAO();
         List<Projeto> lista = dao.listarTodos();
-        
-        DefaultTableModel modelo = (DefaultTableModel) jTProjetos.getModel();
-        modelo.setNumRows(0);
-        
-        for (Projeto p : lista) {
-            String nomeCliente = (p.getCliente() != null) ? p.getCliente().getNome() : "---";
-            String statusTexto = (p.getStatus() != null) ? p.getStatus() : "Indefinido";
-
-            modelo.addRow(new Object[]{
-                p.getId(),    // <--- ID entra na tabela (mas está escondido)
-                p.getNome(),
-                nomeCliente,
-                statusTexto
-            });
-        }
+        projetoModel.setDados(lista);
     }
+    
+    private void configurarPlaceholder() {
+        // 1. Configuração Inicial (Estado "Vazio")
+        lblBusca.setText("  Buscar por projeto ou cliente...");
+        lblBusca.setForeground(new Color(150, 150, 150)); // Cinza claro
+
+        // 2. Adiciona o Ouvinte de Foco
+        lblBusca.addFocusListener(new java.awt.event.FocusListener() {
+            @Override
+            public void focusGained(java.awt.event.FocusEvent e) {
+                // Quando clica no campo: Se tiver o texto fantasma, limpa e poe cor normal
+                if (lblBusca.getText().equals("  Buscar por projeto ou cliente...")) {
+                    lblBusca.setText("");
+                    lblBusca.setForeground(Color.BLACK); // Cor normal do texto
+                }
+            }
+
+            @Override
+            public void focusLost(java.awt.event.FocusEvent e) {
+                // Quando sai do campo: Se estiver vazio, repõe o fantasma
+                if (lblBusca.getText().trim().isEmpty()) {
+                    lblBusca.setText("  Buscar por projeto ou cliente...");
+                    lblBusca.setForeground(new Color(150, 150, 150)); // Cinza fantasma
+                }
+            }
+        });
+    }
+    
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -322,6 +374,8 @@ public class FrHome extends javax.swing.JFrame {
         btnCadastrarprojetos = new javax.swing.JButton();
         jScrollPane2 = new javax.swing.JScrollPane();
         jTProjetos = new javax.swing.JTable();
+        lblBusca = new javax.swing.JTextField();
+        jSeparator1 = new javax.swing.JSeparator();
         jPanel4 = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
         jTClientes = new javax.swing.JTable();
@@ -352,7 +406,7 @@ public class FrHome extends javax.swing.JFrame {
                 btnCadastrarprojetosActionPerformed(evt);
             }
         });
-        jPanel3.add(btnCadastrarprojetos, new org.netbeans.lib.awtextra.AbsoluteConstraints(1200, 20, 130, 40));
+        jPanel3.add(btnCadastrarprojetos, new org.netbeans.lib.awtextra.AbsoluteConstraints(1090, 20, 170, 30));
 
         jTProjetos.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -372,7 +426,21 @@ public class FrHome extends javax.swing.JFrame {
         });
         jScrollPane2.setViewportView(jTProjetos);
 
-        jPanel3.add(jScrollPane2, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 10, 1140, 410));
+        jPanel3.add(jScrollPane2, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 60, 1270, 410));
+
+        lblBusca.setToolTipText("");
+        lblBusca.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                lblBuscaActionPerformed(evt);
+            }
+        });
+        lblBusca.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                lblBuscaKeyReleased(evt);
+            }
+        });
+        jPanel3.add(lblBusca, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 20, 340, 30));
+        jPanel3.add(jSeparator1, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 63, 340, 0));
 
         jTabbedPane2.addTab("Projetos", jPanel3);
 
@@ -414,7 +482,7 @@ public class FrHome extends javax.swing.JFrame {
         );
         jPanel5Layout.setVerticalGroup(
             jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 595, Short.MAX_VALUE)
+            .addGap(0, 625, Short.MAX_VALUE)
         );
 
         jTabbedPane2.addTab("tab3", jPanel5);
@@ -427,12 +495,12 @@ public class FrHome extends javax.swing.JFrame {
         );
         jPanel6Layout.setVerticalGroup(
             jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 595, Short.MAX_VALUE)
+            .addGap(0, 625, Short.MAX_VALUE)
         );
 
         jTabbedPane2.addTab("tab4", jPanel6);
 
-        jPanel1.add(jTabbedPane2, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 100, 1360, 630));
+        jPanel1.add(jTabbedPane2, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 100, 1360, 660));
         jTabbedPane2.getAccessibleContext().setAccessibleName("Projetos");
 
         jPanel7.setBackground(new java.awt.Color(255, 255, 255));
@@ -499,34 +567,43 @@ public class FrHome extends javax.swing.JFrame {
         int linha = jTProjetos.rowAtPoint(evt.getPoint());
         int coluna = jTProjetos.columnAtPoint(evt.getPoint());
         
-        // Verifica se clicou numa linha válida
         if (linha != -1) {
-            
-            // LÓGICA:
-            // Se clicou na Coluna 1 (onde está o botão), basta 1 clique.
-            // Se clicou nas outras colunas (Cliente/Status), exige 2 cliques (opcional).
-            
-            boolean clicouNoBotao = (coluna == 1);
+            // VERIFICA SE O CLIQUE FOI NA COLUNA 3 (Onde está o botão ABRIR)
+            boolean clicouNoBotao = (coluna == 3);
             boolean duploCliqueGeral = (evt.getClickCount() == 2);
             
-            // Se foi clique no botão OU duplo clique no resto da linha...
+            // Se clicou no botão ou deu duplo clique em qualquer lugar, abre
             if (clicouNoBotao || duploCliqueGeral) {
                 
-                // 2. Pega o ID (Coluna 0 escondida)
-                Long idProjeto = (Long) jTProjetos.getValueAt(linha, 0);
+                Projeto projetoCompleto = projetoModel.getProjeto(linha);
                 
-                // 3. Busca no banco
-                ProjetoDAO dao = new ProjetoDAO();
-                Projeto projetoCompleto = dao.buscarPorId(idProjeto);
-                
-                // 4. Abre visualização
                 view.screens.dialogs.DlgVisualizarProjeto dlg = new view.screens.dialogs.DlgVisualizarProjeto(this, true);
                 dlg.setProjeto(projetoCompleto);
                 dlg.setVisible(true);
+                
                 carregarTabelaProjetos();
             }
         }
     }//GEN-LAST:event_jTProjetosMouseClicked
+
+    private void lblBuscaKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_lblBuscaKeyReleased
+        String textoDigitado = lblBusca.getText(); 
+        
+        ProjetoDAO dao = new ProjetoDAO();
+        List<Projeto> resultados;
+
+        if (textoDigitado.trim().isEmpty()) {
+            resultados = dao.listarTodos();
+        } else {
+            resultados = dao.buscarDinamica(textoDigitado);
+        }
+
+        projetoModel.setDados(resultados);
+    }//GEN-LAST:event_lblBuscaKeyReleased
+
+    private void lblBuscaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_lblBuscaActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_lblBuscaActionPerformed
 
     /**
      * @param args the command line arguments
@@ -571,8 +648,10 @@ public class FrHome extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel7;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JSeparator jSeparator1;
     private javax.swing.JTable jTClientes;
     private javax.swing.JTable jTProjetos;
     private javax.swing.JTabbedPane jTabbedPane2;
+    private javax.swing.JTextField lblBusca;
     // End of variables declaration//GEN-END:variables
 }
