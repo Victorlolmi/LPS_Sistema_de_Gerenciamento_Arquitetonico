@@ -3,6 +3,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 package controller;
+
 import javax.swing.JOptionPane;
 import model.dao.UsuarioDAO;
 import model.entities.Usuario;
@@ -11,11 +12,12 @@ import view.screens.FrLogin;
 import view.screens.FrCadastro;
 import view.screens.FrRecuperacaoSenha;
 import view.screens.FrHome;
+
 /**
- *
  * @author Viktin
  */
 public class LoginController {
+    
     private final FrLogin view;
     private final UsuarioDAO usuarioDAO;
 
@@ -25,11 +27,9 @@ public class LoginController {
     }
 
     public void realizarLogin() {
-        // 1. Obter dados da View
         String identificador = view.getIdentificador();
         String senhaDigitada = view.getSenha();
 
-        // 2. Validar dados de entrada (tratamento de exceções de negócio)
         if (identificador.isEmpty()) {
             view.exibeMensagem("Erro: O campo 'Login' é obrigatório.");
             return;
@@ -39,45 +39,33 @@ public class LoginController {
             return;
         }
 
-        // 3. Buscar o usuário no banco de dados
         Usuario usuarioDoBanco = usuarioDAO.findByEmailOrCpf(identificador);
 
-        // 4. Tomar a decisão
         if (usuarioDoBanco == null) {
+            // FIXME: Risco de segurança (Enumeração de Usuários). 
+            // Em produção, retorne mensagem genérica ("Usuário ou senha inválidos") independente do erro.
             view.exibeMensagem("Falha no login: Usuário não encontrado.");
         } else {
-            // Usuário encontrado, agora verificar a senha com BCrypt
+            // Valida o hash (nunca comparar strings puras em auth)
             if (BCrypt.checkpw(senhaDigitada, usuarioDoBanco.getSenha())) {
-                // Sucesso!
-                
                 FrHome telaPrincipal = new FrHome();
-        
                 telaPrincipal.setVisible(true);
-        
-                // Fecha e libera os recursos da tela de login atual
                 view.dispose();
             } else {
-                // Senha incorreta
                 view.exibeMensagem("Falha no login: Senha incorreta.");
             }
         }
     }
-        public void exibirRecuperacaoSenha() {
-        // Cria a nova tela de recuperação
+
+    public void exibirRecuperacaoSenha() {
         FrRecuperacaoSenha telaRecuperacao = new FrRecuperacaoSenha();
         telaRecuperacao.setVisible(true);
-
-        // Fecha a tela de login atual
-        this.view.dispose(); // 'view' é a sua instância de FrLogin
+        this.view.dispose(); 
     }
+
     public void navegarParaCadastro() {
-        
         FrCadastro telaCadastro = new FrCadastro();
-        
-        // Torna a nova tela visível
         telaCadastro.setVisible(true);
-        
-        // Fecha e libera os recursos da tela de login atual
         view.dispose();
     }
 }

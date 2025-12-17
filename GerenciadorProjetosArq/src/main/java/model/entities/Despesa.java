@@ -14,7 +14,6 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 /**
- *
  * @author Viktin
  */
 @Entity
@@ -26,33 +25,36 @@ public class Despesa {
     private Long id;
 
     @Column(nullable = false)
-    private String descricao; // Ex: "Cimento CP-II"
+    private String descricao;
 
+    // FIXME: Double para monetário perde precisão. Migrar para BigDecimal para evitar erros de arredondamento.
     @Column(nullable = false)
     private Double valor;
 
     @Column(nullable = false)
     private LocalDate dataDespesa;
 
-    private String categoria; // Ex: "Material", "Mão de Obra"
+    // TODO: Refatorar para Enum (Evita strings mágicas como "Material")
+    private String categoria;
     
-    private String fornecedor; // Ex: "Casa das Tintas"
+    private String fornecedor;
     
-    private String status; // Ex: "Pago", "Pendente"
+    // TODO: Refatorar para Enum (PENDENTE, PAGO, CANCELADO) para controle de estado
+    private String status;
     
-    // --- NOVOS CAMPOS FINAIS ---
     @Column(name = "forma_pagamento")
-    private String formaPagamento; // Ex: "Pix", "Cartão de Crédito"
+    private String formaPagamento;
     
+    // Força TEXT no banco para não estourar o limite padrão de varchar(255)
     @Column(columnDefinition = "TEXT")
-    private String observacoes; // Ex: "Nota fiscal 455, inclui frete"
-    // ---------------------------
+    private String observacoes;
 
     @ManyToOne
     @JoinColumn(name = "projeto_id", nullable = false)
     private Projeto projeto;
 
     public Despesa() {
+        // Inicializa com defaults para facilitar o bind na UI
         this.dataDespesa = LocalDate.now();
         this.status = "Pendente";
     }
@@ -67,8 +69,6 @@ public class Despesa {
         this.projeto = projeto;
         this.dataDespesa = LocalDate.now();
     }
-
-    // --- Getters e Setters ---
 
     public Long getId() { 
         return id; 

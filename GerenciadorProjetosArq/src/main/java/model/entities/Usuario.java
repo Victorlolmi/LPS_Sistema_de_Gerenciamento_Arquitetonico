@@ -5,143 +5,117 @@
 package model.entities;
 import java.time.LocalDateTime;
 import javax.persistence.*;
+
 /**
- *
  * @author Viktin
  */
-
 @Entity
 @Table(name = "usuarios")
-@Inheritance(strategy = InheritanceType.JOINED) //  definimos a estratégia a qual conecta o usuario aos seus resltados pelo id
-@DiscriminatorColumn(name = "tipo_usuario") // Coluna que identifica o tipo
+// Estratégia JOINED: Normaliza o banco. Dados comuns ficam aqui, dados específicos nas tabelas filhas (Cliente, etc).
+@Inheritance(strategy = InheritanceType.JOINED) 
+@DiscriminatorColumn(name = "tipo_usuario")
 public abstract class Usuario {
+
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)//Auto incremento
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     @Column(nullable = false)
     private String nome;
-    @Column(nullable = false, unique = true)// campo unico em todo BD e nao pode ser vazio
+
+    @Column(nullable = false, unique = true)
     private String senha;
-    @Column(nullable = false,unique = true)
+
+    @Column(nullable = false, unique = true)
     private String email;
+
     @Column(nullable = false, unique = true) 
     private String cpf;
+
+    // Refatorado para camelCase (Java Standard). O name="" garante o match com o banco.
     @Column(name = "codigo_recuperacao")
-    private String codigo_recuperacao;
+    private String codigoRecuperacao;
+
     @Column(name = "validade_codigo_recuperacao")
-    private LocalDateTime validade_codigo_recuperacao;
+    private LocalDateTime validadeCodigoRecuperacao;
     
-    // Ligacao com o JPA
+    // Performance: LAZY evita carregar o endereço se não for necessário.
+    // Cascade ALL garante que se o user for deletado, o endereço também será.
     @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinColumn(name = "endereco_id", referencedColumnName = "id")
     private Endereco endereco;
     
     public Usuario(){}
     
-    /**
-     * @return the id
-     */
+    // Getters e Setters (Boilerplate limpo)
+
     public Long getId() {
         return id;
     }
-    
-    /**
-     * @return the nome
-     */
+
     public String getNome() {
         return nome;
     }
 
-    /**
-     * @param nome the nome to set
-     */
     public void setNome(String nome) {
         this.nome = nome;
     }
 
-    /**
-     * @param id the id to set
-     */
     public void setId(Long id) {
         this.id = id;
     }
 
-
-    /**
-     * @return the senha
-     */
     public String getSenha() {
         return senha;
     }
 
-    /**
-     * @param senha the senha to set
-     */
     public void setSenha(String senha) {
         this.senha = senha;
     }
 
-    /**
-     * @return the email
-     */
     public String getEmail() {
         return email;
     }
 
-    /**
-     * @param email the email to set
-     */
     public void setEmail(String email) {
         this.email = email;
     }
 
-    /**
-     * @return the cpf
-     */
     public String getCpf() {
         return cpf;
     }
 
-    /**
-     * @param cpf the cpf to set
-     */
     public void setCpf(String cpf) {
         this.cpf = cpf;
     }
 
-    /**
-     * @return the endereco
-     */
     public Endereco getEndereco() {
         return endereco;
     }
 
-    /**
-     * @param endereco the endereco to set
-     */
     public void setEndereco(Endereco endereco) {
         this.endereco = endereco;
     }
     
-
     public String getCodigo_recuperacao() {
-        return codigo_recuperacao;
+        return codigoRecuperacao;
     }
 
-    public void setCodigo_recuperacao(String codigo_recuperacao) {
-        this.codigo_recuperacao = codigo_recuperacao;
+    public void setCodigo_recuperacao(String codigoRecuperacao) {
+        this.codigoRecuperacao = codigoRecuperacao;
     }
 
     public LocalDateTime getValidade_codigo_recuperacao() {
-        return validade_codigo_recuperacao;
+        return validadeCodigoRecuperacao;
     }
 
-    public void setValidade_codigo_recuperacao(LocalDateTime validade_codigo_recuperacao) {
-        this.validade_codigo_recuperacao = validade_codigo_recuperacao;
+    public void setValidade_codigo_recuperacao(LocalDateTime validadeCodigoRecuperacao) {
+        this.validadeCodigoRecuperacao = validadeCodigoRecuperacao;
     }
     
     @Override
     public String toString() {
-        return this.getNome(); // Retorna o nome para aparecer na lista
+        // Facilita a visualização em componentes visuais (ex: ComboBox)
+        return this.getNome(); 
     }
 }

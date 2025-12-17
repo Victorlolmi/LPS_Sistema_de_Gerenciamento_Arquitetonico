@@ -3,6 +3,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 package controller;
+
 import java.io.File;
 import java.util.List;
 import javax.swing.JOptionPane;
@@ -11,7 +12,6 @@ import model.entities.Documento;
 import model.entities.Projeto;
 
 /**
- *
  * @author Viktin
  */
 public class DocumentoController {
@@ -22,18 +22,20 @@ public class DocumentoController {
         this.dao = new DocumentoDAO();
     }
 
-    // Método para salvar recebendo os dados brutos da tela (futura DlgCadastroDocumento)
     public boolean salvarDocumento(String nome, String categoria, File arquivo, Projeto projeto) {
         
-        // Validações
         if (nome == null || nome.isEmpty()) {
             JOptionPane.showMessageDialog(null, "O nome do documento é obrigatório.");
             return false;
         }
+        
+        // Garante que o arquivo existe fisicamente no disco antes de vincular
         if (arquivo == null || !arquivo.exists()) {
             JOptionPane.showMessageDialog(null, "Selecione um arquivo válido.");
             return false;
         }
+        
+        // Guard clause: Documento órfão quebra a lógica do sistema
         if (projeto == null) {
             JOptionPane.showMessageDialog(null, "Erro: Projeto não vinculado.");
             return false;
@@ -42,16 +44,20 @@ public class DocumentoController {
         try {
             Documento doc = new Documento();
             doc.setNome(nome);
-            doc.setCaminhoArquivo(arquivo.getAbsolutePath()); // Salva o caminho completo
+            
+            // FIXME: Armazenar path absoluto é frágil. Se moverem o arquivo no SO, o link quebra.
+            // Ideal seria copiar o arquivo para uma pasta gerenciada pela app.
+            doc.setCaminhoArquivo(arquivo.getAbsolutePath()); 
+            
             doc.setCategoria(categoria);
             doc.setProjeto(projeto);
 
-            // Extrai a extensão do arquivo (Ex: "contrato.pdf" -> ".pdf")
+            // Parser manual da extensão para metadados/ícones
             String nomeArquivo = arquivo.getName();
             if (nomeArquivo.lastIndexOf(".") != -1) {
                 doc.setTipo(nomeArquivo.substring(nomeArquivo.lastIndexOf(".")));
             } else {
-                doc.setTipo("Arquivo");
+                doc.setTipo("Arquivo"); // Fallback
             }
 
             dao.salvar(doc);

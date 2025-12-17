@@ -10,10 +10,8 @@ import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
-import javax.swing.JFrame;
 
 /**
- *
  * @author Viktin
  */
 public class FrLogin extends javax.swing.JFrame {
@@ -21,19 +19,44 @@ public class FrLogin extends javax.swing.JFrame {
     private final LoginController controller;
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(FrLogin.class.getName());
 
-    /**
-     * Creates new form FrTelaLogin
-     */
     public FrLogin() {
         initComponents();
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
         
+        // Inicializa o Controller
         this.controller = new LoginController(this);
         
+        // UX: Configura o texto "fantasma" (placeholder)
+        configurarPlaceholder();
     }
     
+    // Configura o comportamento do campo de texto (E-mail ou CPF)
+    private void configurarPlaceholder() {
+        // Estado inicial
+        edtIdentificador.setText("Digite seu e-mail ou CPF");
+        edtIdentificador.setForeground(Color.GRAY);
+
+        edtIdentificador.addFocusListener(new FocusListener() {
+            @Override
+            public void focusGained(FocusEvent e) {
+                if (edtIdentificador.getText().equals("Digite seu e-mail ou CPF")) {
+                    edtIdentificador.setText("");
+                    edtIdentificador.setForeground(Color.BLACK);
+                }
+            }
+
+            @Override
+            public void focusLost(FocusEvent e) {
+                if (edtIdentificador.getText().isEmpty()) {
+                    edtIdentificador.setForeground(Color.GRAY);
+                    edtIdentificador.setText("Digite seu e-mail ou CPF");
+                }
+            }
+        });
+    }
     public String getIdentificador() {
+        // Se o usuário não digitou nada (está aparecendo o placeholder), retorna vazio
         if (edtIdentificador.getText().equals("Digite seu e-mail ou CPF")) {
             return "";
         }
@@ -41,7 +64,6 @@ public class FrLogin extends javax.swing.JFrame {
     }
 
     public String getSenha() {
-        // Garante que o placeholder da senha não seja enviado
         return new String(edtSenha.getPassword());
     }
 

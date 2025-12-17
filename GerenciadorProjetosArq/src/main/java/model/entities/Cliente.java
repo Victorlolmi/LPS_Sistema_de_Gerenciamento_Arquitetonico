@@ -4,24 +4,20 @@
  */
 package model.entities;
 import javax.persistence.*;
+
 /**
- *
  * @author Viktin
  */
 @Entity
-@Table(name = "clientes") // Tabela separada para dados específicos do cliente
-@DiscriminatorValue("CLIENTE") // O valor que vai entrar automático na coluna 'tipo_usuario'
-@PrimaryKeyJoinColumn(name = "id") // Une a tabela clientes com usuarios pelo ID
+@Table(name = "clientes")
+@DiscriminatorValue("CLIENTE")
+@PrimaryKeyJoinColumn(name = "id")
 public class Cliente extends Usuario {
 
-    // Se o cliente tiver campos exclusivos (ex: CNPJ), coloque aqui.
-    // Se não, pode deixar a classe assim mesmo, herdando tudo de Usuario.
-    
-    // Exemplo (opcional):
-    // @Column(name = "cnpj")
-    // private String cnpj;
-    
+    // TODO: Adicionar campos específicos de regra de negócio (Ex: CNPJ, LimiteCredito) se necessário.
+    // Atualmente funciona apenas como especialização para a estratégia JOINED do JPA.
+
     public Cliente() {
-        super(); // Chama o construtor do Usuario
+        super();
     }
 }

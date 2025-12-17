@@ -4,29 +4,29 @@
  */
 package view.screens;
 
-import javax.swing.JFrame;
 import controller.CadastroController;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
 /**
- *
  * @author Viktin
  */
 public class FrCadastro extends javax.swing.JFrame {
+    
     private final CadastroController controller;
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(FrCadastro.class.getName());
 
-    /**
-     * Creates new form DlgCadastro
-     */
     public FrCadastro() {
         initComponents();
         
         setLocationRelativeTo(null); // Centraliza na tela
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        
+        // Inicializa o Controller passando a View (this)
         this.controller = new CadastroController(this);
     }
+    
+    // Dados Pessoais
     public String getNome() {
         return edtINome.getText();
     }
@@ -40,29 +40,37 @@ public class FrCadastro extends javax.swing.JFrame {
     }
 
     public String getSenha() {
+        // Converte o array de char do PasswordField para String
         return new String(edtSenha1.getPassword());
     }
-
+    
+    // Endereço
     public String getCep() {
         return edtCep.getText();
     }
     
-    public boolean isTipo() {
-        return edtTipo.isSelected();
-    }   
-
     public String getCidade() {
         return edtCidade.getText(); 
     }
+    
     public String getLogradouro() {
         return edtLogradouro.getText(); 
     }
+    
     public String getBairro() {
         return edtBairro.getText(); 
     }
+    
     public String getNumero() {
         return edtNumero.getText(); 
     }
+    
+    // Checkbox (Gestor ou Cliente?)
+    public boolean isTipo() {
+        return edtTipo.isSelected();
+    }    
+
+    // Auxiliar para mensagens
     public void exibeMensagem(String mensagem) {
         JOptionPane.showMessageDialog(this, mensagem);
     }

@@ -7,36 +7,34 @@ import factory.JPAUtil;
 import model.entities.Usuario;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
+
 /**
- *
  * @author Viktin
  */
 public class UsuarioDAO extends GenericDAO<Usuario> {
 
     public UsuarioDAO() {
-        // Passa a classe da entidade para o construtor do GenericDAO
         super(Usuario.class);
     }
-    
-    // O método 'salvar(Usuario usuario)' já foi herdado! Não é preciso reescrevê-lo.
 
     public Usuario findByEmailOrCpf(String ident) {
+        // Sanitiza input caso seja um CPF formatado (123.456...), mas mantém original para validação de email
         String identLimpo = ident.replaceAll("[.\\-]", "");
         
         EntityManager em = JPAUtil.getEntityManager();
         try {
-            // JPQL para buscar em duas colunas diferentes
+            // Smart Login: Tenta match no email (literal) ou CPF (apenas números)
             String jpql = "SELECT u FROM Usuario u WHERE u.email = :identificador OR u.cpf = :identificadorLimpo";
             
             return em.createQuery(jpql, Usuario.class)
-                    .setParameter("identificador", ident) // Busca o email com o valor original
-                    .setParameter("identificadorLimpo", identLimpo) // Busca o CPF com o valor limpo
+                    .setParameter("identificador", ident) 
+                    .setParameter("identificadorLimpo", identLimpo) 
                     .getSingleResult();
+                    
         } catch (NoResultException e) {
-            return null; // Nenhum usuário encontrado com esse email ou CPF
+            return null; 
         } finally {
             em.close();
         }
     }
-    
 }

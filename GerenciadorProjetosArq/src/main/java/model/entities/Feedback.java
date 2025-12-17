@@ -11,8 +11,8 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.JoinColumn;
+
 /**
- *
  * @author Viktin
  */
 @Entity
@@ -23,10 +23,14 @@ public class Feedback implements Serializable {
     private Long id;
 
     private LocalDateTime dataRegistro;
-    private String tipo; // "Problema", "Elogio", "Diário"
+    
+    // TODO: Refatorar para Enum (PROBLEMA, ELOGIO, DIARIO) para evitar typos e garantir consistência
+    private String tipo; 
+    
     private String comentario;
     
-    // NOVO CAMPO: Identifica quem mandou ("Gestor" ou "Cliente")
+    // Audit simples: armazena "Gestor" ou "Cliente".
+    // FIXME: Deveria ser um relacionamento @ManyToOne com Usuario para rastreabilidade real.
     private String autor; 
 
     @ManyToOne
@@ -34,10 +38,10 @@ public class Feedback implements Serializable {
     private Projeto projeto;
 
     public Feedback() {
+        // Timestamp automático ao instanciar
         this.dataRegistro = LocalDateTime.now();
     }
 
-    // Atualizei o construtor para receber o Autor
     public Feedback(String tipo, String comentario, Projeto projeto, String autor) {
         this.dataRegistro = LocalDateTime.now();
         this.tipo = tipo;
@@ -46,19 +50,22 @@ public class Feedback implements Serializable {
         this.autor = autor;
     }
 
-    // Getters e Setters
+    // Getters e Setters omitidos de comentários por serem boilerplate
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
+    
     public LocalDateTime getDataRegistro() { return dataRegistro; }
     public void setDataRegistro(LocalDateTime dataRegistro) { this.dataRegistro = dataRegistro; }
+    
     public String getTipo() { return tipo; }
     public void setTipo(String tipo) { this.tipo = tipo; }
+    
     public String getComentario() { return comentario; }
     public void setComentario(String comentario) { this.comentario = comentario; }
+    
     public Projeto getProjeto() { return projeto; }
     public void setProjeto(Projeto projeto) { this.projeto = projeto; }
     
-    // Novo Getter/Setter
     public String getAutor() { return autor; }
     public void setAutor(String autor) { this.autor = autor; }
 }

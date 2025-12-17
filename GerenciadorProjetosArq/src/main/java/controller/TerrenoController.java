@@ -3,14 +3,15 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 package controller;
+
 import model.dao.ProjetoDAO;
 import model.dao.TerrenoDAO;
 import model.entities.Endereco;
 import model.entities.Projeto;
 import model.entities.Terreno;
 import view.screens.dialogs.DlgCadastroTerreno;
+
 /**
- *
  * @author Viktin
  */
 public class TerrenoController {
@@ -31,22 +32,20 @@ public class TerrenoController {
     }
     
     public void preencherTelaParaEdicao(Terreno t) {
-        this.terrenoEmEdicao = t; // Guarda o objeto
+        this.terrenoEmEdicao = t; 
         
         if (t != null) {
             view.setTitle("Editar Terreno: " + t.getNome());
             
-            // Textos Simples
             view.setTextoNome(t.getNome());
             view.setTextoReferencia(t.getReferencia());
             view.setTextoGabarito(t.getGabaritoAltura());
             view.setTextoDescricao(t.getDescricao());
             
-            // Combos
             view.setSelecionadoTopografia(t.getTopografia());
             view.setSelecionadoTipo(t.getTipoSolo());
 
-            // Formatação de Números (Logica de Apresentação)
+            // Formatação UI (Double -> String com vírgula)
             if (t.getAreaTotal() != null) {
                 view.setTextoArea(String.format("%.2f", t.getAreaTotal()).replace(".", ","));
             }
@@ -60,7 +59,6 @@ public class TerrenoController {
                 view.setTextoTaxa(String.valueOf(t.getTaxaOcupacao()).replace(".", ","));
             }
 
-            // Endereço
             if (t.getEndereco() != null) {
                 view.setTextoCep(t.getEndereco().getCep());
                 view.setTextoCidade(t.getEndereco().getCidade());
@@ -72,30 +70,23 @@ public class TerrenoController {
     }
 
     public void salvarTerreno() {
-        // -----------------------------------------------------------
-        // 1. RECUPERA OS DADOS DA TELA
-        // -----------------------------------------------------------
         String nome = view.getNome();
-        String areaStr = view.getAreaTotal(); // Vem como String, precisa converter
+        String areaStr = view.getAreaTotal(); 
         String topografia = view.getTopografia();
         String tipoSolo = view.getTipoSolo();
-        String caStr = view.getCoeficienteAproveitamento(); // String
+        String caStr = view.getCoeficienteAproveitamento();
         String toStr = view.getTaxaOcupacao();
         String valorStr = view.getValorCompra();
         String gabarito = view.getGabaritoAltura();
         String referencia = view.getReferencia();
         String descricao = view.getDescricao();
 
-        // Dados do Endereço
         String cep = view.getCep();
         String cidade = view.getCidade();
         String logradouro = view.getLogradouro();
         String bairro = view.getBairro();
         String numero = view.getNumero();
 
-        // -----------------------------------------------------------
-        // 2. VALIDAÇÕES BÁSICAS
-        // -----------------------------------------------------------
         if (nome.isEmpty() || areaStr.isEmpty()) {
             view.exibeMensagem("Erro: Nome e Área Total são obrigatórios.");
             return;
@@ -106,37 +97,15 @@ public class TerrenoController {
             return;
         }
         
-        // -----------------------------------------------------------
-        // 3. IDENTIFICAR SE É NOVO OU EDIÇÃO
-        // -----------------------------------------------------------
-        Terreno terreno;
-        if (this.terrenoEmEdicao != null) {
-            terreno = this.terrenoEmEdicao; 
-        } else {
-            terreno = new Terreno(); 
-        }
-        
-        if (terrenoEmEdicao != null) {
-            terreno = terrenoEmEdicao; // Usa o existente (Mantém o ID)
-        } else {
-            terreno = new Terreno(); // Cria um novo (Sem ID)
-        }
-        
-        if (!toStr.isEmpty()) {
-            terreno.setTaxaOcupacao(Double.parseDouble(toStr.replace(",", ".")));
-        } else {
-            terreno.setTaxaOcupacao(null);
-        }
+        // Estratégia de Update vs Insert: Se já existe objeto em memória, usa ele (preserva ID).
+        Terreno terreno = (this.terrenoEmEdicao != null) ? this.terrenoEmEdicao : new Terreno();
 
         try {
-            // -----------------------------------------------------------
-            // 4. CONVERSÃO DE NÚMEROS (Double)
-            // -----------------------------------------------------------
-            // Troca vírgula por ponto para evitar erro (ex: "12,5" -> "12.5")
+            // Sanitização numérica (PT-BR -> Double)
+            // Replace manual necessário pois o Java swing não lida nativamente com locale em campos de texto simples
             double areaTotal = Double.parseDouble(areaStr.replace(",", "."));
             terreno.setAreaTotal(areaTotal);
 
-            // Coeficiente de Aproveitamento (C.A.)
             if (!caStr.isEmpty()) {
                 double ca = Double.parseDouble(caStr.replace(",", "."));
                 terreno.setCoeficienteAproveitamento(ca);
@@ -144,27 +113,22 @@ public class TerrenoController {
                 terreno.setCoeficienteAproveitamento(null);
             }
             
-            // Taxa de Ocupação (T.O.) - CORRIGIDO (Movido para dentro do Try)
             if (!toStr.isEmpty()) {
                 terreno.setTaxaOcupacao(Double.parseDouble(toStr.replace(",", ".")));
             } else {
                 terreno.setTaxaOcupacao(null);
             }
 
-            // Valor de Compra
             if (!valorStr.isEmpty()) {
                 String valorLimpo = valorStr.replace("R$", "")
-                                            .replace(".", "")   // Remove ponto de milhar
-                                            .replace(",", ".")  // Troca vírgula decimal por ponto
+                                            .replace(".", "")   // Remove milhar
+                                            .replace(",", ".")  // Decimal
                                             .trim();
                 terreno.setValorCompra(Double.parseDouble(valorLimpo));
             } else {
                 terreno.setValorCompra(null);
             }
 
-            // -----------------------------------------------------------
-            // 5. POPULAR OBJETO TERRENO
-            // -----------------------------------------------------------
             terreno.setNome(nome);
             terreno.setTopografia(topografia);
             terreno.setTipoSolo(tipoSolo);
@@ -172,38 +136,31 @@ public class TerrenoController {
             terreno.setReferencia(referencia);
             terreno.setDescricao(descricao);
 
-            // -----------------------------------------------------------
-            // 6. TRATAMENTO DO ENDEREÇO (Vinculado)
-            // -----------------------------------------------------------
-            // Se o terreno já tem endereço, atualizamos ele. Se não, criamos um novo.
+            // Se o terreno já tem endereço (edição), atualizamos a referência existente
+            // Isso previne problemas com Hibernate/JPA criando linhas órfãs
             Endereco endereco = (terreno.getEndereco() != null) ? terreno.getEndereco() : new Endereco();
 
-            endereco.setCep(cep.replaceAll("[^0-9]", "")); // Limpa o CEP (só números)
+            endereco.setCep(cep.replaceAll("[^0-9]", "")); 
             endereco.setCidade(cidade);
             endereco.setLogradouro(logradouro);
             endereco.setBairro(bairro);
             endereco.setNumero(numero);
 
-            // Vincula o endereço ao terreno
             terreno.setEndereco(endereco);
 
-            // -----------------------------------------------------------
-            // 7. SALVAR NO BANCO
-            // -----------------------------------------------------------
-            // O CascadeType.ALL na entidade Terreno fará o endereço ser salvo/atualizado automaticamente!
+            // Persistence: CascadeType.ALL na entidade cuida do Endereço
             dao.salvar(terreno);
 
-           // SE tivermos um projeto pai, fazemos o vínculo agora
+            // Vinculação reversa manual (Foreign Key no Projeto)
             if (this.projetoPai != null) {
-                this.projetoPai.setTerreno(terreno); // Vincula na memória
+                this.projetoPai.setTerreno(terreno); 
                 
-                // Salva o Projeto para persistir o vínculo (chave estrangeira)
                 ProjetoDAO projetoDao = new ProjetoDAO();
                 projetoDao.salvar(this.projetoPai);
             }
 
             view.exibeMensagem("Terreno salvo com sucesso!");
-            view.dispose(); // Fecha a janela
+            view.dispose();
 
         } catch (NumberFormatException e) {
             view.exibeMensagem("Erro: Verifique os campos numéricos (Área ou Coeficiente).\nUse apenas números e vírgula/ponto.");

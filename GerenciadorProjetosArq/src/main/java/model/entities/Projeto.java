@@ -18,14 +18,12 @@ import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 /**
- *
  * @author juans
  */
 @Entity
 @Table(name = "projetos")
 public class Projeto {
 
-   
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -33,9 +31,11 @@ public class Projeto {
     @Column(nullable = false)
     private String nome;
 
+    // TODO: Refatorar para Enum (EM_ANDAMENTO, CONCLUIDO, CANCELADO)
     @Column(nullable = false)
     private String status; 
     
+    // TEXT para suportar descrições longas (> 255 chars)
     @Column(columnDefinition = "TEXT") 
     private String descricao;
 
@@ -45,13 +45,15 @@ public class Projeto {
     @Column(name = "data_previsao")
     private LocalDate dataPrevisao;
 
+    // FIXME: Double perde precisão decimal. Ideal migrar para BigDecimal.
     private Double orcamento;
     
-    @OneToOne(cascade = javax.persistence.CascadeType.ALL)
+    // Cascade ALL: Salvar o projeto já persiste as alterações do Terreno
+    @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "terreno_id", referencedColumnName = "id", nullable = true)
     private Terreno terreno;
     
-    // Relacionamento com Cliente (Correto)
+    // Performance Alert: EAGER carrega o cliente sempre. Cuidado com N+1 em listagens grandes.
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "cliente_id", nullable = false)
     private Cliente cliente;
@@ -65,11 +67,11 @@ public class Projeto {
         this.cliente = cliente;
     }
     
+    // Getters e Setters (Boilerplate omitido de comentários)
     
     public String getDescricao() { 
         return descricao; 
     }
-    
     public void setDescricao(String descricao) {
         this.descricao = descricao; 
     }
@@ -77,7 +79,6 @@ public class Projeto {
     public LocalDate getDataInicio() {
         return dataInicio; 
     }
-    
     public void setDataInicio(LocalDate dataInicio) {
         this.dataInicio = dataInicio; 
     }
@@ -85,7 +86,6 @@ public class Projeto {
     public LocalDate getDataPrevisao() {
         return dataPrevisao; 
     }
-    
     public void setDataPrevisao(LocalDate dataPrevisao) {
         this.dataPrevisao = dataPrevisao; 
     }
@@ -93,7 +93,6 @@ public class Projeto {
     public Double getOrcamento() {
         return orcamento; 
     }
-    
     public void setOrcamento(Double orcamento) { 
         this.orcamento = orcamento;
     }
@@ -101,7 +100,6 @@ public class Projeto {
     public Long getId() { 
         return id; 
     }
-    
     public void setId(Long id) {
         this.id = id;
     }
@@ -109,7 +107,6 @@ public class Projeto {
     public String getNome() { 
         return nome; 
     }
-    
     public void setNome(String nome) {
         this.nome = nome;
     }
@@ -117,7 +114,6 @@ public class Projeto {
     public String getStatus() {
         return status; 
     }
-    
     public void setStatus(String status) {
         this.status = status;
     }
@@ -125,21 +121,13 @@ public class Projeto {
     public Cliente getCliente() {
         return cliente; 
     }
-    
     public void setCliente(Cliente cliente) {
         this.cliente = cliente; 
     }
     
-     /**
-     * @return the terreno
-     */
     public Terreno getTerreno() {
         return terreno;
     }
-
-    /**
-     * @param terreno the terreno to set
-     */
     public void setTerreno(Terreno terreno) {
         this.terreno = terreno;
     }

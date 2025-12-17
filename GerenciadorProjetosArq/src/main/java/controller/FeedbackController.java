@@ -3,13 +3,14 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 package controller;
+
 import java.util.List;
 import javax.swing.JOptionPane;
 import model.dao.FeedbackDAO;
 import model.entities.Feedback;
 import model.entities.Projeto;
+
 /**
- *
  * @author Viktin
  */
 public class FeedbackController {
@@ -21,22 +22,26 @@ public class FeedbackController {
     }
 
     public boolean salvarFeedback(String tipo, String comentario, Projeto projeto, String autor) {
-        // Validações...
+        
+        // Bloqueia registro órfão (integridade referencial)
         if (projeto == null) {
             JOptionPane.showMessageDialog(null, "Erro: Nenhum projeto vinculado.");
             return false;
         }
+        
         if (comentario == null || comentario.trim().isEmpty()) {
             JOptionPane.showMessageDialog(null, "Escreva um comentário.");
             return false;
         }
 
         try {
-            // Cria o feedback passando o autor
+            // TODO: Validar se 'autor' precisa ser normalizado (trim/uppercase) ou buscado do AuthContext
             Feedback f = new Feedback(tipo, comentario, projeto, autor);
             dao.salvar(f);
             return true;
+            
         } catch (Exception e) {
+            // Em prod, substituir JOptionPane por Logger (SLF4J)
             JOptionPane.showMessageDialog(null, "Erro: " + e.getMessage());
             return false;
         }
@@ -55,6 +60,4 @@ public class FeedbackController {
             return false;
         }
     }
-    
-    
 }
