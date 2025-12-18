@@ -9,7 +9,6 @@ import javax.persistence.EntityManager;
 import model.entities.Feedback;
 
 /**
- *
  * @author Viktin
  */
 public class FeedbackDAO extends GenericDAO<Feedback> {
@@ -18,13 +17,10 @@ public class FeedbackDAO extends GenericDAO<Feedback> {
         super(Feedback.class);
     }
 
-    /**
-     * Lista os feedbacks de um projeto específico.
-     * Ordenado por Data de Registro DESC (Mais novo primeiro).
-     */
     public List<Feedback> listarPorProjeto(Long idProjeto) {
         EntityManager em = JPAUtil.getEntityManager();
         try {
+            // Ordenação DESC para priorizar feedbacks recentes na UI
             String jpql = "SELECT f FROM Feedback f WHERE f.projeto.id = :idProjeto ORDER BY f.dataRegistro DESC";
             
             return em.createQuery(jpql, Feedback.class)

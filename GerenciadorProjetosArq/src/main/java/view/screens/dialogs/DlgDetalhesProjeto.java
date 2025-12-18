@@ -6,14 +6,15 @@ package view.screens.dialogs;
 
 import model.entities.Projeto;
 import java.time.format.DateTimeFormatter;
+
 /**
- *
  * @author juans
  */
 public class DlgDetalhesProjeto extends javax.swing.JDialog {
     
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(DlgDetalhesProjeto.class.getName());
     private final DateTimeFormatter fmt = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+
     /**
      * Creates new form DlgDetalhesProjeto
      */
@@ -24,26 +25,38 @@ public class DlgDetalhesProjeto extends javax.swing.JDialog {
         // Centraliza a janela na tela
         this.setLocationRelativeTo(parent); 
         
-        // Agora a variável "projeto" existe e pode ser usada
-        preencherDados(projeto);
+        // Só tenta preencher se o objeto projeto for válido (não nulo)
+        if (projeto != null) {
+            preencherDados(projeto);
+        }
     }
     
     private void preencherDados(Projeto p) {
-        // Supondo que você criou JLabels ou JTextFields na tela:
+        // Campos de Texto Simples
         edtNomeProjeto.setText(p.getNome());
-        cbStatus.setSelectedItem(p.getStatus());
-        edtDescricao.setText(p.getDescricao()); // Use JTextArea para descrição
+        edtDescricao.setText(p.getDescricao());
         
-        // Formatação de valores
+        // ComboBox
+        if (p.getStatus() != null) {
+            cbStatus.setSelectedItem(p.getStatus());
+        }
+        
+        // Formatação de valores Monetários
         if(p.getOrcamento() != null) {
-            edtOrcamento.setText("R$ " + String.format("%.2f", p.getOrcamento()));
+            // Dica: O replace troca o ponto por vírgula para ficar no padrão visual BR
+            edtOrcamento.setText("R$ " + String.format("%.2f", p.getOrcamento()).replace('.', ','));
         }
 
-        // Formatação de Datas (importante verificar se não é nulo)
+        // Formatação de Datas
         if (p.getDataInicio() != null) {
             edtDataInicio.setText(p.getDataInicio().format(fmt));
         }
         
+        if (p.getDataPrevisao() != null) {
+             edtPrevisao.setText(p.getDataPrevisao().format(fmt));
+        }
+        
+        // Objeto Relacionado (Cliente)
         if (p.getCliente() != null) {
             edtCliente.setText(p.getCliente().getNome());
         }

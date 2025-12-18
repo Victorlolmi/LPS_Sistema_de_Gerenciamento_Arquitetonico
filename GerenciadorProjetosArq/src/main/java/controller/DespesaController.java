@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package controller;
 
 import java.time.LocalDate;
@@ -11,86 +7,83 @@ import javax.swing.JOptionPane;
 import model.dao.DespesaDAO;
 import model.entities.Despesa;
 import model.entities.Projeto;
+import view.screens.dialogs.DlgVisualizarProjeto;
+
 /**
- *
  * @author Viktin
  */
 public class DespesaController {
 
     private final DespesaDAO dao;
+    private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
     public DespesaController() {
         this.dao = new DespesaDAO();
     }
 
-    /**
-     * Método atualizado para receber TODOS os campos do financeiro
-     */
     public boolean salvarDespesa(String descricao, String valorTexto, String categoria, 
                                  String dataTexto, String fornecedor, String status, 
                                  String formaPagamento, String observacoes, Projeto projeto) {
         
-        // 1. Validações Básicas
-        if (projeto == null) {
-            JOptionPane.showMessageDialog(null, "Erro Crítico: Nenhum projeto vinculado a esta despesa.");
-            return false;
-        }
-        if (descricao.trim().isEmpty()) {
-            JOptionPane.showMessageDialog(null, "A descrição é obrigatória.");
-            return false;
-        }
-        // Fornecedor é importante, vamos obrigar? Por enquanto deixo opcional, mas recomendo obrigar.
-        if (valorTexto.isEmpty()) {
-            JOptionPane.showMessageDialog(null, "Informe o valor.");
-            return false;
-        }
-
         try {
-            Despesa despesa = new Despesa();
+            if (projeto == null) {
+                JOptionPane.showMessageDialog(null, "Erro: A despesa deve estar vinculada a um projeto.");
+                return false;
+            }
             
-            // --- Preenchendo os dados ---
-            despesa.setDescricao(descricao);
+            if (descricao == null || descricao.trim().isEmpty()) {
+                JOptionPane.showMessageDialog(null, "A descrição da despesa é obrigatória.");
+                return false;
+            }
+
+            Despesa despesa = new Despesa();
+            despesa.setDescricao(descricao.trim());
             despesa.setCategoria(categoria);
-            despesa.setFornecedor(fornecedor);
-            despesa.setStatus(status); // "Pago" ou "Pendente"
+            despesa.setFornecedor(fornecedor != null ? fornecedor.trim() : "");
+            despesa.setStatus(status);
             despesa.setFormaPagamento(formaPagamento);
             despesa.setObservacoes(observacoes);
             despesa.setProjeto(projeto);
 
-            // 2. Tratamento do Valor (Dinheiro)
-            // Aceita "1.200,50" ou "1200.50"
             String valorLimpo = valorTexto.replace("R$", "").replace(".", "").replace(",", ".").trim();
-            despesa.setValor(Double.parseDouble(valorLimpo));
+            despesa.setValor(Double.valueOf(valorLimpo));
 
-            // 3. Tratamento da Data
-            DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-            if (dataTexto != null && !dataTexto.equals("__/__/____") && !dataTexto.trim().isEmpty()) {
-                despesa.setDataDespesa(LocalDate.parse(dataTexto, dtf));
+            if (dataTexto == null || dataTexto.contains("_") || dataTexto.trim().isEmpty()) {
+                despesa.setDataDespesa(LocalDate.now());
             } else {
-                despesa.setDataDespesa(LocalDate.now()); // Se não preencher, usa hoje
+                despesa.setDataDespesa(LocalDate.parse(dataTexto, DATE_FORMATTER));
             }
 
-            // 4. Salvar
             dao.salvar(despesa);
             return true;
 
-        } catch (NumberFormatException e) {
-            JOptionPane.showMessageDialog(null, "Valor inválido. Digite apenas números (ex: 150,00).");
-            return false;
         } catch (Exception e) {
-            JOptionPane.showMessageDialog(null, "Erro ao salvar despesa: " + e.getMessage());
-            e.printStackTrace();
+            JOptionPane.showMessageDialog(null, "Erro ao salvar: " + e.getMessage());
             return false;
         }
     }
 
-    public boolean excluirDespesa(Long id) {
-        try {
-            dao.remover(id);
-            return true;
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(null, "Erro ao excluir: " + e.getMessage());
-            return false;
+    /**
+     * Exclui uma despesa e solicita que a View se atualize.
+     */
+    public void excluirDespesa(Despesa d, DlgVisualizarProjeto view) {
+        if (d == null) return;
+
+        int confirm = JOptionPane.showConfirmDialog(view, 
+                "Deseja excluir a despesa: " + d.getDescricao() + "?", 
+                "Excluir Gasto", JOptionPane.YES_NO_OPTION);
+
+        if (confirm == JOptionPane.YES_OPTION) {
+            try {
+                dao.remover(d.getId());
+                
+                // Agora funciona porque tornamos o método public na View
+                view.atualizarAbaFinanceiro(); 
+                
+                JOptionPane.showMessageDialog(view, "Despesa excluída com sucesso.");
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(view, "Erro ao excluir: " + e.getMessage());
+            }
         }
     }
 
@@ -99,6 +92,7 @@ public class DespesaController {
     }
     
     public Double buscarTotalGasto(Long idProjeto) {
-        return dao.somarTotalPorProjeto(idProjeto);
+        Double total = dao.somarTotalPorProjeto(idProjeto);
+        return total != null ? total : 0.0;
     }
 }

@@ -3,65 +3,69 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JDialog.java to edit this template
  */
 package view.screens.dialogs;
+
 import controller.TerrenoController;
 import javax.swing.JOptionPane;
+import model.entities.Projeto; 
 import model.entities.Terreno;
+
 /**
- *
  * @author Viktin
  */
 public class DlgCadastroTerreno extends javax.swing.JDialog {
     
     private final TerrenoController controller;
-    
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(DlgCadastroTerreno.class.getName());
 
-    /**
-     * Creates new form DlgCadastroTerreno
-     */
     public DlgCadastroTerreno(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
         
+        // Inicializa o Controller passando a View (this)
         this.controller = new TerrenoController(this);
         this.setLocationRelativeTo(null);
     }
     
+    // --- Métodos de Negócio ---
+    
     public void carregarTerreno(Terreno t) {
+        // Delega para o controller preencher os campos
         controller.preencherTelaParaEdicao(t);
     }
     
-    public void setProjetoVinculado(model.entities.Projeto p) {
+    public void setProjetoVinculado(Projeto p) {
         controller.setProjetoPai(p);
     }
     
- // --- Métodos apenas para definir textos (Setters visuais) ---
+    // Dados Básicos
     public void setTextoNome(String texto) { edtNomeTerreno.setText(texto); }
     public void setTextoReferencia(String texto) { edtReferenciaTerreno.setText(texto); }
-    public void setTextoArea(String texto) { edtAreaTotal.setText(texto); }
+    public void setTextoDescricao(String texto) { edtDescricaoTerreno.setText(texto); }
     public void setTextoValor(String texto) { edtValorTerreno.setText(texto); }
+    public void setTextoArea(String texto) { edtAreaTotal.setText(texto); }
+
+    // Endereço
+    public void setTextoCep(String texto) { edtCepTerreno.setText(texto); }
+    public void setTextoCidade(String texto) { edtCidadeTerreno.setText(texto); }
+    public void setTextoLogradouro(String texto) { estLogradouroTerreno.setText(texto); } // O nome da variavel ficou 'est' no design
+    public void setTextoBairro(String texto) { edtBairroTerreno.setText(texto); }
+    public void setTextoNumero(String texto) { edtNumeroTerreno.setText(texto); }
+
+    // Dados Técnicos
     public void setTextoCoeficiente(String texto) { edtCoeficienteTerreno.setText(texto); }
     public void setTextoTaxa(String texto) { edtTaxaTerreno.setText(texto); }
     public void setTextoGabarito(String texto) { edtGabaritoTerreno.setText(texto); }
-    public void setTextoDescricao(String texto) { edtDescricaoTerreno.setText(texto); }
     
     // Combos
     public void setSelecionadoTopografia(String valor) { cbTopografia.setSelectedItem(valor); }
     public void setSelecionadoTipo(String valor) { cbTipo.setSelectedItem(valor); }
 
-    // Endereço
-    public void setTextoCep(String texto) { edtCepTerreno.setText(texto); }
-    public void setTextoCidade(String texto) { edtCidadeTerreno.setText(texto); }
-    public void setTextoLogradouro(String texto) { estLogradouroTerreno.setText(texto); }
-    public void setTextoBairro(String texto) { edtBairroTerreno.setText(texto); }
-    public void setTextoNumero(String texto) { edtNumeroTerreno.setText(texto); }
-
-    // --- GETTERS PARA O CONTROLLER ---
-
+    // GETTERS 
     public String getNome() { return edtNomeTerreno.getText(); }
     public String getReferencia() { return edtReferenciaTerreno.getText(); }
     public String getAreaTotal() { return edtAreaTotal.getText(); }
     public String getValorCompra() { return edtValorTerreno.getText(); }
+    public String getDescricao() { return edtDescricaoTerreno.getText(); }
     
     public String getTopografia() { return (String) cbTopografia.getSelectedItem(); }
     public String getTipoSolo() { return (String) cbTipo.getSelectedItem(); }
@@ -69,20 +73,17 @@ public class DlgCadastroTerreno extends javax.swing.JDialog {
     public String getCoeficienteAproveitamento() { return edtCoeficienteTerreno.getText(); }
     public String getTaxaOcupacao() { return edtTaxaTerreno.getText(); }
     public String getGabaritoAltura() { return edtGabaritoTerreno.getText(); }
-    public String getDescricao() { return edtDescricaoTerreno.getText(); }
     
-    // Endereço
     public String getCep() { return edtCepTerreno.getText(); }
     public String getCidade() { return edtCidadeTerreno.getText(); }
     public String getLogradouro() { return estLogradouroTerreno.getText(); }
     public String getBairro() { return edtBairroTerreno.getText(); }
     public String getNumero() { return edtNumeroTerreno.getText(); }
-
-    // --- MENSAGENS ---
+    
+    // Mensagens
     public void exibeMensagem(String msg) {
         JOptionPane.showMessageDialog(this, msg);
     }
-    
     
 
     /**

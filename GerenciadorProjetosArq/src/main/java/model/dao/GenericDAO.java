@@ -5,8 +5,8 @@
 package model.dao;
 import factory.JPAUtil;
 import javax.persistence.EntityManager;
+
 /**
- *
  * @author Viktin
  */
 public class GenericDAO<T> {
@@ -17,40 +17,36 @@ public class GenericDAO<T> {
     }
 
     public void salvar(T entity) {
-        // Obtém uma instância do EntityManager
         EntityManager em = JPAUtil.getEntityManager();
         
         try {
-            // Inicia a transação
             em.getTransaction().begin();
             
-            // --- AQUI ESTÁ A MÁGICA ---
-            // Trocamos 'persist' por 'merge'.
-            // O 'merge' verifica: 
-            // 1. O objeto tem ID? Não -> Faz INSERT (Cria novo)
-            // 2. O objeto tem ID? Sim -> Faz UPDATE (Atualiza o existente)
-            // Isso resolve seu problema de duplicação e erro de edição.
+            // Strategy: "Upsert" via Merge. 
+            // Se ID null -> Insert. Se ID existe -> Update.
+            // Simplifica a lógica no Controller evitando check manual de ID.
             em.merge(entity);
             
-            // Confirma a transação
             em.getTransaction().commit();
+
         } catch (Exception e) {
-            // Se ocorrer um erro, desfaz a transação
+            // Rollback mandatório para garantir atomicidade em caso de falha
             if (em.getTransaction().isActive()) {
                 em.getTransaction().rollback();
             }
-            // Propaga a exceção para que a camada superior possa tratá-la
+            // Wrap em RuntimeException para não sujar assinatura do método
             throw new RuntimeException("Erro ao salvar/atualizar a entidade: " + e.getMessage(), e);
+
         } finally {
-            // Fecha o EntityManager para liberar os recursos
             if (em.isOpen()) {
                 em.close();
             }
         }
     }
 
-    // Você pode manter esse método se quiser ser específico em algum lugar,
-    // mas o 'salvar' ali de cima agora já faz o trabalho desse aqui também.
+    // Wrapper semântico.
+    // Como o 'salvar' usa merge, este método é tecnicamente redundante, 
+    // mas mantido para clareza de leitura (dao.update vs dao.salvar).
     public void update(T entity) {
         EntityManager em = JPAUtil.getEntityManager();
         try {
@@ -67,16 +63,18 @@ public class GenericDAO<T> {
         }
     }
     
-    // Método para deletar (caso precise no futuro)
     public void remover(Long id) {
         EntityManager em = JPAUtil.getEntityManager();
         try {
             em.getTransaction().begin();
+            
             T entidade = em.find(entityClass, id);
             if (entidade != null) {
                 em.remove(entidade);
             }
+            
             em.getTransaction().commit();
+
         } catch (Exception e) {
             if (em.getTransaction().isActive()) {
                 em.getTransaction().rollback();
@@ -87,4 +85,3 @@ public class GenericDAO<T> {
         }
     }
 }
-

@@ -11,7 +11,6 @@ import javax.swing.JOptionPane;
 import model.entities.Projeto;
 
 /**
- *
  * @author Viktin
  */
 public class DlgCadastroDocumento extends javax.swing.JDialog {
@@ -22,20 +21,19 @@ public class DlgCadastroDocumento extends javax.swing.JDialog {
     
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(DlgCadastroDocumento.class.getName());
 
-    /**
-     * Creates new form DlgCadastroDocumento
-     */
     public DlgCadastroDocumento(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
         this.controller = new DocumentoController();
+        
+        // Bloqueia edição manual para evitar caminhos inválidos (copy-paste errado do user)
         this.edtCaminhoArquivo.setEditable(false);
+        this.setLocationRelativeTo(null);
     }
     
     public void setProjetoVinculado(Projeto p) {
         this.projetoVinculado = p;
     }
-
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -118,38 +116,11 @@ public class DlgCadastroDocumento extends javax.swing.JDialog {
     }//GEN-LAST:event_edtNomeDocumentoActionPerformed
 
     private void btnSelecionarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSelecionarActionPerformed
-       // --- 1. FORÇA O VISUAL DO WINDOWS AGORA ---
-        try {
-            // Isso garante que o FileChooser tenha a cara do Windows 10/11
-            javax.swing.UIManager.setLookAndFeel(javax.swing.UIManager.getSystemLookAndFeelClassName());
-            
-            // Atualiza os componentes internos para pegarem o novo visual
-            javax.swing.SwingUtilities.updateComponentTreeUI(this);
-        } catch (Exception e) {
-            e.printStackTrace(); // Se der erro, apenas ignora e usa o padrão
-        }
-        // ------------------------------------------
-
-        // 2. Instancia o seletor (agora com o visual novo)
-        javax.swing.JFileChooser fileChooser = new javax.swing.JFileChooser();
-        fileChooser.setDialogTitle("Selecione o documento");
-        
-        // 3. Filtros
-        javax.swing.filechooser.FileNameExtensionFilter filtro = 
-            new javax.swing.filechooser.FileNameExtensionFilter(
-                "Arquivos de Projeto (PDF, Imagens, DWG)", "pdf", "jpg", "jpeg", "png", "dwg");
-        fileChooser.setFileFilter(filtro);
-        
-        // 4. Abre a janela
-        int retorno = fileChooser.showOpenDialog(this);
-        
-        if (retorno == javax.swing.JFileChooser.APPROVE_OPTION) {
-            this.arquivoSelecionado = fileChooser.getSelectedFile();
+       this.arquivoSelecionado = controller.selecionarArquivo(this);
+        if (this.arquivoSelecionado != null) {
             edtCaminhoArquivo.setText(this.arquivoSelecionado.getAbsolutePath());
-            
-            if (edtNomeDocumento.getText().isEmpty()) {
-                edtNomeDocumento.setText(this.arquivoSelecionado.getName());
-            }
+            // O controller decidirá se deve preencher o nome automaticamente
+            edtNomeDocumento.setText(controller.sugerirNome(edtNomeDocumento.getText(), arquivoSelecionado));
         }
     }//GEN-LAST:event_btnSelecionarActionPerformed
 
@@ -157,18 +128,22 @@ public class DlgCadastroDocumento extends javax.swing.JDialog {
         String nome = edtNomeDocumento.getText();
         String categoria = (String) cbCategoriaDocumento.getSelectedItem();
         
-        // Verifica se o projeto veio da outra tela
+        // Guard Clauses (Validação defensiva)
         if (this.projetoVinculado == null) {
-            JOptionPane.showMessageDialog(this, "Erro crítico: Projeto não vinculado.");
+            JOptionPane.showMessageDialog(this, "Erro crítico: Projeto não vinculado.", "Erro", JOptionPane.ERROR_MESSAGE);
             return;
         }
+        
+        if (this.arquivoSelecionado == null) {
+             JOptionPane.showMessageDialog(this, "Por favor, selecione um arquivo.", "Aviso", JOptionPane.WARNING_MESSAGE);
+             return;
+        }
 
-        // Chama o Controller para salvar
         boolean sucesso = controller.salvarDocumento(nome, categoria, arquivoSelecionado, projetoVinculado);
         
         if (sucesso) {
             JOptionPane.showMessageDialog(this, "Documento anexado com sucesso!");
-            this.dispose(); // Fecha a janela
+            this.dispose(); 
         }
     }//GEN-LAST:event_btnSalvarDocumentoActionPerformed
 

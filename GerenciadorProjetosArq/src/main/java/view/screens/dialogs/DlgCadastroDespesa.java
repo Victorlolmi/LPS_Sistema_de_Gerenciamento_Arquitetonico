@@ -3,35 +3,31 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JDialog.java to edit this template
  */
 package view.screens.dialogs;
+
 import controller.DespesaController;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import javax.swing.JOptionPane;
 import model.entities.Projeto;
+
 /**
- *
  * @author Viktin
  */
 public class DlgCadastroDespesa extends javax.swing.JDialog {
+
     private final DespesaController controller;
     private Projeto projetoVinculado;
     
-    
+    // Logger padrão para debug de UI
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(DlgCadastroDespesa.class.getName());
 
-    /**
-     * Creates new form DlgCadastroDespesa
-     */
     public DlgCadastroDespesa(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
         setLocationRelativeTo(null);
         
-        // 2. Inicializa o Controller
         this.controller = new DespesaController();
         
-        // 3. Preenche a data com o dia de hoje automaticamente para facilitar
-        edtDataDespesa.setText(LocalDate.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
     }
     
     public void setProjetoVinculado(Projeto p) {
@@ -158,37 +154,18 @@ public class DlgCadastroDespesa extends javax.swing.JDialog {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnSalvarDespesaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSalvarDespesaActionPerformed
-        String descricao = edtDescricaoDespesa.getText();
-        String valor = edtValorDespesa.getText(); // O Controller trata R$ e vírgulas
-        String fornecedor = edtFornecedorDespesa.getText();
-        String data = edtDataDespesa.getText();
-        String observacoes = jTObservacoes.getText();
-        
-        // 2. Coleta os dados dos ComboBoxes
-        String categoria = (String) cbCategoria.getSelectedItem();
-        String pagamento = (String) cbFormaPag.getSelectedItem();
-        String status = (String) cbStatusDespesa.getSelectedItem();
-        
-        // 3. Verifica se tem projeto vinculado (Segurança)
-        if (this.projetoVinculado == null) {
-            JOptionPane.showMessageDialog(this, "Erro: Nenhum projeto vinculado para lançar a despesa.");
-            return;
-        }
-
-        // 4. Chama o Controller
-        boolean sucesso = controller.salvarDespesa(
-                descricao, 
-                valor, 
-                categoria, 
-                data, 
-                fornecedor, 
-                status, 
-                pagamento, 
-                observacoes, 
+            boolean sucesso = controller.salvarDespesa(
+                edtDescricaoDespesa.getText(), 
+                edtValorDespesa.getText(), 
+                (String) cbCategoria.getSelectedItem(), 
+                edtDataDespesa.getText(), 
+                edtFornecedorDespesa.getText(), 
+                (String) cbStatusDespesa.getSelectedItem(), 
+                (String) cbFormaPag.getSelectedItem(), 
+                jTObservacoes.getText(), 
                 this.projetoVinculado
         );
-        
-        // 5. Se deu certo, fecha a janela. Se deu erro, o controller já mostrou o alerta.
+
         if (sucesso) {
             JOptionPane.showMessageDialog(this, "Despesa salva com sucesso!");
             this.dispose();

@@ -3,79 +3,62 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JDialog.java to edit this template
  */
 package view.screens.dialogs;
+
 import controller.ProjetoController;
 import model.entities.Cliente;
 import model.entities.Projeto; 
 import java.time.format.DateTimeFormatter; 
+import java.util.List;
+import javax.swing.JOptionPane;
+
 /**
- *
  * @author Viktin
  */
 public class DlgCadastroProjetos extends javax.swing.JDialog {
+
     private final ProjetoController controller;
     private Projeto projetoEmEdicao = null;
+    
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(DlgCadastroProjetos.class.getName());
     
-    /**
-     * Creates new form DlgCadastroProjetos
-     */
     public DlgCadastroProjetos(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
+        
+        // 1. Inicializa o Controller passando esta tela (View)
         this.controller = new ProjetoController(this);
+        
         this.setLocationRelativeTo(null);
-        
     }
+    
     public void setProjetoParaEdicao(Projeto p) {
-        this.projetoEmEdicao = p; // Guarda o projeto na variável global
-        
+        this.projetoEmEdicao = p;
         if (p != null) {
-            this.setTitle("Editar Projeto: " + p.getNome()); 
-            
-            // 1. Textos Simples
-            edtNomeProjeto.setText(p.getNome());
-            edtDescricao.setText(p.getDescricao());
-            
-            // 2. Orçamento (Formatado)
-            if (p.getOrcamento() != null) {
-                // Formata para String (substitui ponto por vírgula se necessário pelo seu Locale)
-                edtOrcamento.setText(String.format("%.2f", p.getOrcamento()).replace('.', ','));
-            }
+            controller.preencherCamposEdicao(p);
+        }
+    }
+    public void setProjetoCampos(String nome, String desc, String status, String orcamento, String dataIn, String dataPrev, Cliente cliente) {
+        edtNomeProjeto.setText(nome);
+        edtDescricao.setText(desc);
+        cbStatus.setSelectedItem(status);
+        edtOrcamento.setText(orcamento);
+        edtDataInicio.setText(dataIn);
+        edtPrevisao.setText(dataPrev);
 
-            // 3. Status (Seleciona no ComboBox)
-            if (p.getStatus() != null) {
-                cbStatus.setSelectedItem(p.getStatus());
-            }
-
-            // 4. Datas (LocalDate -> String)
-            DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-            
-            if (p.getDataInicio() != null) {
-                edtDataInicio.setText(p.getDataInicio().format(dtf));
-            }
-            if (p.getDataPrevisao() != null) { 
-                // Nota: Verifique se no seu model é getPrevisaoTermino() ou getDataPrevisao()
-                edtPrevisao.setText(p.getDataPrevisao().format(dtf));
-            }
-
-            // 5. Cliente (Percorre a lista para selecionar o correto)
-            if (p.getCliente() != null) {
-                for (int i = 0; i < cbCliente.getItemCount(); i++) {
-                    Cliente c = cbCliente.getItemAt(i);
-                    // Compara os IDs para ter certeza
-                    if (c.getId().equals(p.getCliente().getId())) {
-                        cbCliente.setSelectedIndex(i);
-                        break;
-                    }
+        // Para o JComboBox de Clientes selecionar o correto:
+        if (cliente != null) {
+            for (int i = 0; i < cbCliente.getItemCount(); i++) {
+                Cliente item = cbCliente.getItemAt(i);
+                if (item.getId().equals(cliente.getId())) {
+                    cbCliente.setSelectedIndex(i);
+                    break;
                 }
             }
         }
     }
-    
     public Projeto getProjetoEmEdicao() {
         return this.projetoEmEdicao;
     }
-
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -212,13 +195,12 @@ public class DlgCadastroProjetos extends javax.swing.JDialog {
         return edtNomeProjeto.getText();
     }
 
-   public Cliente getClienteSelecionado() {
-    // Pegamos o objeto selecionado e fazemos o "cast" (conversão) para Cliente
-    return (Cliente) cbCliente.getSelectedItem();
-}
+    public Cliente getClienteSelecionado() {
+        // Cast seguro: O ComboBox guarda objetos do tipo Cliente
+        return (Cliente) cbCliente.getSelectedItem();
+    }
 
     public String getDataInicio() {
-        // Retorna o texto formatado (ex: "13/12/2025")
         return edtDataInicio.getText();
     }
 
@@ -235,30 +217,32 @@ public class DlgCadastroProjetos extends javax.swing.JDialog {
     }
 
     public String getStatus() {
-        // Pega o item selecionado no ComboBox de Status
         return (String) cbStatus.getSelectedItem();
     }
-    public void atualizarComboClientes(java.util.List<Cliente> listaClientes) {
-        // Remove tudo que tiver antes
+    
+    /**
+     * Atualiza a lista de clientes disponiveis no ComboBox.
+     * Chamado pelo Controller ao abrir a tela.
+     */
+    public void atualizarComboClientes(List<Cliente> listaClientes) {
         cbCliente.removeAllItems();
-
-        // Adiciona item por item
         for (Cliente c : listaClientes) {
             cbCliente.addItem(c);
         }
     }
     
     public void exibeMensagem(String msg) {
-    // Isso cria aquela janelinha pop-up com o aviso
-        javax.swing.JOptionPane.showMessageDialog(this, msg);
+        JOptionPane.showMessageDialog(this, msg);
     }    
-    // Se precisar limpar a tela após salvar
+    
     public void limparCampos() {
         edtNomeProjeto.setText("");
         edtDescricao.setText("");
         edtOrcamento.setText("");
         edtDataInicio.setText("");
         edtPrevisao.setText("");
+        // Reseta o combo para o primeiro item ou null
+        if (cbCliente.getItemCount() > 0) cbCliente.setSelectedIndex(0);
     }
     
     public static void main(String args[]) {

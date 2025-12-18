@@ -8,26 +8,20 @@ import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 import model.entities.Despesa;
+
 /**
- *
  * @author Viktin
  */
 public class DespesaDAO extends GenericDAO<Despesa> {
 
     public DespesaDAO() {
-        // Informa ao GenericDAO que esta classe cuida de 'Despesa'
         super(Despesa.class);
     }
 
-    // OBS: Os métodos salvar, atualizar, remover e buscarPorId já são herdados do GenericDAO.
-
-    /**
-     * Lista apenas as despesas de um projeto específico.
-     * Ordenado pela data da despesa (mais recentes primeiro).
-     */
     public List<Despesa> listarPorProjeto(Long idProjeto) {
         EntityManager em = JPAUtil.getEntityManager();
         try {
+            // Ordenação DESC para priorizar lançamentos recentes na UI
             String jpql = "SELECT d FROM Despesa d WHERE d.projeto.id = :idProjeto ORDER BY d.dataDespesa DESC";
             
             return em.createQuery(jpql, Despesa.class)
@@ -38,14 +32,10 @@ public class DespesaDAO extends GenericDAO<Despesa> {
         }
     }
 
-    /**
-     * Soma o total gasto pelo projeto diretamente no banco.
-     * Retorna 0.0 se não houver gastos, evitando NullPointerException.
-     */
     public Double somarTotalPorProjeto(Long idProjeto) {
         EntityManager em = JPAUtil.getEntityManager();
         try {
-            // JPQL de Soma (SUM)
+            // Aggregation direto no banco (mais performático que trazer a lista e somar no Java)
             String jpql = "SELECT SUM(d.valor) FROM Despesa d WHERE d.projeto.id = :idProjeto";
             
             TypedQuery<Double> query = em.createQuery(jpql, Double.class);
@@ -53,6 +43,7 @@ public class DespesaDAO extends GenericDAO<Despesa> {
             
             Double total = query.getSingleResult();
             
+            // Null safety: JPQL retorna NULL se não houver registros matchando o WHERE
             return (total != null) ? total : 0.0;
             
         } finally {

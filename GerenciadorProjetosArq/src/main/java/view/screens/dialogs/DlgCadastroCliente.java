@@ -3,29 +3,28 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JDialog.java to edit this template
  */
 package view.screens.dialogs;
+
 import controller.ClienteController;
 import javax.swing.JOptionPane;
+
 /**
- *
  * @author Viktin
  */
 public class DlgCadastroCliente extends javax.swing.JDialog {
+
     private final ClienteController controller;
     
+    // Logger padrão do Swing, pode ser útil para debug de UI
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(DlgCadastroCliente.class.getName());
 
-    /**
-     * Creates new form DlgCadastroCliente
-     */
     public DlgCadastroCliente(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
-        initComponents();
+        initComponents(); // Inicialização dos componentes visuais (Gerado pelo NetBeans)
         
-        // 2. Inicializa o Controller passando esta tela
+        // Injeção da View no Controller (Tight Coupling comum em Swing simples)
         this.controller = new ClienteController(this);
         
-        // Centraliza a janela
-        this.setLocationRelativeTo(null);
+        this.setLocationRelativeTo(null); // Centraliza na tela
     }
 
     /**

@@ -6,7 +6,6 @@ package model.entities;
 import javax.persistence.*;
 
 /**
- *
  * @author Viktin
  */
 @Entity
@@ -23,21 +22,21 @@ public class Endereco {
     @Column(nullable = false)
     private String bairro;
     
+    // Nullable proposital para suportar terrenos ou locais "S/N" (Sem Número)
     private String numero;
     
+    // Length 20 dá margem para salvar com máscara (12345-678) ou formatos internacionais
     @Column(nullable = false, length = 20)
     private String cep;
     
+    // TODO: Avaliar adicionar constraint (nullable = false) para cidade no futuro
     private String cidade;
-    
-    
     
     public Endereco(){}
     
     public Long getId() {
         return id;
     }
-
     public void setId(Long id) {
         this.id = id;
     }
@@ -45,7 +44,6 @@ public class Endereco {
     public String getLogradouro() {
         return logradouro;
     }
-
     public void setLogradouro(String logradouro) {
         this.logradouro = logradouro;
     }
@@ -53,7 +51,6 @@ public class Endereco {
     public String getBairro() {
         return bairro;
     }
-
     public void setBairro(String bairro) {
         this.bairro = bairro;
     }
@@ -61,7 +58,6 @@ public class Endereco {
     public String getNumero() {
         return numero;
     }
-
     public void setNumero(String numero) {
         this.numero = numero;
     }
@@ -69,7 +65,6 @@ public class Endereco {
     public String getCep() {
         return cep;
     }
-
     public void setCep(String cep) {
         this.cep = cep;
     }
@@ -77,7 +72,6 @@ public class Endereco {
     public String getCidade() {
         return cidade;
     }
-
     public void setCidade(String cidade) {
         this.cidade = cidade;
     }

@@ -11,11 +11,8 @@ import view.screens.FrLogin;
 import view.screens.FrNovaSenha;
 
 /**
- *
  * @author juans
  */
-
-
 public class NovaSenhaController {
 
     private final FrNovaSenha view;
@@ -41,12 +38,15 @@ public class NovaSenhaController {
             return;
         }
 
-        // 3. Buscar o usuário no banco de dados
+        // TODO: Adicionar validação de força de senha (Regex para min 8 chars, num, symbol)
+        
         Usuario usuario = usuarioDAO.findByEmailOrCpf(email);
 
         if (usuario != null) {
             String senhaCriptografada = BCrypt.hashpw(novaSenha, BCrypt.gensalt());
             usuario.setSenha(senhaCriptografada);
+            
+            // Security: Queima o token imediatamente para evitar Replay Attack
             usuario.setCodigo_recuperacao(null); 
             usuario.setValidade_codigo_recuperacao(null); 
 
@@ -56,6 +56,7 @@ public class NovaSenhaController {
             
             navegarParaLogin();
         } else {
+            // Se chegou aqui com email inválido, algo estranho aconteceu no fluxo anterior
             view.exibeMensagem("Ocorreu um erro ao encontrar o usuário. Tente novamente.");
         }
     }

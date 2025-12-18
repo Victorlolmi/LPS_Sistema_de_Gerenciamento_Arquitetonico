@@ -6,8 +6,8 @@ import javax.swing.JOptionPane;
 import org.apache.commons.mail.SimpleEmail;
 
 /**
- * Serviço responsável pelo envio de e-mails.
- * As credenciais são carregadas de um arquivo de configuração externo (config.properties).
+ * Wrapper simples do Commons Email.
+ * Carrega credenciais do 'properties/config.properties'.
  * @author juans
  */
 public class EmailService {
@@ -20,7 +20,9 @@ public class EmailService {
         try (InputStream input = getClass().getClassLoader().getResourceAsStream("properties/config.properties")) {
             
             if (input == null) {
-                System.out.println("ERRO: Não foi possível encontrar o arquivo config.properties");
+                // Fail-fast: Sem config, o serviço é inútil.
+                // TODO: Remover dependência de GUI (JOptionPane) na camada de serviço. Lançar Exception é melhor.
+                System.out.println("ERRO: config.properties não encontrado");
                 JOptionPane.showMessageDialog(null, "Arquivo de configuração de e-mail não encontrado.", "Erro Crítico", JOptionPane.ERROR_MESSAGE);
                 return;
             }
@@ -36,12 +38,15 @@ public class EmailService {
     }
 
     public void enviarEmailRecuperacao(String emailDestinatario, String codigo) {
+        // Guard clause caso o construtor tenha falhado silenciosamente
         if (emailRemetente == null || senhaEmailRemetente == null) {
             System.out.println("As credenciais de e-mail não foram carregadas. O envio foi cancelado.");
             return; 
         }
         
         SimpleEmail email = new SimpleEmail();
+        
+        // FIXME: Hardcoded para Gmail. Mover Host e Port para o arquivo config.properties.
         email.setHostName("smtp.gmail.com");
         email.setSmtpPort(465);
         email.setAuthentication(this.emailRemetente, this.senhaEmailRemetente);
@@ -66,7 +71,8 @@ public class EmailService {
 
         } catch (Exception e) {
             e.printStackTrace();
-            JOptionPane.showMessageDialog(null, "Erro ao enviar o e--mail de recuperação. Verifique a conexão ou as configurações.", "Erro de E-mail", JOptionPane.ERROR_MESSAGE);
+            // TODO: Substituir sysout/stacktrace por Logger real (Log4j/SLF4J)
+            JOptionPane.showMessageDialog(null, "Erro ao enviar o e-mail de recuperação. Verifique a conexão.", "Erro de E-mail", JOptionPane.ERROR_MESSAGE);
         }
     }
 }

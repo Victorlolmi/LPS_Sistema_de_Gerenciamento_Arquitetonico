@@ -1,111 +1,185 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package controller;
-import java.math.BigDecimal;
+
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
+import java.util.List;
+import javax.swing.JOptionPane;
 import model.dao.ProjetoDAO;
 import model.dao.ClienteDAO;
+import model.dao.TerrenoDAO;
 import model.entities.Cliente;
 import model.entities.Projeto;
 import view.screens.dialogs.DlgCadastroProjetos;
-import java.util.List;
+import view.screens.dialogs.DlgVisualizarProjeto;
+
 /**
- *
- * @author Viktin
+ * @author Viktin 
  */
 public class ProjetoController {
 
-    private final DlgCadastroProjetos view;
+    private DlgCadastroProjetos cadastroView;
+    private DlgVisualizarProjeto visualizarView;
     private final ProjetoDAO dao;
     private final ClienteDAO clienteDAO;
+    private final TerrenoDAO terrenoDAO;
+    private final DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
     public ProjetoController(DlgCadastroProjetos view) {
-        this.view = view;
+        this.cadastroView = view;
         this.dao = new ProjetoDAO();
         this.clienteDAO = new ClienteDAO();
-        inicializar();
+        this.terrenoDAO = new TerrenoDAO();
+        inicializarCadastro();
     }
 
-    private void inicializar() {
-        // Carrega os clientes no ComboBox ao abrir a tela
-        List<Cliente> clientes = clienteDAO.listarTodos();
-        view.atualizarComboClientes(clientes);
-    }
-    
-    public ProjetoController() {
-        this.view = null; // Não tem tela vinculada
+    public ProjetoController(DlgVisualizarProjeto view) {
+        this.visualizarView = view;
         this.dao = new ProjetoDAO();
         this.clienteDAO = new ClienteDAO();
+        this.terrenoDAO = new TerrenoDAO();
     }
-    
+
+    private void inicializarCadastro() {
+        if (cadastroView != null) {
+            List<Cliente> clientes = clienteDAO.listarTodos();
+            cadastroView.atualizarComboClientes(clientes);
+        }
+    }
+
+    public void preencherCamposEdicao(Projeto p) {
+        if (cadastroView == null || p == null) return;
+
+        cadastroView.setTitle("Editar Projeto: " + p.getNome());
+        
+        // NOTE: Acesso direto aos setters da View (Swing style).
+        cadastroView.setProjetoCampos(
+            p.getNome(),
+            p.getDescricao(),
+            p.getStatus(),
+            p.getOrcamento() != null ? String.format("%.2f", p.getOrcamento()) : "0,00",
+            p.getDataInicio() != null ? p.getDataInicio().format(dtf) : "",
+            p.getDataPrevisao() != null ? p.getDataPrevisao().format(dtf) : "",
+            p.getCliente()
+        );
+    }
+
     public Projeto buscarPorId(Long id) {
         return dao.buscarPorId(id);
     }
 
-    public void salvarProjeto() {
-        // 1. Validar campos obrigatórios
-        if (view.getNome().isEmpty() || view.getDataInicio().isEmpty()) {
-            view.exibeMensagem("Preencha o Nome e a Data de Início!");
+    public void excluirProjeto(Projeto projeto) {
+        if (projeto == null || projeto.getId() == null) {
+            JOptionPane.showMessageDialog(visualizarView, "Erro: Nenhum projeto selecionado.");
             return;
         }
 
-        Projeto projeto;
+        int confirmacao = JOptionPane.showConfirmDialog(visualizarView, 
+            "Tem certeza que deseja EXCLUIR o projeto '" + projeto.getNome() + "'?\nEssa ação não pode ser desfeita.", 
+            "Excluir Projeto", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
 
-        // --- AQUI ESTÁ A CORREÇÃO MÁGICA ---
-        // Perguntamos para a View: "Existe um projeto em edição?"
-        Projeto projetoExistente = view.getProjetoEmEdicao();
-
-        if (projetoExistente != null) {
-            // CENÁRIO EDIÇÃO: Usamos o objeto que já tem ID
-            projeto = projetoExistente; 
-        } else {
-            // CENÁRIO NOVO: Criamos um objeto zerado
-            projeto = new Projeto();
+        if (confirmacao == JOptionPane.YES_OPTION) {
+            try {
+                dao.remover(projeto.getId());
+                JOptionPane.showMessageDialog(visualizarView, "Projeto excluído com sucesso!");
+                visualizarView.dispose();
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(visualizarView, "Erro ao excluir: " + e.getMessage());
+            }
         }
-        // -----------------------------------
+    }
+
+    public void excluirTerreno(Projeto projeto) {
+        if (projeto == null || projeto.getTerreno() == null) return;
+
+        int confirmacao = JOptionPane.showConfirmDialog(visualizarView, 
+                "Tem certeza que deseja remover o terreno deste projeto?", "Excluir Terreno",
+                JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+
+        if (confirmacao == JOptionPane.YES_OPTION) {
+            try {
+                Long idTerreno = projeto.getTerreno().getId();
+                projeto.setTerreno(null);
+                dao.salvar(projeto);
+                terrenoDAO.remover(idTerreno);
+                JOptionPane.showMessageDialog(visualizarView, "Terreno removido!");
+                visualizarView.setProjeto(dao.buscarPorId(projeto.getId()));
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(visualizarView, "Erro: " + e.getMessage());
+            }
+        }
+    }
+
+    private LocalDate converterData(String data) {
+        if (data == null || data.trim().isEmpty()) return null;
+        
+        try {
+            return LocalDate.parse(data.trim(), dtf);
+        } catch (Exception e) {
+            System.err.println("Erro ao converter data: " + data + " | " + e.getMessage());
+            return null; 
+        }
+    }
+
+    private boolean isDataValida(String data) {
+        if (data == null) return false;
+        String limpa = data.replace("/", "").trim();
+        return !limpa.isEmpty() && limpa.length() == 8;
+    }
+
+    public void salvarProjeto() {
+        if (cadastroView.getNome().trim().isEmpty()) {
+            cadastroView.exibeMensagem("O nome do projeto é obrigatório!");
+            return;
+        }
+
+        Projeto projeto = (cadastroView.getProjetoEmEdicao() != null) 
+                          ? cadastroView.getProjetoEmEdicao() 
+                          : new Projeto();
 
         try {
-            // 2. Preencher os dados (seja novo ou velho, atualizamos os campos)
-            projeto.setNome(view.getNome());
-            projeto.setDescricao(view.getDescricao());
-            projeto.setStatus(view.getStatus());
-            projeto.setCliente(view.getClienteSelecionado());
+            projeto.setNome(cadastroView.getNome());
+            projeto.setDescricao(cadastroView.getDescricao());
+            projeto.setStatus(cadastroView.getStatus());
+            projeto.setCliente(cadastroView.getClienteSelecionado());
 
-            // 3. Conversão de Datas (String -> LocalDate)
-            DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-            
-            // Data Início
-            if (!view.getDataInicio().isEmpty()) {
-                projeto.setDataInicio(LocalDate.parse(view.getDataInicio(), dtf));
+            String strDataIn = cadastroView.getDataInicio();
+            if (isDataValida(strDataIn)) {
+                LocalDate dtIn = converterData(strDataIn);
+                if (dtIn != null) {
+                    projeto.setDataInicio(dtIn);
+                } else {
+                    cadastroView.exibeMensagem("Data de Início inválida!");
+                    return;
+                }
+            } else {
+                cadastroView.exibeMensagem("Data de Início é obrigatória!");
+                return;
             }
 
-            // Data Previsão
-            if (!view.getDataPrevisao().trim().isEmpty() && !view.getDataPrevisao().equals("__/__/____")) {
-                 projeto.setDataPrevisao(LocalDate.parse(view.getDataPrevisao(), dtf));
+            String strDataPrev = cadastroView.getDataPrevisao();
+            if (isDataValida(strDataPrev)) {
+                projeto.setDataPrevisao(converterData(strDataPrev));
             }
 
-            // 4. Conversão de Orçamento (String -> Double)
-            String valorTexto = view.getOrcamento();
-            if (!valorTexto.isEmpty()) {
-                // Troca vírgula por ponto para o Java entender (ex: 10,50 -> 10.50)
-                valorTexto = valorTexto.replace(",", ".");
-                projeto.setOrcamento(Double.parseDouble(valorTexto));
-            }
+            projeto.setOrcamento(converterMoeda(cadastroView.getOrcamento()));
 
-            // 5. Salvar no Banco
-            // Se o projeto tiver ID, o DAO fará 'merge' (Update). Se não, 'persist' (Insert).
             dao.salvar(projeto);
-
-            view.exibeMensagem("Projeto salvo com sucesso!");
-            view.dispose(); // Fecha a janela
+            cadastroView.exibeMensagem("Projeto salvo com sucesso!");
+            cadastroView.dispose();
 
         } catch (Exception e) {
-            view.exibeMensagem("Erro ao salvar: " + e.getMessage());
+            cadastroView.exibeMensagem("Erro ao processar dados: " + e.getMessage());
             e.printStackTrace();
+        }
+    }
+
+    private Double converterMoeda(String valor) {
+        if (valor == null || valor.trim().isEmpty()) return 0.0;
+        try {
+            // Normaliza formato pt-BR (1.234,56) para o parse do Double
+            return Double.parseDouble(valor.replace(".", "").replace(",", "."));
+        } catch (NumberFormatException e) {
+            return 0.0;
         }
     }
 }

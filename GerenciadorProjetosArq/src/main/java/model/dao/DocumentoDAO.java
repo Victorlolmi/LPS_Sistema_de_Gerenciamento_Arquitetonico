@@ -8,21 +8,25 @@ import factory.JPAUtil;
 import java.util.List;
 import javax.persistence.EntityManager;
 import model.entities.Documento;
+
 /**
- *
  * @author Viktin
  */
 public class DocumentoDAO {
 
+    // TODO: Refatorar para estender GenericDAO (quebra de padrão detectada)
     public void salvar(Documento d) {
         EntityManager em = JPAUtil.getEntityManager();
         try {
             em.getTransaction().begin();
+            
+            // Upsert pattern manual
             if (d.getId() == null) {
-                em.persist(d); // Novo
+                em.persist(d);
             } else {
-                em.merge(d); // Edição
+                em.merge(d);
             }
+            
             em.getTransaction().commit();
         } catch (Exception e) {
             em.getTransaction().rollback();
@@ -37,9 +41,11 @@ public class DocumentoDAO {
         try {
             em.getTransaction().begin();
             Documento d = em.find(Documento.class, id);
+            
             if (d != null) {
                 em.remove(d);
             }
+            
             em.getTransaction().commit();
         } catch (Exception e) {
             em.getTransaction().rollback();
@@ -49,19 +55,16 @@ public class DocumentoDAO {
         }
     }
 
-    // Busca apenas os documentos daquele projeto específico
     public List<Documento> listarPorProjeto(Long idProjeto) {
         EntityManager em = JPAUtil.getEntityManager();
-        List<Documento> lista = null;
         try {
-            // JPQL: Seleciona Documento onde o ID do Projeto seja igual ao parâmetro
             String jpql = "SELECT d FROM Documento d WHERE d.projeto.id = :idProjeto";
-            lista = em.createQuery(jpql, Documento.class)
+            
+            return em.createQuery(jpql, Documento.class)
                       .setParameter("idProjeto", idProjeto)
                       .getResultList();
         } finally {
             em.close();
         }
-        return lista;
     }
 }

@@ -8,7 +8,10 @@ import model.services.EmailService;
 import view.screens.FrLogin;
 import view.screens.FrRecuperacaoSenha;
 import view.screens.FrVerificacaoCodigo;
-
+/**
+ *
+ * @author juans
+ */
 public class RecuperacaoSenhaController {
 
     private final FrRecuperacaoSenha view;
@@ -31,8 +34,11 @@ public class RecuperacaoSenhaController {
 
         Usuario usuario = usuarioDAO.findByEmailOrCpf(identificador);
 
+        // Se o usuário não existir, falhamos silenciosamente para não vazar dados
         if (usuario != null) {
             String codigo = gerarCodigoRecuperacao();
+            
+            // Janela de 15 min para uso do token
             LocalDateTime validade = LocalDateTime.now().plusMinutes(15);
             
             usuario.setCodigo_recuperacao(codigo);
@@ -40,15 +46,19 @@ public class RecuperacaoSenhaController {
             
             usuarioDAO.update(usuario);
             
+            // TODO: Mover para processamento assíncrono (fila) para não travar a UI
             emailService.enviarEmailRecuperacao(usuario.getEmail(), codigo);
         }
 
+        // Security: Mensagem genérica proposital para evitar Enumeração de Usuários (User Enumeration Attack).
+        // O atacante não deve saber se o e-mail existe ou não.
         view.exibeMensagem("Se o e-mail informado estiver em nossa base de dados, um código de recuperação será enviado.");
         
         navegarParaVerificacao(identificador);
     }
 
     private String gerarCodigoRecuperacao() {
+        // Gera token curto alfanumérico (6 chars). UUID substring é suficiente aqui.
         return UUID.randomUUID().toString().replaceAll("-", "").substring(0, 6).toUpperCase();
     }
 
