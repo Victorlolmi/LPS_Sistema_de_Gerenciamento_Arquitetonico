@@ -627,6 +627,7 @@ public class DlgVisualizarProjeto extends javax.swing.JDialog {
         jLabel4 = new javax.swing.JLabel();
         jScrollPane4 = new javax.swing.JScrollPane();
         edtComentario = new javax.swing.JTextArea();
+        jLabel3 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setMinimumSize(new java.awt.Dimension(1370, 760));
@@ -638,11 +639,11 @@ public class DlgVisualizarProjeto extends javax.swing.JDialog {
 
         lblNomeCliente.setFont(new java.awt.Font("Segoe UI", 2, 18)); // NOI18N
         lblNomeCliente.setText("Victor Emmanuel");
-        jPanel1.add(lblNomeCliente, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 50, 230, -1));
+        jPanel1.add(lblNomeCliente, new org.netbeans.lib.awtextra.AbsoluteConstraints(300, 50, 230, -1));
 
         lblNomeProjeto.setFont(new java.awt.Font("Segoe UI", 1, 36)); // NOI18N
         lblNomeProjeto.setText("Casas Duplas");
-        jPanel1.add(lblNomeProjeto, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 0, 870, 50));
+        jPanel1.add(lblNomeProjeto, new org.netbeans.lib.awtextra.AbsoluteConstraints(300, 0, 870, 50));
         jPanel1.add(jTabbedPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(610, 260, -1, -1));
 
         jTabbedPane2.setBackground(new java.awt.Color(249, 250, 251));
@@ -951,6 +952,9 @@ public class DlgVisualizarProjeto extends javax.swing.JDialog {
         jPanel1.add(jTabbedPane2, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 100, 1390, 660));
         jTabbedPane2.getAccessibleContext().setAccessibleName("Visão Geral");
 
+        jLabel3.setText("<------ Voltar aos projetos");
+        jPanel1.add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 30, -1, -1));
+
         getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 1430, 790));
 
         pack();
@@ -1220,6 +1224,7 @@ public class DlgVisualizarProjeto extends javax.swing.JDialog {
     private javax.swing.JLabel jLabel11;
     private javax.swing.JLabel jLabel12;
     private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
