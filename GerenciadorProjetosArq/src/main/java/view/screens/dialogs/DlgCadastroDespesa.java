@@ -28,8 +28,6 @@ public class DlgCadastroDespesa extends javax.swing.JDialog {
         
         this.controller = new DespesaController();
         
-        // UX: Já traz a data atual preenchida para agilizar o cadastro
-        edtDataDespesa.setText(LocalDate.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
     }
     
     public void setProjetoVinculado(Projeto p) {
@@ -156,34 +154,18 @@ public class DlgCadastroDespesa extends javax.swing.JDialog {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnSalvarDespesaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSalvarDespesaActionPerformed
-        String descricao = edtDescricaoDespesa.getText();
-        String valor = edtValorDespesa.getText(); 
-        String fornecedor = edtFornecedorDespesa.getText();
-        String data = edtDataDespesa.getText();
-        String observacoes = jTObservacoes.getText();
-        
-        String categoria = (String) cbCategoria.getSelectedItem();
-        String pagamento = (String) cbFormaPag.getSelectedItem();
-        String status = (String) cbStatusDespesa.getSelectedItem();
-        
-        // Guard clause: Tentar salvar despesa órfã gera inconsistência no banco
-        if (this.projetoVinculado == null) {
-            JOptionPane.showMessageDialog(this, "Erro: Nenhum projeto vinculado para lançar a despesa.");
-            return;
-        }
-
-        boolean sucesso = controller.salvarDespesa(
-                descricao, 
-                valor, 
-                categoria, 
-                data, 
-                fornecedor, 
-                status, 
-                pagamento, 
-                observacoes, 
+            boolean sucesso = controller.salvarDespesa(
+                edtDescricaoDespesa.getText(), 
+                edtValorDespesa.getText(), 
+                (String) cbCategoria.getSelectedItem(), 
+                edtDataDespesa.getText(), 
+                edtFornecedorDespesa.getText(), 
+                (String) cbStatusDespesa.getSelectedItem(), 
+                (String) cbFormaPag.getSelectedItem(), 
+                jTObservacoes.getText(), 
                 this.projetoVinculado
         );
-        
+
         if (sucesso) {
             JOptionPane.showMessageDialog(this, "Despesa salva com sucesso!");
             this.dispose();

@@ -116,33 +116,11 @@ public class DlgCadastroDocumento extends javax.swing.JDialog {
     }//GEN-LAST:event_edtNomeDocumentoActionPerformed
 
     private void btnSelecionarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSelecionarActionPerformed
-       // UX: Tenta forçar o visual nativo do sistema operacional para a janela de arquivos
-        try {
-            javax.swing.UIManager.setLookAndFeel(javax.swing.UIManager.getSystemLookAndFeelClassName());
-            javax.swing.SwingUtilities.updateComponentTreeUI(this);
-        } catch (Exception e) {
-            // Falha silenciosa: se não der, usa o padrão do Java (Metal)
-        }
-
-        JFileChooser fileChooser = new JFileChooser();
-        fileChooser.setDialogTitle("Selecione o documento");
-        
-        // Filtro para guiar o usuário aos tipos corretos
-        javax.swing.filechooser.FileNameExtensionFilter filtro = 
-            new javax.swing.filechooser.FileNameExtensionFilter(
-                "Arquivos de Projeto (PDF, Imagens, DWG)", "pdf", "jpg", "jpeg", "png", "dwg");
-        fileChooser.setFileFilter(filtro);
-        
-        int retorno = fileChooser.showOpenDialog(this);
-        
-        if (retorno == JFileChooser.APPROVE_OPTION) {
-            this.arquivoSelecionado = fileChooser.getSelectedFile();
+       this.arquivoSelecionado = controller.selecionarArquivo(this);
+        if (this.arquivoSelecionado != null) {
             edtCaminhoArquivo.setText(this.arquivoSelecionado.getAbsolutePath());
-            
-            // Auto-fill: Se o user não digitou nome, usa o nome do arquivo
-            if (edtNomeDocumento.getText().isEmpty()) {
-                edtNomeDocumento.setText(this.arquivoSelecionado.getName());
-            }
+            // O controller decidirá se deve preencher o nome automaticamente
+            edtNomeDocumento.setText(controller.sugerirNome(edtNomeDocumento.getText(), arquivoSelecionado));
         }
     }//GEN-LAST:event_btnSelecionarActionPerformed
 

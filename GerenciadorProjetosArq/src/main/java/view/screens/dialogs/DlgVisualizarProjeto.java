@@ -50,7 +50,7 @@ public class DlgVisualizarProjeto extends javax.swing.JDialog {
         estilizarAbasModernas();
         
         // Inicializa Controllers
-        this.controller = new ProjetoController();
+        this.controller = new ProjetoController(this);
         this.docController = new DocumentoController();
         this.despesaController = new DespesaController();
         this.feedbackController = new FeedbackController();
@@ -127,7 +127,7 @@ public class DlgVisualizarProjeto extends javax.swing.JDialog {
         atualizarAbaFinanceiro();
         atualizarAbaFeedback();
     }
-    private void atualizarAbaFinanceiro() {
+    public void atualizarAbaFinanceiro() {
         if (this.projetoAtual == null || this.projetoAtual.getId() == null) return;
 
         List<Despesa> despesas = despesaController.listarDespesasDoProjeto(this.projetoAtual.getId());
@@ -166,7 +166,7 @@ public class DlgVisualizarProjeto extends javax.swing.JDialog {
          edtComentario.setText(""); // Limpa campo de input
     }
     
-    private void atualizarTabelaDocumentos() {
+    public void atualizarTabelaDocumentos() {
         if (this.projetoAtual != null && this.projetoAtual.getId() != null) {
             List<Documento> lista = docController.listarDocumentosDoProjeto(this.projetoAtual.getId());
             docModel.setDados(lista);
@@ -826,105 +826,39 @@ public class DlgVisualizarProjeto extends javax.swing.JDialog {
     }//GEN-LAST:event_bntEditarActionPerformed
 
     private void btnExcluirProjetoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnExcluirProjetoActionPerformed
-        if (this.projetoAtual == null || this.projetoAtual.getId() == null) {
-            JOptionPane.showMessageDialog(this, "Erro: Nenhum projeto selecionado.");
-            return;
-        }
-
-        int confirmacao = JOptionPane.showConfirmDialog(
-            this, 
-            "Tem certeza que deseja EXCLUIR o projeto '" + projetoAtual.getNome() + "'?\nEssa ação não pode ser desfeita.", 
-            "Excluir Projeto", 
-            JOptionPane.YES_NO_OPTION,
-            JOptionPane.WARNING_MESSAGE
-        );
-
-        // Se o usuário clicou em SIM (YES_OPTION = 0)
-        if (confirmacao == JOptionPane.YES_OPTION) {
-            try {
-                ProjetoDAO dao = new ProjetoDAO();
-                dao.remover(projetoAtual.getId());
-                
-                JOptionPane.showMessageDialog(this, "Projeto excluído com sucesso!");
-                
-                // Fecha a janela de detalhes, pois o projeto sumiu
-                this.dispose();
-                
-            } catch (Exception e) {
-                JOptionPane.showMessageDialog(this, "Erro ao excluir: " + e.getMessage());
-                e.printStackTrace();
-            }
-        }
+        controller.excluirProjeto(this.projetoAtual);
     }//GEN-LAST:event_btnExcluirProjetoActionPerformed
 
     private void btnAdicionarTerrenoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAdicionarTerrenoActionPerformed
         DlgCadastroTerreno dlg = new DlgCadastroTerreno(null, true);
-        
         dlg.setProjetoVinculado(this.projetoAtual);
-        
+
         if (this.projetoAtual.getTerreno() != null) {
             dlg.carregarTerreno(this.projetoAtual.getTerreno());
         } 
-        
+
         dlg.setLocationRelativeTo(null);
         dlg.setVisible(true); 
-        
+
+        // Deixa o controller buscar os dados novos e atualizar a tela
         if (this.projetoAtual.getId() != null) {
-            Projeto projetoAtualizado = controller.buscarPorId(this.projetoAtual.getId());
-            this.setProjeto(projetoAtualizado);
+            Projeto atualizado = controller.buscarPorId(this.projetoAtual.getId());
+            this.setProjeto(atualizado);
         }
     }//GEN-LAST:event_btnAdicionarTerrenoActionPerformed
 
     private void btnExcluirTerrenoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnExcluirTerrenoActionPerformed
-        if (this.projetoAtual.getTerreno() == null) return;
-
-        int confirmacao = JOptionPane.showConfirmDialog(this, 
-                "Tem certeza que deseja remover o terreno deste projeto?\nTodos os dados do terreno serão perdidos.",
-                "Excluir Terreno",
-                JOptionPane.YES_NO_OPTION,
-                JOptionPane.WARNING_MESSAGE);
-
-        if (confirmacao == JOptionPane.YES_OPTION) {
-            try {
-                Long idTerreno = this.projetoAtual.getTerreno().getId();
-
-                this.projetoAtual.setTerreno(null);
-                new ProjetoDAO().salvar(this.projetoAtual);
-                new TerrenoDAO().remover(idTerreno);
-
-                JOptionPane.showMessageDialog(this, "Terreno removido com sucesso!");
-
-                Projeto projetoAtualizado = controller.buscarPorId(this.projetoAtual.getId());
-                this.setProjeto(projetoAtualizado);
-
-            } catch (Exception e) {
-                JOptionPane.showMessageDialog(this, "Erro ao excluir terreno: " + e.getMessage());
-                e.printStackTrace();
-            }
-        }
+    controller.excluirTerreno(this.projetoAtual);
     }//GEN-LAST:event_btnExcluirTerrenoActionPerformed
 
     private void btnExcluirDocActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnExcluirDocActionPerformed
-        int linhaSelecionada = jTDocs.getSelectedRow();
-        
-        if (linhaSelecionada == -1) {
-            JOptionPane.showMessageDialog(this, "Selecione um documento para excluir.");
-            return;
-        }
-        
-        Documento doc = docModel.getDocumento(linhaSelecionada);
-        
-        int confirm = JOptionPane.showConfirmDialog(this, 
-                "Deseja excluir o documento '" + doc.getNome() + "'?", 
-                "Excluir", JOptionPane.YES_NO_OPTION);
-        
-        if (confirm == JOptionPane.YES_OPTION) {
-            boolean sucesso = docController.excluirDocumento(doc.getId());
-            if (sucesso) {
-                atualizarTabelaDocumentos();
-                JOptionPane.showMessageDialog(this, "Documento removido.");
-            }
-        }
+        int linha = jTDocs.getSelectedRow();
+    if (linha != -1) {
+        Documento doc = docModel.getDocumento(linha);
+        docController.excluirDocumento(doc, this); // O Controller cuida do resto
+    } else {
+        JOptionPane.showMessageDialog(this, "Selecione um documento.");
+    }
     }//GEN-LAST:event_btnExcluirDocActionPerformed
 
     private void btnAbrirDocActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAbrirDocActionPerformed
@@ -961,23 +895,11 @@ public class DlgVisualizarProjeto extends javax.swing.JDialog {
 
     private void btnExcluirDespesaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnExcluirDespesaActionPerformed
         int linha = jTable1.getSelectedRow();
-        if (linha == -1) {
+        if (linha != -1) {
+            Despesa d = despesaModel.getDespesa(linha);
+            despesaController.excluirDespesa(d, this); // Chama o controller
+        } else {
             JOptionPane.showMessageDialog(this, "Selecione uma despesa para excluir.");
-            return;
-        }
-        
-        Despesa d = despesaModel.getDespesa(linha);
-        
-        int confirm = JOptionPane.showConfirmDialog(this, 
-                "Deseja excluir a despesa: " + d.getDescricao() + "?", 
-                "Excluir Gasto", JOptionPane.YES_NO_OPTION);
-        
-        if (confirm == JOptionPane.YES_OPTION) {
-            boolean sucesso = despesaController.excluirDespesa(d.getId());
-            if (sucesso) {
-                atualizarAbaFinanceiro(); // Recalcula tudo
-                JOptionPane.showMessageDialog(this, "Despesa excluída.");
-            }
         }
     }//GEN-LAST:event_btnExcluirDespesaActionPerformed
 

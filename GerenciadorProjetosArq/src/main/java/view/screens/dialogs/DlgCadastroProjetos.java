@@ -32,49 +32,30 @@ public class DlgCadastroProjetos extends javax.swing.JDialog {
     }
     
     public void setProjetoParaEdicao(Projeto p) {
-        this.projetoEmEdicao = p; // Guarda o projeto na variável global
-        
+        this.projetoEmEdicao = p;
         if (p != null) {
-            this.setTitle("Editar Projeto: " + p.getNome()); 
-            
-            // 1. Textos Simples
-            edtNomeProjeto.setText(p.getNome());
-            edtDescricao.setText(p.getDescricao());
-            
-            // 2. Orçamento (Visual: troca ponto por vírgula para padrão BR)
-            if (p.getOrcamento() != null) {
-                edtOrcamento.setText(String.format("%.2f", p.getOrcamento()).replace('.', ','));
-            }
+            controller.preencherCamposEdicao(p);
+        }
+    }
+    public void setProjetoCampos(String nome, String desc, String status, String orcamento, String dataIn, String dataPrev, Cliente cliente) {
+        edtNomeProjeto.setText(nome);
+        edtDescricao.setText(desc);
+        cbStatus.setSelectedItem(status);
+        edtOrcamento.setText(orcamento);
+        edtDataInicio.setText(dataIn);
+        edtPrevisao.setText(dataPrev);
 
-            // 3. Status
-            if (p.getStatus() != null) {
-                cbStatus.setSelectedItem(p.getStatus());
-            }
-
-            // 4. Datas (LocalDate -> String)
-            DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-            
-            if (p.getDataInicio() != null) {
-                edtDataInicio.setText(p.getDataInicio().format(dtf));
-            }
-            if (p.getDataPrevisao() != null) { 
-                edtPrevisao.setText(p.getDataPrevisao().format(dtf));
-            }
-
-            // 5. Cliente (Lógica para selecionar o item correto no ComboBox)
-            if (p.getCliente() != null) {
-                for (int i = 0; i < cbCliente.getItemCount(); i++) {
-                    Cliente c = cbCliente.getItemAt(i);
-                    // Compara IDs para garantir unicidade
-                    if (c.getId().equals(p.getCliente().getId())) {
-                        cbCliente.setSelectedIndex(i);
-                        break;
-                    }
+        // Para o JComboBox de Clientes selecionar o correto:
+        if (cliente != null) {
+            for (int i = 0; i < cbCliente.getItemCount(); i++) {
+                Cliente item = cbCliente.getItemAt(i);
+                if (item.getId().equals(cliente.getId())) {
+                    cbCliente.setSelectedIndex(i);
+                    break;
                 }
             }
         }
     }
-    
     public Projeto getProjetoEmEdicao() {
         return this.projetoEmEdicao;
     }

@@ -22,6 +22,7 @@ public class FrVerificacaoCodigo extends javax.swing.JFrame {
     public FrVerificacaoCodigo(String email) {
         initComponents();
         setLocationRelativeTo(null);
+        // Armazena o e-mail para saber de quem é o código
         this.emailUsuario = email;
         this.controller = new VerificacaoCodigoController(this);
     }
