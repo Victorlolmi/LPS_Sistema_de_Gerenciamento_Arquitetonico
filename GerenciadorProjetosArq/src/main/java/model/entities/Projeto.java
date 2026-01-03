@@ -57,6 +57,9 @@ public class Projeto {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "cliente_id", nullable = false)
     private Cliente cliente;
+    
+    @javax.persistence.Column(name = "caminho_modelo_3d")
+    private String caminhoModelo3D;
 
     public Projeto() {}
 
@@ -130,5 +133,12 @@ public class Projeto {
     }
     public void setTerreno(Terreno terreno) {
         this.terreno = terreno;
+    }
+    
+    public String getCaminhoModelo3D() {
+        return caminhoModelo3D; 
+    }
+    public void setCaminhoModelo3D(String caminhoModelo3D) { 
+        this.caminhoModelo3D = caminhoModelo3D; 
     }
 }

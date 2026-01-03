@@ -57,7 +57,7 @@ public class FrHome extends javax.swing.JFrame {
         configurarTabelaClientes();
         
         // 3. UI/UX
-        configurarPlaceholderBusca();
+        configurarPlaceholders();
         
         // 4. Carrega Dados Iniciais
         carregarTabelaClientes();
@@ -238,28 +238,40 @@ public class FrHome extends javax.swing.JFrame {
         });
     }
     
-    private void configurarPlaceholderBusca() {
-        lblBusca.setText("  Buscar por projeto ou cliente...");
-        lblBusca.setForeground(new Color(150, 150, 150)); // Cinza claro
+    private void configurarPlaceholders() {
+        // 1. Configura Busca de Projetos
+        String phProjetos = "  Buscar por projeto...";
+        lblBusca.setText(phProjetos);
+        lblBusca.setForeground(new Color(150, 150, 150));
+        adicionarEfeitoPlaceholder(lblBusca, phProjetos);
 
-        lblBusca.addFocusListener(new java.awt.event.FocusListener() {
+        // 2. Configura Busca de Clientes
+        String phClientes = "  Buscar por nome...";
+        lblBuscaCliente.setText(phClientes);
+        lblBuscaCliente.setForeground(new Color(150, 150, 150));
+        adicionarEfeitoPlaceholder(lblBuscaCliente, phClientes);
+    }
+    private void adicionarEfeitoPlaceholder(javax.swing.JTextField field, String placeholder) {
+        field.addFocusListener(new java.awt.event.FocusListener() {
             @Override
             public void focusGained(java.awt.event.FocusEvent e) {
-                if (lblBusca.getText().contains("Buscar por")) {
-                    lblBusca.setText("");
-                    lblBusca.setForeground(Color.BLACK);
+                // Se o texto for igual ao placeholder, limpa e põe cor preta
+                if (field.getText().equals(placeholder)) {
+                    field.setText("");
+                    field.setForeground(Color.BLACK);
                 }
             }
+
             @Override
             public void focusLost(java.awt.event.FocusEvent e) {
-                if (lblBusca.getText().trim().isEmpty()) {
-                    lblBusca.setText("  Buscar por projeto ou cliente...");
-                    lblBusca.setForeground(new Color(150, 150, 150));
+                // Se saiu e tá vazio, repõe o placeholder e a cor cinza
+                if (field.getText().trim().isEmpty()) {
+                    field.setText(placeholder);
+                    field.setForeground(new Color(150, 150, 150));
                 }
             }
         });
     }
-    
     
     /**
      * This method is called from within the constructor to initialize the form.
@@ -285,6 +297,7 @@ public class FrHome extends javax.swing.JFrame {
         jScrollPane1 = new javax.swing.JScrollPane();
         jTClientes = new javax.swing.JTable();
         btnCadastrarCliente = new javax.swing.JButton();
+        lblBuscaCliente = new javax.swing.JTextField();
         jPanel5 = new javax.swing.JPanel();
         jPanel6 = new javax.swing.JPanel();
         jPanel7 = new javax.swing.JPanel();
@@ -365,7 +378,7 @@ public class FrHome extends javax.swing.JFrame {
         ));
         jScrollPane1.setViewportView(jTClientes);
 
-        jPanel4.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 10, 1170, 410));
+        jPanel4.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 60, 1170, 410));
 
         btnCadastrarCliente.setBackground(new java.awt.Color(64, 86, 213));
         btnCadastrarCliente.setForeground(new java.awt.Color(255, 255, 255));
@@ -376,6 +389,19 @@ public class FrHome extends javax.swing.JFrame {
             }
         });
         jPanel4.add(btnCadastrarCliente, new org.netbeans.lib.awtextra.AbsoluteConstraints(1210, 20, 130, 40));
+
+        lblBuscaCliente.setToolTipText("");
+        lblBuscaCliente.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                lblBuscaClienteActionPerformed(evt);
+            }
+        });
+        lblBuscaCliente.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                lblBuscaClienteKeyReleased(evt);
+            }
+        });
+        jPanel4.add(lblBuscaCliente, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 20, 340, 30));
 
         jTabbedPane2.addTab("Clientes", jPanel4);
 
@@ -503,6 +529,31 @@ public class FrHome extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_lblBuscaActionPerformed
 
+    private void lblBuscaClienteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_lblBuscaClienteActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_lblBuscaClienteActionPerformed
+
+    private void lblBuscaClienteKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_lblBuscaClienteKeyReleased
+        String texto = lblBuscaCliente.getText();
+        
+        // Ignora se for o texto do placeholder
+        if (texto.equals("  Buscar por nome...")) return;
+
+        ClienteDAO dao = new ClienteDAO();
+        List<Cliente> resultados;
+
+        if (texto.trim().isEmpty()) {
+            // Se estiver vazio, traz tudo
+            resultados = dao.listarTodos();
+        } else {
+            // Se tiver texto, busca APENAS pelo nome
+            resultados = dao.buscarPorNome(texto);
+        }
+        
+        // Atualiza a tabela com o resultado
+        clienteModel.setDados(resultados);
+    }//GEN-LAST:event_lblBuscaClienteKeyReleased
+
     /**
      * @param args the command line arguments
      */
@@ -551,5 +602,6 @@ public class FrHome extends javax.swing.JFrame {
     private javax.swing.JTable jTProjetos;
     private javax.swing.JTabbedPane jTabbedPane2;
     private javax.swing.JTextField lblBusca;
+    private javax.swing.JTextField lblBuscaCliente;
     // End of variables declaration//GEN-END:variables
 }

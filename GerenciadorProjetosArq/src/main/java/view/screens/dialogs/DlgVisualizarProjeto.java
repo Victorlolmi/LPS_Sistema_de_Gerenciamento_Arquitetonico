@@ -42,7 +42,9 @@ public class DlgVisualizarProjeto extends javax.swing.JDialog {
     private final Color corAzulHeader = new Color(64, 86, 213);
     private final Color corFundoSelecao = new Color(240, 245, 255);
     private final javax.swing.border.Border bordaInferior = BorderFactory.createMatteBorder(0, 0, 1, 0, new Color(230, 230, 230));
-
+    
+    //visualizador 
+    private view.components.PainelVisualizador3D visualizador3D;
     public DlgVisualizarProjeto(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
@@ -69,6 +71,8 @@ public class DlgVisualizarProjeto extends javax.swing.JDialog {
         configurarTabelaDocs();
         configurarTabelaFinanceiro();
         configurarTabelaFeedback();
+        
+        inicializarAba3D();
         
         // Listener para carregar dados apenas quando clicar na aba (Performance)
         jTabbedPane2.addChangeListener(evt -> {
@@ -120,6 +124,13 @@ public class DlgVisualizarProjeto extends javax.swing.JDialog {
             btnExcluirTerreno.setVisible(false);
             controlarVisibilidadeCamposTerreno(false);
             lblNomeTerreno.setText("Nenhum terreno vinculado");
+        }
+        
+        if (p.getCaminhoModelo3D() != null && !p.getCaminhoModelo3D().isEmpty()) {
+            visualizador3D.carregarModelo(p.getCaminhoModelo3D());
+        } else {
+            // Se não tem, carrega a simulação padrão (passando null ou vazio)
+            visualizador3D.carregarModelo(null);
         }
         
         // Atualiza Abas secundárias
@@ -199,6 +210,98 @@ public class DlgVisualizarProjeto extends javax.swing.JDialog {
             lblCidadeBairroRuaNumero.setText(enderecoCompleto);
         } else {
             lblCidadeBairroRuaNumero.setText("Endereço não cadastrado");
+        }
+    }
+    
+    private void inicializarAba3D() {
+        this.visualizador3D = new view.components.PainelVisualizador3D();
+        jPanel4.setLayout(new java.awt.BorderLayout());
+        jPanel4.add(visualizador3D, java.awt.BorderLayout.CENTER);
+        
+        javax.swing.JPanel panelBotoes = new javax.swing.JPanel();
+        
+        // Botão Carregar
+        javax.swing.JButton btnCarregar = new javax.swing.JButton("Carregar/Trocar Modelo (.OBJ)");
+        btnCarregar.addActionListener(e -> selecionarESalvarModelo3D());
+        
+        // Botão Excluir
+        javax.swing.JButton btnRemover = new javax.swing.JButton("Remover Modelo");
+        btnRemover.setBackground(new Color(200, 50, 50));
+        btnRemover.setForeground(Color.WHITE);
+        btnRemover.addActionListener(e -> removerModelo3D());
+        
+        panelBotoes.add(btnCarregar);
+        panelBotoes.add(btnRemover);
+        jPanel4.add(panelBotoes, java.awt.BorderLayout.SOUTH);
+    }
+    
+    private void selecionarESalvarModelo3D() {
+        if (this.projetoAtual == null || this.projetoAtual.getId() == null) {
+            JOptionPane.showMessageDialog(this, "Salve o projeto antes de adicionar o modelo 3D.");
+            return;
+        }
+
+        javax.swing.JFileChooser fileChooser = new javax.swing.JFileChooser();
+        fileChooser.setDialogTitle("Selecione o modelo 3D (.obj)");
+        fileChooser.setFileFilter(new javax.swing.filechooser.FileNameExtensionFilter("Arquivos OBJ", "obj"));
+        
+        int ret = fileChooser.showOpenDialog(this);
+        if (ret == javax.swing.JFileChooser.APPROVE_OPTION) {
+            File arquivo = fileChooser.getSelectedFile();
+            String caminho = arquivo.getAbsolutePath();
+            
+            // 1. Atualiza visualmente na hora
+            visualizador3D.carregarModelo(caminho);
+            
+            // 2. Salva no banco de dados
+            try {
+                this.projetoAtual.setCaminhoModelo3D(caminho);
+                new ProjetoDAO().salvar(this.projetoAtual); // Persiste a alteração
+                JOptionPane.showMessageDialog(this, "Modelo 3D vinculado ao projeto com sucesso!");
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(this, "Erro ao salvar vínculo no banco: " + ex.getMessage());
+                ex.printStackTrace();
+            }
+        }
+    }
+
+    private void removerModelo3D() {
+        if (this.projetoAtual == null) return;
+        
+        if (this.projetoAtual.getCaminhoModelo3D() == null || this.projetoAtual.getCaminhoModelo3D().isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Não há modelo 3D vinculado para remover.");
+            return;
+        }
+
+        int confirm = JOptionPane.showConfirmDialog(this, 
+                "Tem certeza que deseja desvincular o modelo 3D deste projeto?", 
+                "Remover Modelo", JOptionPane.YES_NO_OPTION);
+        
+        if (confirm == JOptionPane.YES_OPTION) {
+            try {
+                // 1. Limpa no Objeto e no Banco
+                this.projetoAtual.setCaminhoModelo3D(null);
+                new ProjetoDAO().salvar(this.projetoAtual);
+                
+                // 2. Limpa visualmente (Carrega simulação)
+                visualizador3D.carregarModelo(null);
+                
+                JOptionPane.showMessageDialog(this, "Modelo removido.");
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(this, "Erro ao remover do banco: " + ex.getMessage());
+            }
+        }
+    }
+
+    private void carregarArquivo3D() {
+        javax.swing.JFileChooser fileChooser = new javax.swing.JFileChooser();
+        fileChooser.setDialogTitle("Selecione um arquivo 3D (.obj, .fxml)");
+        
+        int userSelection = fileChooser.showOpenDialog(this);
+        if (userSelection == javax.swing.JFileChooser.APPROVE_OPTION) {
+            File fileToOpen = fileChooser.getSelectedFile();
+            // Manda o visualizador carregar
+            visualizador3D.carregarModelo(fileToOpen.getAbsolutePath());
         }
     }
 

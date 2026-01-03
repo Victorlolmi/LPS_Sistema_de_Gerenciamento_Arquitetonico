@@ -3,6 +3,7 @@
  */
 package model.dao;
 import factory.JPAUtil;
+import java.util.ArrayList;
 import model.entities.Cliente;
 import java.util.List;
 import javax.persistence.EntityManager;
@@ -30,16 +31,19 @@ public class ClienteDAO extends GenericDAO<Cliente> {
         }
     }
 
-    public List<Cliente> buscarPorNome(String nome) {
+    public List<Cliente> buscarPorNome(String nomeBusca) {
         EntityManager em = JPAUtil.getEntityManager();
         try {
-            // Busca parcial e case-insensitive (Like '%nome%')
-            String jpql = "SELECT c FROM Cliente c WHERE lower(c.nome) LIKE lower(:nome) ORDER BY c.nome";
+            // A MÁGICA ESTÁ AQUI: "JOIN FETCH c.endereco"
+            // Isso diz: "Traga o cliente E JÁ TRAGA o endereço dele junto agora."
+            String jpql = "SELECT c FROM Cliente c JOIN FETCH c.endereco WHERE lower(c.nome) LIKE lower(:nome)";
             
             return em.createQuery(jpql, Cliente.class)
-                    .setParameter("nome", "%" + nome + "%")
-                    .getResultList();
-            
+                     .setParameter("nome", "%" + nomeBusca + "%")
+                     .getResultList();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ArrayList<>();
         } finally {
             em.close();
         }
