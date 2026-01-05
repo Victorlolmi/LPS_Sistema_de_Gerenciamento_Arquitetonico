@@ -5,7 +5,7 @@ import model.dao.TerrenoDAO;
 import model.entities.Endereco;
 import model.entities.Projeto;
 import model.entities.Terreno;
-import view.screens.dialogs.DlgCadastroTerreno;
+import view.screens.dialogs.Gestor.DlgCadastroTerreno;
 
 /**
  * @author Viktin

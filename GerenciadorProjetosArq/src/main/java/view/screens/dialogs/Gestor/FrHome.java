@@ -2,11 +2,11 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
  */
-package view.screens;
+package view.screens.dialogs.Gestor;
 
-import view.screens.dialogs.DlgCadastroProjetos;
-import view.screens.dialogs.DlgCadastroCliente;
-import view.screens.dialogs.DlgVisualizarProjeto;
+import view.screens.dialogs.Gestor.DlgCadastroProjetos;
+import view.screens.dialogs.Gestor.DlgCadastroCliente;
+import view.screens.dialogs.Gestor.DlgVisualizarProjeto;
 import model.dao.ClienteDAO;
 import model.entities.Cliente;
 import model.dao.ProjetoDAO;
@@ -344,7 +344,7 @@ public class FrHome extends javax.swing.JFrame {
         });
         jScrollPane2.setViewportView(jTProjetos);
 
-        jPanel3.add(jScrollPane2, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 60, 1270, 410));
+        jPanel3.add(jScrollPane2, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 60, 1270, 540));
 
         lblBusca.setToolTipText("");
         lblBusca.addActionListener(new java.awt.event.ActionListener() {

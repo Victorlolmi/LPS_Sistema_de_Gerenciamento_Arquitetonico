@@ -9,7 +9,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import model.dao.DocumentoDAO;
 import model.entities.Documento;
 import model.entities.Projeto;
-import view.screens.dialogs.DlgVisualizarProjeto;
+import view.screens.dialogs.Gestor.DlgVisualizarProjeto;
 
 /**
  * @author Viktin

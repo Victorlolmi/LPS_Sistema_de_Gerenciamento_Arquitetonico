@@ -11,7 +11,7 @@ import org.mindrot.jbcrypt.BCrypt;
 import view.screens.FrLogin;
 import view.screens.FrCadastro;
 import view.screens.FrRecuperacaoSenha;
-import view.screens.FrHome;
+import view.screens.dialogs.Gestor.FrHome;
 
 /**
  * @author Viktin

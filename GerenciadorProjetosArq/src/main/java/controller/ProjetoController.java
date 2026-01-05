@@ -9,8 +9,8 @@ import model.dao.ClienteDAO;
 import model.dao.TerrenoDAO;
 import model.entities.Cliente;
 import model.entities.Projeto;
-import view.screens.dialogs.DlgCadastroProjetos;
-import view.screens.dialogs.DlgVisualizarProjeto;
+import view.screens.dialogs.Gestor.DlgCadastroProjetos;
+import view.screens.dialogs.Gestor.DlgVisualizarProjeto;
 
 /**
  * @author Viktin 

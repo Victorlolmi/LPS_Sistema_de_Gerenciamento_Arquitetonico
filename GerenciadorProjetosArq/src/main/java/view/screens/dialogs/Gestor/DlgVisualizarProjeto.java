@@ -2,7 +2,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JDialog.java to edit this template
  */
-package view.screens.dialogs;
+package view.screens.dialogs.Gestor;
 
 import controller.*;
 import controller.tableModel.*;
@@ -141,29 +141,47 @@ public class DlgVisualizarProjeto extends javax.swing.JDialog {
     public void atualizarAbaFinanceiro() {
         if (this.projetoAtual == null || this.projetoAtual.getId() == null) return;
 
+        // 1. Carrega a lista de despesas na tabela (Visual)
         List<Despesa> despesas = despesaController.listarDespesasDoProjeto(this.projetoAtual.getId());
         despesaModel.setDados(despesas);
 
+        // 2. Obtém o Orçamento Total
         Double orcamento = (this.projetoAtual.getOrcamento() != null) ? this.projetoAtual.getOrcamento() : 0.0;
-        Double totalGasto = despesaController.buscarTotalGasto(this.projetoAtual.getId());
+
+        // 3. Calcula o total das Despesas lançadas (Mão de obra, materiais, etc.)
+        Double totalDespesas = despesaController.buscarTotalGasto(this.projetoAtual.getId());
+        
+        // 4. Obtém o Custo do Terreno (NOVO CÁLCULO)
+        Double custoTerreno = 0.0;
+        if (this.projetoAtual.getTerreno() != null && this.projetoAtual.getTerreno().getValorCompra() != null) {
+            custoTerreno = this.projetoAtual.getTerreno().getValorCompra();
+        }
+
+        // 5. Soma tudo para o Total Gasto Real
+        Double totalGasto = totalDespesas + custoTerreno;
         Double saldo = orcamento - totalGasto;
 
+        // 6. Atualiza os Labels da Interface
         NumberFormat nf = NumberFormat.getCurrencyInstance(new Locale("pt", "BR"));
         lblResumoOrcamento.setText(nf.format(orcamento));
-        lblResumoGasto.setText(nf.format(totalGasto));
+        lblResumoGasto.setText(nf.format(totalGasto)); // Agora inclui o terreno
         lblResumoSaldo.setText(nf.format(saldo));
 
         // Cor do Saldo (Vermelho se negativo, Verde se positivo)
         lblResumoSaldo.setForeground(saldo < 0 ? Color.RED : new Color(0, 153, 51));
 
-        // Barra de Progresso
+        // 7. Atualiza a Barra de Progresso
         if (orcamento > 0) {
             int percentual = (int) ((totalGasto / orcamento) * 100);
             barProgressoFinanceiro.setValue(percentual);
             barProgressoFinanceiro.setString(percentual + "% Usado");
             
             // Fica vermelha se estourar o orçamento
-            barProgressoFinanceiro.setForeground(percentual > 100 ? Color.RED : corAzulHeader);
+            if (percentual > 100) {
+                barProgressoFinanceiro.setForeground(Color.RED);
+            } else {
+                barProgressoFinanceiro.setForeground(corAzulHeader);
+            }
         } else {
             barProgressoFinanceiro.setValue(0);
             barProgressoFinanceiro.setString("Sem Orçamento");
@@ -591,7 +609,6 @@ public class DlgVisualizarProjeto extends javax.swing.JDialog {
         jLabel4 = new javax.swing.JLabel();
         jScrollPane4 = new javax.swing.JScrollPane();
         edtComentario = new javax.swing.JTextArea();
-        jLabel3 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setMinimumSize(new java.awt.Dimension(1370, 760));
@@ -603,11 +620,11 @@ public class DlgVisualizarProjeto extends javax.swing.JDialog {
 
         lblNomeCliente.setFont(new java.awt.Font("Segoe UI", 2, 18)); // NOI18N
         lblNomeCliente.setText("Victor Emmanuel");
-        jPanel1.add(lblNomeCliente, new org.netbeans.lib.awtextra.AbsoluteConstraints(300, 50, 230, -1));
+        jPanel1.add(lblNomeCliente, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 60, 230, -1));
 
         lblNomeProjeto.setFont(new java.awt.Font("Segoe UI", 1, 36)); // NOI18N
         lblNomeProjeto.setText("Casas Duplas");
-        jPanel1.add(lblNomeProjeto, new org.netbeans.lib.awtextra.AbsoluteConstraints(300, 0, 870, 50));
+        jPanel1.add(lblNomeProjeto, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 10, 870, 50));
         jPanel1.add(jTabbedPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(610, 260, -1, -1));
 
         jTabbedPane2.setBackground(new java.awt.Color(249, 250, 251));
@@ -916,9 +933,6 @@ public class DlgVisualizarProjeto extends javax.swing.JDialog {
         jPanel1.add(jTabbedPane2, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 100, 1390, 660));
         jTabbedPane2.getAccessibleContext().setAccessibleName("Visão Geral");
 
-        jLabel3.setText("<------ Voltar aos projetos");
-        jPanel1.add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 30, -1, -1));
-
         getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 1430, 790));
 
         pack();
@@ -1106,7 +1120,6 @@ public class DlgVisualizarProjeto extends javax.swing.JDialog {
     private javax.swing.JLabel jLabel11;
     private javax.swing.JLabel jLabel12;
     private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;

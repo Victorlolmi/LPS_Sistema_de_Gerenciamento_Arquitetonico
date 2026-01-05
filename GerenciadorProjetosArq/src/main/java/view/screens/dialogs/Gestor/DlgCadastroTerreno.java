@@ -2,7 +2,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JDialog.java to edit this template
  */
-package view.screens.dialogs;
+package view.screens.dialogs.Gestor;
 
 import controller.TerrenoController;
 import javax.swing.JOptionPane;
@@ -131,7 +131,6 @@ public class DlgCadastroTerreno extends javax.swing.JDialog {
         jButton1 = new javax.swing.JButton();
 
         btnSalvar.setText("Salvar");
-        btnSalvar.setActionCommand("Salvar");
         btnSalvar.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnSalvarActionPerformed(evt);
