@@ -9,9 +9,10 @@ import model.dao.ClienteDAO;
 import model.dao.TerrenoDAO;
 import model.entities.Cliente;
 import model.entities.Projeto;
+import model.entities.Usuario;
 import view.screens.dialogs.Gestor.DlgCadastroProjetos;
 import view.screens.dialogs.Gestor.DlgVisualizarProjeto;
-
+import view.screens.dialogs.Gestor.FrHome;
 /**
  * @author Viktin 
  */
@@ -19,6 +20,9 @@ public class ProjetoController {
 
     private DlgCadastroProjetos cadastroView;
     private DlgVisualizarProjeto visualizarView;
+    
+    private Usuario usuarioLogado; 
+    
     private final ProjetoDAO dao;
     private final ClienteDAO clienteDAO;
     private final TerrenoDAO terrenoDAO;
@@ -32,8 +36,11 @@ public class ProjetoController {
         inicializarCadastro();
     }
 
-    public ProjetoController(DlgVisualizarProjeto view) {
+
+    public ProjetoController(DlgVisualizarProjeto view, Usuario usuario) {
         this.visualizarView = view;
+        this.usuarioLogado = usuario; 
+        
         this.dao = new ProjetoDAO();
         this.clienteDAO = new ClienteDAO();
         this.terrenoDAO = new TerrenoDAO();
@@ -172,10 +179,19 @@ public class ProjetoController {
             e.printStackTrace();
         }
     }
-    public void navegarParaLogin() {
-        FrLogin telaLogin = new FrLogin();
-        telaLogin.setVisible(true);
-        view.dispose(); 
+    public void navegarParaHome() {
+
+        if (this.visualizarView != null) {
+            this.visualizarView.dispose();
+        }
+
+        try {
+            FrHome telaHome = new FrHome(this.usuarioLogado); 
+            telaHome.setVisible(true);
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(visualizarView, "Erro ao abrir a Home: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
     private Double converterMoeda(String valor) {
         if (valor == null || valor.trim().isEmpty()) return 0.0;

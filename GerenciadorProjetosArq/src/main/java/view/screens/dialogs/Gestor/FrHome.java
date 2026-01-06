@@ -541,8 +541,9 @@ public class FrHome extends javax.swing.JFrame {
             if (clicouNoBotao || duploClique) {
                 Projeto projetoSelecionado = projetoModel.getProjeto(linha);
                 
-                // Abre a tela de detalhes/visualização
-                DlgVisualizarProjeto dlg = new DlgVisualizarProjeto(this, true);
+                // Adicionei 'this.usuarioLogado' como terceiro parâmetro
+                DlgVisualizarProjeto dlg = new DlgVisualizarProjeto(this, true, this.usuarioLogado);
+                
                 dlg.setProjeto(projetoSelecionado);
                 dlg.setVisible(true);
                 

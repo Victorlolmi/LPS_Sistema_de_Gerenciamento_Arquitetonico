@@ -27,7 +27,7 @@ public class DlgVisualizarProjeto extends javax.swing.JDialog {
     
     private Projeto projetoAtual;
     private final ProjetoController controller;
-    
+    private model.entities.Usuario usuarioLogado;
     // Controllers e Models
     private final DocumentoController docController;
     private final DocumentoTableModel docModel;
@@ -45,14 +45,19 @@ public class DlgVisualizarProjeto extends javax.swing.JDialog {
     
     //visualizador 
     private view.components.PainelVisualizador3D visualizador3D;
-    public DlgVisualizarProjeto(java.awt.Frame parent, boolean modal) {
+    public DlgVisualizarProjeto(java.awt.Frame parent, boolean modal, model.entities.Usuario usuario) {
         super(parent, modal);
+        
+        // 1. Guarda o usuário na variável da classe
+        this.usuarioLogado = usuario;
+        
         initComponents();
         setLocationRelativeTo(null);
         estilizarAbasModernas();
         
-        // Inicializa Controllers
-        this.controller = new ProjetoController(this);
+        // 2. CORREÇÃO DO ERRO: Passa o usuário para o Controller
+        this.controller = new ProjetoController(this, this.usuarioLogado);
+        
         this.docController = new DocumentoController();
         this.despesaController = new DespesaController();
         this.feedbackController = new FeedbackController();
@@ -1092,7 +1097,7 @@ public class DlgVisualizarProjeto extends javax.swing.JDialog {
     }//GEN-LAST:event_btnExcluirFeedbackActionPerformed
 
     private void cadastroButton2MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_cadastroButton2MouseClicked
-        controller.navegarParaLogin();
+        controller.navegarParaHome();
     }//GEN-LAST:event_cadastroButton2MouseClicked
 
     private void HomeButtonMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_HomeButtonMouseClicked
@@ -1100,7 +1105,7 @@ public class DlgVisualizarProjeto extends javax.swing.JDialog {
     }//GEN-LAST:event_HomeButtonMouseClicked
 
     private void HomeButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_HomeButton2ActionPerformed
-        controller.navegarParaLogin();
+
     }//GEN-LAST:event_HomeButton2ActionPerformed
 
     /**
@@ -1119,7 +1124,7 @@ public class DlgVisualizarProjeto extends javax.swing.JDialog {
                     break;
                 }
             }
-        } catch (ReflectiveOperationException | javax.swing.UnsupportedLookAndFeelException ex) {
+        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | javax.swing.UnsupportedLookAndFeelException ex) {
             logger.log(java.util.logging.Level.SEVERE, null, ex);
         }
         //</editor-fold>
@@ -1128,7 +1133,9 @@ public class DlgVisualizarProjeto extends javax.swing.JDialog {
         java.awt.EventQueue.invokeLater(new Runnable() {
             @Override
             public void run() {
-                DlgVisualizarProjeto dialog = new DlgVisualizarProjeto(new javax.swing.JFrame(), true);
+                // CORREÇÃO AQUI: Adicionei o 'null' como terceiro parâmetro
+                DlgVisualizarProjeto dialog = new DlgVisualizarProjeto(new javax.swing.JFrame(), true, null);
+                
                 dialog.addWindowListener(new java.awt.event.WindowAdapter() {
                     @Override
                     public void windowClosing(java.awt.event.WindowEvent e) {
