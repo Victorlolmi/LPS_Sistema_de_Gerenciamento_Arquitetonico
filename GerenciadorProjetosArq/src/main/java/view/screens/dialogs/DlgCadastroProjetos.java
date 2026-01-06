@@ -2,12 +2,13 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JDialog.java to edit this template
  */
-package view.screens.dialogs.Gestor;
+package view.screens.dialogs;
 
 import controller.ProjetoController;
 import model.entities.Cliente;
 import model.entities.Projeto; 
 import java.time.format.DateTimeFormatter; 
+import model.entities.Usuario;
 import java.util.List;
 import javax.swing.JOptionPane;
 
@@ -21,12 +22,11 @@ public class DlgCadastroProjetos extends javax.swing.JDialog {
     
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(DlgCadastroProjetos.class.getName());
     
-    public DlgCadastroProjetos(java.awt.Frame parent, boolean modal) {
+    public DlgCadastroProjetos(java.awt.Frame parent, boolean modal, Usuario usuario) {
         super(parent, modal);
         initComponents();
         
-        // 1. Inicializa o Controller passando esta tela (View)
-        this.controller = new ProjetoController(this);
+        this.controller = new ProjetoController(this, usuario);
         
         this.setLocationRelativeTo(null);
     }
@@ -267,7 +267,7 @@ public class DlgCadastroProjetos extends javax.swing.JDialog {
         java.awt.EventQueue.invokeLater(new Runnable() {
             @Override
             public void run() {
-                DlgCadastroProjetos dialog = new DlgCadastroProjetos(new javax.swing.JFrame(), true);
+                DlgCadastroProjetos dialog = new DlgCadastroProjetos(new javax.swing.JFrame(), true, null);
                 dialog.addWindowListener(new java.awt.event.WindowAdapter() {
                     @Override
                     public void windowClosing(java.awt.event.WindowEvent e) {

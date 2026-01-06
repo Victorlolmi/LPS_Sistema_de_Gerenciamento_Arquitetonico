@@ -7,7 +7,7 @@ import javax.swing.JOptionPane;
 import model.dao.DespesaDAO;
 import model.entities.Despesa;
 import model.entities.Projeto;
-import view.screens.dialogs.Gestor.DlgVisualizarProjeto;
+import view.screens.dialogs.DlgVisualizarProjeto;
 
 /**
  * @author Viktin

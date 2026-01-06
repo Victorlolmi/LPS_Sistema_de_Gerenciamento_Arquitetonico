@@ -10,7 +10,7 @@ import javax.swing.SwingUtilities;
 import view.screens.FrLogin;
 import com.formdev.flatlaf.FlatLightLaf; // Para o tema claro
 import com.formdev.flatlaf.FlatDarkLaf;
-import view.screens.dialogs.Gestor.FrHome;
+import view.screens.dialogs.FrHome;
 /**
  *
  * @author Viktin

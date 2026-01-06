@@ -7,7 +7,7 @@ package controller;
 import model.dao.ClienteDAO;
 import model.entities.Cliente;
 import model.entities.Endereco;
-import view.screens.dialogs.Gestor.DlgCadastroCliente;
+import view.screens.dialogs.DlgCadastroCliente;
 import org.mindrot.jbcrypt.BCrypt;
 
 /**

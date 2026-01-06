@@ -8,11 +8,12 @@ import model.dao.ProjetoDAO;
 import model.dao.ClienteDAO;
 import model.dao.TerrenoDAO;
 import model.entities.Cliente;
+import model.entities.Gestor;
 import model.entities.Projeto;
 import model.entities.Usuario;
-import view.screens.dialogs.Gestor.DlgCadastroProjetos;
-import view.screens.dialogs.Gestor.DlgVisualizarProjeto;
-import view.screens.dialogs.Gestor.FrHome;
+import view.screens.dialogs.DlgCadastroProjetos;
+import view.screens.dialogs.DlgVisualizarProjeto;
+import view.screens.dialogs.FrHome;
 /**
  * @author Viktin 
  */
@@ -28,8 +29,9 @@ public class ProjetoController {
     private final TerrenoDAO terrenoDAO;
     private final DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
-    public ProjetoController(DlgCadastroProjetos view) {
+    public ProjetoController(DlgCadastroProjetos view, Usuario usuarioLogado) {
         this.cadastroView = view;
+        this.usuarioLogado = usuarioLogado; 
         this.dao = new ProjetoDAO();
         this.clienteDAO = new ClienteDAO();
         this.terrenoDAO = new TerrenoDAO();
@@ -148,7 +150,13 @@ public class ProjetoController {
             projeto.setDescricao(cadastroView.getDescricao());
             projeto.setStatus(cadastroView.getStatus());
             projeto.setCliente(cadastroView.getClienteSelecionado());
-
+            
+            if (this.usuarioLogado instanceof Gestor) {
+                projeto.setGestor((Gestor) this.usuarioLogado);
+            } else {
+                
+                System.out.println("Aviso: O usuário logado não é um Gestor. Projeto sem gestor definido.");
+            }
             String strDataIn = cadastroView.getDataInicio();
             if (isDataValida(strDataIn)) {
                 LocalDate dtIn = converterData(strDataIn);

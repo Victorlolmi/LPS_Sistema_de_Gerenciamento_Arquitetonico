@@ -44,8 +44,8 @@ public class Projeto {
 
     @Column(name = "data_previsao")
     private LocalDate dataPrevisao;
-
-    // FIXME: Double perde precisão decimal. Ideal migrar para BigDecimal.
+    
+    @Column(name = "orcamento") 
     private Double orcamento;
     
     // Cascade ALL: Salvar o projeto já persiste as alterações do Terreno
@@ -53,24 +53,32 @@ public class Projeto {
     @JoinColumn(name = "terreno_id", referencedColumnName = "id", nullable = true)
     private Terreno terreno;
     
-    // Performance Alert: EAGER carrega o cliente sempre. Cuidado com N+1 em listagens grandes.
+    // RELACIONAMENTO COM CLIENTE
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "cliente_id", nullable = false)
     private Cliente cliente;
+    
+    // RELACIONAMENTO COM GESTOR ---
+    @ManyToOne
+    @JoinColumn(name = "gestor_id", nullable = true) 
+    private Usuario gestor;
+
     
     @javax.persistence.Column(name = "caminho_modelo_3d")
     private String caminhoModelo3D;
 
     public Projeto() {}
 
-    public Projeto(Long id, String nome, String status, Cliente cliente) {
+    // Construtor atualizado
+    public Projeto(Long id, String nome, String status, Cliente cliente, Gestor gestor) {
         this.id = id;
         this.nome = nome;
         this.status = status;
         this.cliente = cliente;
+        this.gestor = gestor;
     }
     
-    // Getters e Setters (Boilerplate omitido de comentários)
+    // Getters e Setters
     
     public String getDescricao() { 
         return descricao; 
@@ -128,6 +136,13 @@ public class Projeto {
         this.cliente = cliente; 
     }
     
+    public Usuario getGestor() {
+        return gestor;
+    }
+
+    public void setGestor(Usuario gestor) {
+        this.gestor = gestor;
+    }
     public Terreno getTerreno() {
         return terreno;
     }

@@ -2,7 +2,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JDialog.java to edit this template
  */
-package view.screens.dialogs.Gestor;
+package view.screens.dialogs;
 
 import controller.*;
 import controller.tableModel.*;
@@ -974,7 +974,7 @@ public class DlgVisualizarProjeto extends javax.swing.JDialog {
     }// </editor-fold>//GEN-END:initComponents
 
     private void bntEditarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bntEditarActionPerformed
-        DlgCadastroProjetos dlg = new DlgCadastroProjetos(null, true);
+        DlgCadastroProjetos dlg = new DlgCadastroProjetos(null, true, this.usuarioLogado);
         dlg.setProjetoParaEdicao(this.projetoAtual);
         dlg.setLocationRelativeTo(null);
         dlg.setVisible(true);
@@ -1101,11 +1101,11 @@ public class DlgVisualizarProjeto extends javax.swing.JDialog {
     }//GEN-LAST:event_cadastroButton2MouseClicked
 
     private void HomeButtonMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_HomeButtonMouseClicked
-      //  controller.navegarParaHome();
+      controller.navegarParaHome();
     }//GEN-LAST:event_HomeButtonMouseClicked
 
     private void HomeButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_HomeButton2ActionPerformed
-
+    controller.navegarParaHome();
     }//GEN-LAST:event_HomeButton2ActionPerformed
 
     /**

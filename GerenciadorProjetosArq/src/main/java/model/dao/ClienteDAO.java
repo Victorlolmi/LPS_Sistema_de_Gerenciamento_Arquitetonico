@@ -8,6 +8,7 @@ import model.entities.Cliente;
 import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
+import javax.persistence.TypedQuery;
 
 /**
  * @author Viktin
@@ -94,6 +95,26 @@ public class ClienteDAO extends GenericDAO<Cliente> {
 
         } catch (NoResultException e) {
             return null; 
+        } finally {
+            em.close();
+        }
+    }
+    
+    public List<Cliente> buscarPorGestor(Long gestorId) {
+        EntityManager em = JPAUtil.getEntityManager();
+        try {
+ 
+            String jpql = "SELECT DISTINCT c FROM Projeto p " +
+                          "JOIN p.cliente c " +
+                          "LEFT JOIN FETCH c.endereco " + 
+                          "WHERE p.gestor.id = :gestorId " +
+                          "ORDER BY c.nome";
+            
+            TypedQuery<Cliente> query = em.createQuery(jpql, Cliente.class);
+            query.setParameter("gestorId", gestorId);
+            
+            return query.getResultList();
+            
         } finally {
             em.close();
         }

@@ -18,8 +18,6 @@ public class ValidadorUsuario {
             throw new UsuarioException("CPF inválido! Deve conter 11 dígitos.");
         }
         
-        // Fix: Usar a instância injetada (usuarioDAO) em vez de dar 'new' aqui dentro.
-        // Isso permite mockar o banco em testes unitários.
         if (usuarioDAO.findByEmailOrCpf(email) != null || usuarioDAO.findByEmailOrCpf(cpfLimpo) != null) {
             throw new UsuarioException("Erro: CPF ou Email já cadastrado no sistema.");
         }

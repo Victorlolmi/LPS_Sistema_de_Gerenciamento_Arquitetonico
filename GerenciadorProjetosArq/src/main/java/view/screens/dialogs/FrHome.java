@@ -2,13 +2,17 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
  */
-package view.screens.dialogs.Gestor;
+package view.screens.dialogs;
 
-import view.screens.dialogs.Gestor.DlgCadastroProjetos;
-import view.screens.dialogs.Gestor.DlgCadastroCliente;
-import view.screens.dialogs.Gestor.DlgVisualizarProjeto;
+import view.screens.dialogs.DlgCadastroProjetos;
+import view.screens.dialogs.DlgCadastroCliente;
+import view.screens.dialogs.DlgVisualizarProjeto;
 import model.dao.ClienteDAO;
+import model.dao.GestorDAO;
 
+import controller.tableModel.GestorTableModel;
+import model.dao.GestorDAO; // Certifique-se que esta classe existe
+import model.entities.Gestor;
 import model.entities.Cliente;
 import model.entities.Usuario;
 import model.entities.Gestor;
@@ -38,6 +42,7 @@ public class FrHome extends javax.swing.JFrame {
     
     private final ProjetoTableModel projetoModel;
     private final ClienteTableModel clienteModel;
+    private final controller.tableModel.GestorTableModel gestorModel;
     
     private final Color corAzulEscuro = new Color(30, 60, 160);
     private final Color corSelecao = new Color(240, 247, 255);
@@ -45,31 +50,34 @@ public class FrHome extends javax.swing.JFrame {
     private final javax.swing.border.Border bordaInferior = BorderFactory.createMatteBorder(0, 0, 1, 0, new Color(230, 230, 230));
     
     public FrHome(Usuario usuario) {
-        this.usuarioLogado = usuario; // Salva o usuário recebido
+        this.usuarioLogado = usuario;
         
         initComponents();
         setLocationRelativeTo(null);
         estilizarAbasModernas();
         
-        // Configura a visualização baseada no tipo (Gestor vs Cliente)
         configurarVisaoUsuario();
         
         // Inicializa Models
         this.projetoModel = new ProjetoTableModel();
         this.clienteModel = new ClienteTableModel();
+        this.gestorModel = new controller.tableModel.GestorTableModel(); 
         
         jTProjetos.setModel(projetoModel);
         jTClientes.setModel(clienteModel);
+        jTGestores.setModel(gestorModel);
         
         // Configura Layout das Tabelas
         configurarTabelaProjetos();
         configurarTabelaClientes();
+        configurarTabelaGestores(); 
         
         configurarPlaceholders();
         
         // Carrega Dados Iniciais
         carregarTabelaClientes();
         carregarTabelaProjetos();
+        carregarTabelaGestores();
     }
     
     // aqui é onde eu atualizo as informações para o usuario especifico
@@ -79,13 +87,19 @@ public class FrHome extends javax.swing.JFrame {
 
         if (usuarioLogado instanceof Gestor) {
             lblTipo_usuario.setText("Gestor");
+            if (jTabbedPane2.getTabCount() > 2) {
+                jTabbedPane2.removeTabAt(2); 
+            }
+            
         } else {
             lblTipo_usuario.setText("Cliente");
             
             btnCadastrarprojetos.setVisible(false); 
             btnCadastrarCliente.setVisible(false); 
 
-            jTabbedPane2.removeTabAt(1); 
+            if (jTabbedPane2.getTabCount() > 1) {
+                jTabbedPane2.removeTabAt(1); 
+            }
         }
     }
    
@@ -146,6 +160,19 @@ public class FrHome extends javax.swing.JFrame {
         jTClientes.getColumnModel().getColumn(2).setCellRenderer(criarRendererTexto());
         jTClientes.getColumnModel().getColumn(3).setCellRenderer(criarRendererTexto());
         jTClientes.getColumnModel().getColumn(4).setCellRenderer(criarRendererBotao());
+    }
+    private void configurarTabelaGestores() {
+        padronizarLayoutTabela(jTGestores, jScrollPane3);
+
+        jTGestores.getColumnModel().getColumn(0).setPreferredWidth(200); 
+        jTGestores.getColumnModel().getColumn(1).setPreferredWidth(120);
+        jTGestores.getColumnModel().getColumn(2).setPreferredWidth(200); 
+        jTGestores.getColumnModel().getColumn(3).setPreferredWidth(120); 
+
+        jTGestores.getColumnModel().getColumn(0).setCellRenderer(criarRendererTexto());
+        jTGestores.getColumnModel().getColumn(1).setCellRenderer(criarRendererTexto());
+        jTGestores.getColumnModel().getColumn(2).setCellRenderer(criarRendererTexto());
+        jTGestores.getColumnModel().getColumn(3).setCellRenderer(criarRendererBotao());
     }
     
 
@@ -223,13 +250,12 @@ public class FrHome extends javax.swing.JFrame {
         List<Projeto> lista;
 
         if (usuarioLogado instanceof Cliente) {
-
             Cliente clienteLogado = (Cliente) usuarioLogado;
-
-            Long idCliente = Long.valueOf(clienteLogado.getId());
-
-            lista = dao.buscarPorClienteId(idCliente);
-
+            lista = dao.buscarPorClienteId(clienteLogado.getId());
+            
+        } else if (usuarioLogado instanceof Gestor) {
+            lista = dao.buscarPorGestorId(usuarioLogado.getId());
+            
         } else {
             lista = dao.listarTodos();
         }
@@ -239,10 +265,29 @@ public class FrHome extends javax.swing.JFrame {
     
     public void carregarTabelaClientes() {
         ClienteDAO dao = new ClienteDAO();
-        List<Cliente> lista = dao.listarTodos();
+        List<Cliente> lista;
+        
+        if (usuarioLogado instanceof Gestor) {
+            lista = dao.buscarPorGestor(usuarioLogado.getId());
+            
+        } else {
+            lista = dao.listarTodos();
+        }
+        
         clienteModel.setDados(lista);
     }
 
+    public void carregarTabelaGestores() {
+        GestorDAO dao = new GestorDAO();
+        List<Gestor> lista;
+        if (usuarioLogado instanceof Cliente) {
+            lista = dao.buscarPorCliente(usuarioLogado.getId());
+        } else {
+            lista = dao.listarTodos();
+        }
+
+        gestorModel.setDados(lista);
+    }
     // --- UI HELPERS ---
 
     private void estilizarAbasModernas() {
@@ -289,6 +334,12 @@ public class FrHome extends javax.swing.JFrame {
         lblBuscaCliente.setText(phClientes);
         lblBuscaCliente.setForeground(new Color(150, 150, 150));
         adicionarEfeitoPlaceholder(lblBuscaCliente, phClientes);
+        
+        // Configura Busca de Gestores
+        String phGestores = "  Buscar gestor por nome...";
+        lblBuscaGestor.setText(phGestores);
+        lblBuscaGestor.setForeground(new Color(150, 150, 150));
+        adicionarEfeitoPlaceholder(lblBuscaGestor, phGestores);
     }
     private void adicionarEfeitoPlaceholder(javax.swing.JTextField field, String placeholder) {
         field.addFocusListener(new java.awt.event.FocusListener() {
@@ -338,7 +389,9 @@ public class FrHome extends javax.swing.JFrame {
         btnCadastrarCliente = new javax.swing.JButton();
         lblBuscaCliente = new javax.swing.JTextField();
         jPanel5 = new javax.swing.JPanel();
-        jPanel6 = new javax.swing.JPanel();
+        lblBuscaGestor = new javax.swing.JTextField();
+        jScrollPane3 = new javax.swing.JScrollPane();
+        jTGestores = new javax.swing.JTable();
         jPanel7 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
         lblTipo_usuario = new javax.swing.JLabel();
@@ -444,33 +497,55 @@ public class FrHome extends javax.swing.JFrame {
 
         jTabbedPane2.addTab("Clientes", jPanel4);
 
+        lblBuscaGestor.setToolTipText("");
+        lblBuscaGestor.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                lblBuscaGestorActionPerformed(evt);
+            }
+        });
+        lblBuscaGestor.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                lblBuscaGestorKeyReleased(evt);
+            }
+        });
+
+        jTGestores.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null}
+            },
+            new String [] {
+                "Title 1", "Title 2", "Title 3", "Title 4"
+            }
+        ));
+        jScrollPane3.setViewportView(jTGestores);
+
         javax.swing.GroupLayout jPanel5Layout = new javax.swing.GroupLayout(jPanel5);
         jPanel5.setLayout(jPanel5Layout);
         jPanel5Layout.setHorizontalGroup(
             jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 1360, Short.MAX_VALUE)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel5Layout.createSequentialGroup()
+                .addContainerGap(34, Short.MAX_VALUE)
+                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(lblBuscaGestor, javax.swing.GroupLayout.PREFERRED_SIZE, 340, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 1170, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(156, 156, 156))
         );
         jPanel5Layout.setVerticalGroup(
             jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 625, Short.MAX_VALUE)
+            .addGroup(jPanel5Layout.createSequentialGroup()
+                .addGap(23, 23, 23)
+                .addComponent(lblBuscaGestor, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(10, 10, 10)
+                .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 410, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(152, Short.MAX_VALUE))
         );
 
-        jTabbedPane2.addTab("tab3", jPanel5);
+        jTabbedPane2.addTab("Gestores", jPanel5);
 
-        javax.swing.GroupLayout jPanel6Layout = new javax.swing.GroupLayout(jPanel6);
-        jPanel6.setLayout(jPanel6Layout);
-        jPanel6Layout.setHorizontalGroup(
-            jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 1360, Short.MAX_VALUE)
-        );
-        jPanel6Layout.setVerticalGroup(
-            jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 625, Short.MAX_VALUE)
-        );
-
-        jTabbedPane2.addTab("tab4", jPanel6);
-
-        jPanel1.add(jTabbedPane2, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 100, 1360, 660));
+        jPanel1.add(jTabbedPane2, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 100, 1360, 660));
         jTabbedPane2.getAccessibleContext().setAccessibleName("Projetos");
 
         jPanel7.setBackground(new java.awt.Color(255, 255, 255));
@@ -514,13 +589,48 @@ public class FrHome extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void btnCadastrarprojetosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCadastrarprojetosActionPerformed
-        DlgCadastroProjetos dlg = new DlgCadastroProjetos(this, true);
-        dlg.setLocationRelativeTo(null);
-        dlg.setVisible(true);
-        // Recarrega a lista ao fechar o diálogo
-        carregarTabelaProjetos();
-    }//GEN-LAST:event_btnCadastrarprojetosActionPerformed
+    private void sairButtonMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_sairButtonMouseClicked
+        int confirmacao = javax.swing.JOptionPane.showConfirmDialog(
+                this, 
+                "Tem certeza que deseja sair do sistema?", 
+                "Sair", 
+                javax.swing.JOptionPane.YES_NO_OPTION,
+                javax.swing.JOptionPane.QUESTION_MESSAGE
+        );
+
+        if (confirmacao == javax.swing.JOptionPane.YES_OPTION) {
+            
+            view.screens.FrLogin telaLogin = new view.screens.FrLogin();
+            telaLogin.setVisible(true);
+            
+            this.dispose();
+        }
+    }//GEN-LAST:event_sairButtonMouseClicked
+
+    private void lblBuscaClienteKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_lblBuscaClienteKeyReleased
+        String texto = lblBuscaCliente.getText();
+
+        // Ignora se for o texto do placeholder
+        if (texto.equals("  Buscar por nome...")) return;
+
+        ClienteDAO dao = new ClienteDAO();
+        List<Cliente> resultados;
+
+        if (texto.trim().isEmpty()) {
+            // Se estiver vazio, traz tudo
+            resultados = dao.listarTodos();
+        } else {
+            // Se tiver texto, busca APENAS pelo nome
+            resultados = dao.buscarPorNome(texto);
+        }
+
+        // Atualiza a tabela com o resultado
+        clienteModel.setDados(resultados);
+    }//GEN-LAST:event_lblBuscaClienteKeyReleased
+
+    private void lblBuscaClienteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_lblBuscaClienteActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_lblBuscaClienteActionPerformed
 
     private void btnCadastrarClienteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCadastrarClienteActionPerformed
         DlgCadastroCliente dlg = new DlgCadastroCliente(this, true);
@@ -529,33 +639,9 @@ public class FrHome extends javax.swing.JFrame {
         carregarTabelaClientes();
     }//GEN-LAST:event_btnCadastrarClienteActionPerformed
 
-    private void jTProjetosMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTProjetosMouseClicked
-        int linha = jTProjetos.rowAtPoint(evt.getPoint());
-        int coluna = jTProjetos.columnAtPoint(evt.getPoint());
-        
-        if (linha != -1) {
-            // Coluna 3 é onde está o botão "Ver Detalhes"
-            boolean clicouNoBotao = (coluna == 3);
-            boolean duploClique = (evt.getClickCount() == 2);
-            
-            if (clicouNoBotao || duploClique) {
-                Projeto projetoSelecionado = projetoModel.getProjeto(linha);
-                
-                // Adicionei 'this.usuarioLogado' como terceiro parâmetro
-                DlgVisualizarProjeto dlg = new DlgVisualizarProjeto(this, true, this.usuarioLogado);
-                
-                dlg.setProjeto(projetoSelecionado);
-                dlg.setVisible(true);
-                
-                // Recarrega a tabela na volta (caso tenha editado/excluido)
-                carregarTabelaProjetos();
-            }
-        }
-    }//GEN-LAST:event_jTProjetosMouseClicked
-
     private void lblBuscaKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_lblBuscaKeyReleased
-        String texto = lblBusca.getText(); 
-        
+        String texto = lblBusca.getText();
+
         // Evita buscar o texto do placeholder
         if (texto.contains("Buscar por")) return;
 
@@ -574,48 +660,58 @@ public class FrHome extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_lblBuscaActionPerformed
 
-    private void lblBuscaClienteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_lblBuscaClienteActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_lblBuscaClienteActionPerformed
+    private void jTProjetosMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTProjetosMouseClicked
+        int linha = jTProjetos.rowAtPoint(evt.getPoint());
+        int coluna = jTProjetos.columnAtPoint(evt.getPoint());
 
-    private void lblBuscaClienteKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_lblBuscaClienteKeyReleased
-        String texto = lblBuscaCliente.getText();
+        if (linha != -1) {
+            // Coluna 3 é onde está o botão "Ver Detalhes"
+            boolean clicouNoBotao = (coluna == 3);
+            boolean duploClique = (evt.getClickCount() == 2);
+
+            if (clicouNoBotao || duploClique) {
+                Projeto projetoSelecionado = projetoModel.getProjeto(linha);
+
+                // Adicionei 'this.usuarioLogado' como terceiro parâmetro
+                DlgVisualizarProjeto dlg = new DlgVisualizarProjeto(this, true, this.usuarioLogado);
+
+                dlg.setProjeto(projetoSelecionado);
+                dlg.setVisible(true);
+
+                // Recarrega a tabela na volta (caso tenha editado/excluido)
+                carregarTabelaProjetos();
+            }
+        }
+    }//GEN-LAST:event_jTProjetosMouseClicked
+
+    private void btnCadastrarprojetosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCadastrarprojetosActionPerformed
+        DlgCadastroProjetos dlg = new DlgCadastroProjetos(this, true, this.usuarioLogado);
         
-        // Ignora se for o texto do placeholder
-        if (texto.equals("  Buscar por nome...")) return;
+        dlg.setLocationRelativeTo(null);
+        dlg.setVisible(true);
+        carregarTabelaProjetos();
+    }//GEN-LAST:event_btnCadastrarprojetosActionPerformed
 
-        ClienteDAO dao = new ClienteDAO();
-        List<Cliente> resultados;
+    private void lblBuscaGestorActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_lblBuscaGestorActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_lblBuscaGestorActionPerformed
+
+    private void lblBuscaGestorKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_lblBuscaGestorKeyReleased
+        String texto = lblBuscaGestor.getText();
+
+        if (texto.contains("Buscar")) return;
+
+        model.dao.GestorDAO dao = new model.dao.GestorDAO();
+        java.util.List<model.entities.Gestor> resultados;
 
         if (texto.trim().isEmpty()) {
-            // Se estiver vazio, traz tudo
             resultados = dao.listarTodos();
         } else {
-            // Se tiver texto, busca APENAS pelo nome
             resultados = dao.buscarPorNome(texto);
         }
-        
-        // Atualiza a tabela com o resultado
-        clienteModel.setDados(resultados);
-    }//GEN-LAST:event_lblBuscaClienteKeyReleased
 
-    private void sairButtonMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_sairButtonMouseClicked
-        int confirmacao = javax.swing.JOptionPane.showConfirmDialog(
-                this, 
-                "Tem certeza que deseja sair do sistema?", 
-                "Sair", 
-                javax.swing.JOptionPane.YES_NO_OPTION,
-                javax.swing.JOptionPane.QUESTION_MESSAGE
-        );
-
-        if (confirmacao == javax.swing.JOptionPane.YES_OPTION) {
-            
-            view.screens.FrLogin telaLogin = new view.screens.FrLogin();
-            telaLogin.setVisible(true);
-            
-            this.dispose();
-        }
-    }//GEN-LAST:event_sairButtonMouseClicked
+        gestorModel.setDados(resultados);
+    }//GEN-LAST:event_lblBuscaGestorKeyReleased
 
     /**
      * @param args the command line arguments
@@ -654,16 +750,18 @@ public class FrHome extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel5;
-    private javax.swing.JPanel jPanel6;
     private javax.swing.JPanel jPanel7;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JSeparator jSeparator1;
     private javax.swing.JTable jTClientes;
+    private javax.swing.JTable jTGestores;
     private javax.swing.JTable jTProjetos;
     private javax.swing.JTabbedPane jTabbedPane2;
     private javax.swing.JTextField lblBusca;
     private javax.swing.JTextField lblBuscaCliente;
+    private javax.swing.JTextField lblBuscaGestor;
     private javax.swing.JLabel lblTipo_usuario;
     private javax.swing.JLabel sairButton;
     // End of variables declaration//GEN-END:variables

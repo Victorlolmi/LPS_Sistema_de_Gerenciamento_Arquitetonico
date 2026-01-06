@@ -21,7 +21,6 @@ public class ProjetoDAO extends GenericDAO<Projeto> {
     public List<Projeto> listarTodos() {
         EntityManager em = JPAUtil.getEntityManager();
         try {
-            // Mantive o teu FETCH aqui, está perfeito
             String jpql = "SELECT p FROM Projeto p LEFT JOIN FETCH p.cliente ORDER BY p.nome";
             
             return em.createQuery(jpql, Projeto.class).getResultList();
@@ -89,16 +88,27 @@ public class ProjetoDAO extends GenericDAO<Projeto> {
         }
     }
     
-    // --- AQUI ESTÁ A MUDANÇA IMPORTANTE ---
     public List<Projeto> buscarPorClienteId(Long clienteId) {
         EntityManager em = JPAUtil.getEntityManager();
         try {
-            // Adicionei "LEFT JOIN FETCH p.cliente" para garantir que os dados
-            // do cliente venham juntos e não dê erro na tabela visual.
             String jpql = "SELECT p FROM Projeto p LEFT JOIN FETCH p.cliente WHERE p.cliente.id = :id ORDER BY p.nome";
             
             TypedQuery<Projeto> query = em.createQuery(jpql, Projeto.class);
             query.setParameter("id", clienteId);
+            
+            return query.getResultList();
+            
+        } finally {
+            em.close();
+        }
+    }
+    public List<Projeto> buscarPorGestorId(Long gestorId) {
+        EntityManager em = JPAUtil.getEntityManager();
+        try {
+            String jpql = "SELECT p FROM Projeto p LEFT JOIN FETCH p.cliente WHERE p.gestor.id = :id ORDER BY p.nome";
+            
+            TypedQuery<Projeto> query = em.createQuery(jpql, Projeto.class);
+            query.setParameter("id", gestorId);
             
             return query.getResultList();
             
