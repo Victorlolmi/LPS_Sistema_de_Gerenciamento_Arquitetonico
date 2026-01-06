@@ -1096,7 +1096,7 @@ public class DlgVisualizarProjeto extends javax.swing.JDialog {
     }//GEN-LAST:event_cadastroButton2MouseClicked
 
     private void HomeButtonMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_HomeButtonMouseClicked
-        controller.navegarParaHome();
+      //  controller.navegarParaHome();
     }//GEN-LAST:event_HomeButtonMouseClicked
 
     private void HomeButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_HomeButton2ActionPerformed
