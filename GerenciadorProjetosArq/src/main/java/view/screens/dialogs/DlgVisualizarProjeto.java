@@ -90,6 +90,7 @@ public class DlgVisualizarProjeto extends javax.swing.JDialog {
                 }
             }
         });
+        aplicarPermissoesUsuario();
     }
 
     public void setProjeto(Projeto p) {
@@ -532,6 +533,26 @@ public class DlgVisualizarProjeto extends javax.swing.JDialog {
                 table.setRowHeight(row, Math.max(alturaIdeal, 40));
             }
             return this;
+        }
+    }
+    
+    //o que nao pode aparecer para o usuario
+    private void aplicarPermissoesUsuario() {
+        if (this.usuarioLogado instanceof Cliente) {
+            
+            bntEditar.setVisible(false);
+            btnExcluirProjeto.setVisible(false);
+            
+            btnAdicionarTerreno.setVisible(false); 
+            btnExcluirTerreno.setVisible(false);
+            
+            btnExcluirDoc.setVisible(false);
+
+            btnExcluirDespesa.setVisible(false);
+            btnLancarDespesa.setVisible(false); 
+
+            btnExcluirFeedback.setVisible(false);
+            
         }
     }
     
@@ -1074,8 +1095,16 @@ public class DlgVisualizarProjeto extends javax.swing.JDialog {
     private void btnAdicionarFeedbackActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAdicionarFeedbackActionPerformed
         String tipo = (String) jComboBox1.getSelectedItem();
         String comentario = edtComentario.getText();
-        // ENVIA COMO GESTOR (Padrão do Sistema Desktop)
-        boolean sucesso = feedbackController.salvarFeedback(tipo, comentario, this.projetoAtual, "Gestor");
+        
+        if (comentario.trim().isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Digite um comentário.");
+            return;
+        }
+        
+        String tipoAutor = (this.usuarioLogado instanceof Gestor) ? "Gestor" : "Cliente";
+
+        boolean sucesso = feedbackController.salvarFeedback(tipo, comentario, this.projetoAtual, tipoAutor);
+        
         if (sucesso) {
             atualizarAbaFeedback();
             JOptionPane.showMessageDialog(this, "Feedback registrado!");
