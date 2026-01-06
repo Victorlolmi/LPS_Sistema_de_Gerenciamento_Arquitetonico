@@ -540,9 +540,11 @@ public class DlgVisualizarProjeto extends javax.swing.JDialog {
     private void initComponents() {
 
         jFileChooser1 = new javax.swing.JFileChooser();
+        cadastroButton2 = new javax.swing.JLabel();
         jPanel1 = new javax.swing.JPanel();
         lblNomeCliente = new javax.swing.JLabel();
         lblNomeProjeto = new javax.swing.JLabel();
+        HomeButton = new javax.swing.JLabel();
         jTabbedPane1 = new javax.swing.JTabbedPane();
         jTabbedPane2 = new javax.swing.JTabbedPane();
         jPanel3 = new javax.swing.JPanel();
@@ -609,6 +611,14 @@ public class DlgVisualizarProjeto extends javax.swing.JDialog {
         jLabel4 = new javax.swing.JLabel();
         jScrollPane4 = new javax.swing.JScrollPane();
         edtComentario = new javax.swing.JTextArea();
+        HomeButton2 = new javax.swing.JButton();
+
+        cadastroButton2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Imagens/BotaoVoltar.png"))); // NOI18N
+        cadastroButton2.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                cadastroButton2MouseClicked(evt);
+            }
+        });
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setMinimumSize(new java.awt.Dimension(1370, 760));
@@ -625,6 +635,14 @@ public class DlgVisualizarProjeto extends javax.swing.JDialog {
         lblNomeProjeto.setFont(new java.awt.Font("Segoe UI", 1, 36)); // NOI18N
         lblNomeProjeto.setText("Casas Duplas");
         jPanel1.add(lblNomeProjeto, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 10, 870, 50));
+
+        HomeButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Imagens/BotaoVoltar.png"))); // NOI18N
+        HomeButton.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                HomeButtonMouseClicked(evt);
+            }
+        });
+        jPanel1.add(HomeButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(1340, 20, 30, -1));
         jPanel1.add(jTabbedPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(610, 260, -1, -1));
 
         jTabbedPane2.setBackground(new java.awt.Color(249, 250, 251));
@@ -933,6 +951,18 @@ public class DlgVisualizarProjeto extends javax.swing.JDialog {
         jPanel1.add(jTabbedPane2, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 100, 1390, 660));
         jTabbedPane2.getAccessibleContext().setAccessibleName("Visão Geral");
 
+        HomeButton2.setForeground(new java.awt.Color(82, 149, 205));
+        HomeButton2.setText("Voltar para Home");
+        HomeButton2.setBorder(null);
+        HomeButton2.setBorderPainted(false);
+        HomeButton2.setContentAreaFilled(false);
+        HomeButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                HomeButton2ActionPerformed(evt);
+            }
+        });
+        jPanel1.add(HomeButton2, new org.netbeans.lib.awtextra.AbsoluteConstraints(1310, 70, -1, -1));
+
         getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 1430, 790));
 
         pack();
@@ -1061,6 +1091,18 @@ public class DlgVisualizarProjeto extends javax.swing.JDialog {
         }
     }//GEN-LAST:event_btnExcluirFeedbackActionPerformed
 
+    private void cadastroButton2MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_cadastroButton2MouseClicked
+        controller.navegarParaLogin();
+    }//GEN-LAST:event_cadastroButton2MouseClicked
+
+    private void HomeButtonMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_HomeButtonMouseClicked
+        controller.navegarParaHome();
+    }//GEN-LAST:event_HomeButtonMouseClicked
+
+    private void HomeButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_HomeButton2ActionPerformed
+        controller.navegarParaLogin();
+    }//GEN-LAST:event_HomeButton2ActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -1099,6 +1141,8 @@ public class DlgVisualizarProjeto extends javax.swing.JDialog {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JLabel HomeButton;
+    private javax.swing.JButton HomeButton2;
     private javax.swing.JScrollPane JTDespesa;
     private javax.swing.JProgressBar barProgressoFinanceiro;
     private javax.swing.JButton bntEditar;
@@ -1112,6 +1156,7 @@ public class DlgVisualizarProjeto extends javax.swing.JDialog {
     private javax.swing.JButton btnExcluirProjeto;
     private javax.swing.JButton btnExcluirTerreno;
     private javax.swing.JToggleButton btnLancarDespesa;
+    private javax.swing.JLabel cadastroButton2;
     private javax.swing.JTextArea edtComentario;
     private javax.swing.JComboBox<String> jComboBox1;
     private javax.swing.JFileChooser jFileChooser1;

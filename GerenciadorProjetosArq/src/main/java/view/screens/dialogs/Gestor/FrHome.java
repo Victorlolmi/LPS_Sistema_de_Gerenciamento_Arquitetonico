@@ -34,20 +34,16 @@ public class FrHome extends javax.swing.JFrame {
     
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(FrHome.class.getName());
     
-    // Variável para armazenar quem logou
     private final Usuario usuarioLogado;
     
-    // Models das Tabelas
     private final ProjetoTableModel projetoModel;
     private final ClienteTableModel clienteModel;
     
-    // Paleta de Cores do Sistema
     private final Color corAzulEscuro = new Color(30, 60, 160);
     private final Color corSelecao = new Color(240, 247, 255);
     private final Color corBotaoVer = new Color(65, 105, 225);
     private final javax.swing.border.Border bordaInferior = BorderFactory.createMatteBorder(0, 0, 1, 0, new Color(230, 230, 230));
     
-    // CONSTRUTOR ALTERADO: Agora recebe (Usuario usuario)
     public FrHome(Usuario usuario) {
         this.usuarioLogado = usuario; // Salva o usuário recebido
         
@@ -58,21 +54,20 @@ public class FrHome extends javax.swing.JFrame {
         // Configura a visualização baseada no tipo (Gestor vs Cliente)
         configurarVisaoUsuario();
         
-        // 1. Inicializa Models
+        // Inicializa Models
         this.projetoModel = new ProjetoTableModel();
         this.clienteModel = new ClienteTableModel();
         
         jTProjetos.setModel(projetoModel);
         jTClientes.setModel(clienteModel);
         
-        // 2. Configura Layout das Tabelas
+        // Configura Layout das Tabelas
         configurarTabelaProjetos();
         configurarTabelaClientes();
         
-        // 3. UI/UX
         configurarPlaceholders();
         
-        // 4. Carrega Dados Iniciais
+        // Carrega Dados Iniciais
         carregarTabelaClientes();
         carregarTabelaProjetos();
     }
@@ -93,7 +88,7 @@ public class FrHome extends javax.swing.JFrame {
             jTabbedPane2.removeTabAt(1); 
         }
     }
-    
+   
    private void padronizarLayoutTabela(JTable table, JScrollPane scroll) {
         table.setRowHeight(50); // Altura confortável
         table.setShowGrid(false);
@@ -225,7 +220,20 @@ public class FrHome extends javax.swing.JFrame {
 
     public void carregarTabelaProjetos() {
         ProjetoDAO dao = new ProjetoDAO();
-        List<Projeto> lista = dao.listarTodos();
+        List<Projeto> lista;
+
+        if (usuarioLogado instanceof Cliente) {
+
+            Cliente clienteLogado = (Cliente) usuarioLogado;
+
+            Long idCliente = Long.valueOf(clienteLogado.getId());
+
+            lista = dao.buscarPorClienteId(idCliente);
+
+        } else {
+            lista = dao.listarTodos();
+        }
+
         projetoModel.setDados(lista);
     }
     
@@ -270,13 +278,13 @@ public class FrHome extends javax.swing.JFrame {
     }
     
     private void configurarPlaceholders() {
-        // 1. Configura Busca de Projetos
+        // Configura Busca de Projetos
         String phProjetos = "  Buscar por projeto...";
         lblBusca.setText(phProjetos);
         lblBusca.setForeground(new Color(150, 150, 150));
         adicionarEfeitoPlaceholder(lblBusca, phProjetos);
 
-        // 2. Configura Busca de Clientes
+        // Configura Busca de Clientes
         String phClientes = "  Buscar por nome...";
         lblBuscaCliente.setText(phClientes);
         lblBuscaCliente.setForeground(new Color(150, 150, 150));
@@ -335,7 +343,7 @@ public class FrHome extends javax.swing.JFrame {
         jLabel1 = new javax.swing.JLabel();
         lblTipo_usuario = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
-        jLabel4 = new javax.swing.JLabel();
+        sairButton = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -481,9 +489,14 @@ public class FrHome extends javax.swing.JFrame {
         jLabel3.setText("Victor Emmanuel");
         jPanel7.add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(1130, 20, -1, -1));
 
-        jLabel4.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Imagens/sair.png"))); // NOI18N
-        jLabel4.setText("jLabel4");
-        jPanel7.add(jLabel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(1300, 20, 40, 40));
+        sairButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Imagens/sair.png"))); // NOI18N
+        sairButton.setText("jLabel4");
+        sairButton.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                sairButtonMouseClicked(evt);
+            }
+        });
+        jPanel7.add(sairButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(1300, 20, 40, 40));
 
         jPanel1.add(jPanel7, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 1370, 80));
 
@@ -585,6 +598,24 @@ public class FrHome extends javax.swing.JFrame {
         clienteModel.setDados(resultados);
     }//GEN-LAST:event_lblBuscaClienteKeyReleased
 
+    private void sairButtonMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_sairButtonMouseClicked
+        int confirmacao = javax.swing.JOptionPane.showConfirmDialog(
+                this, 
+                "Tem certeza que deseja sair do sistema?", 
+                "Sair", 
+                javax.swing.JOptionPane.YES_NO_OPTION,
+                javax.swing.JOptionPane.QUESTION_MESSAGE
+        );
+
+        if (confirmacao == javax.swing.JOptionPane.YES_OPTION) {
+            
+            view.screens.FrLogin telaLogin = new view.screens.FrLogin();
+            telaLogin.setVisible(true);
+            
+            this.dispose();
+        }
+    }//GEN-LAST:event_sairButtonMouseClicked
+
     /**
      * @param args the command line arguments
      */
@@ -618,7 +649,6 @@ public class FrHome extends javax.swing.JFrame {
     private javax.swing.border.EtchedBorder etchedBorder3;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel3;
-    private javax.swing.JLabel jLabel4;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
@@ -634,5 +664,6 @@ public class FrHome extends javax.swing.JFrame {
     private javax.swing.JTextField lblBusca;
     private javax.swing.JTextField lblBuscaCliente;
     private javax.swing.JLabel lblTipo_usuario;
+    private javax.swing.JLabel sairButton;
     // End of variables declaration//GEN-END:variables
 }

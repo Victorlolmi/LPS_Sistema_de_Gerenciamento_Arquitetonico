@@ -172,7 +172,11 @@ public class ProjetoController {
             e.printStackTrace();
         }
     }
-
+    public void navegarParaLogin() {
+        FrLogin telaLogin = new FrLogin();
+        telaLogin.setVisible(true);
+        view.dispose(); 
+    }
     private Double converterMoeda(String valor) {
         if (valor == null || valor.trim().isEmpty()) return 0.0;
         try {

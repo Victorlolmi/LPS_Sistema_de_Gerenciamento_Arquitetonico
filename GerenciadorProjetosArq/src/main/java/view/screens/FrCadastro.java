@@ -105,8 +105,8 @@ public class FrCadastro extends javax.swing.JFrame {
         edtBairro = new javax.swing.JTextField();
         edtCidade = new javax.swing.JTextField();
         edtEmail = new javax.swing.JTextField();
-        jLabel11 = new javax.swing.JLabel();
         jLabel10 = new javax.swing.JLabel();
+        jLabel11 = new javax.swing.JLabel();
         jLabel6 = new javax.swing.JLabel();
         jLabel7 = new javax.swing.JLabel();
         edtTipo = new javax.swing.JCheckBox();
@@ -237,14 +237,14 @@ public class FrCadastro extends javax.swing.JFrame {
         });
         jPanel2.add(edtEmail, new org.netbeans.lib.awtextra.AbsoluteConstraints(370, 610, 280, 30));
 
-        jLabel11.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Imagens/Logo.png"))); // NOI18N
-        jLabel11.setVerticalAlignment(javax.swing.SwingConstants.BOTTOM);
-        jPanel2.add(jLabel11, new org.netbeans.lib.awtextra.AbsoluteConstraints(410, 90, 40, 40));
-
         jLabel10.setFont(new java.awt.Font("Segoe UI", 1, 28)); // NOI18N
         jLabel10.setForeground(new java.awt.Color(30, 42, 58));
         jLabel10.setText("ArchFlow");
-        jPanel2.add(jLabel10, new org.netbeans.lib.awtextra.AbsoluteConstraints(460, 90, -1, -1));
+        jPanel2.add(jLabel10, new org.netbeans.lib.awtextra.AbsoluteConstraints(470, 90, -1, -1));
+
+        jLabel11.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Imagens/Logo.png"))); // NOI18N
+        jLabel11.setVerticalAlignment(javax.swing.SwingConstants.BOTTOM);
+        jPanel2.add(jLabel11, new org.netbeans.lib.awtextra.AbsoluteConstraints(410, 80, 60, 60));
 
         jLabel6.setText("Email");
         jPanel2.add(jLabel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(370, 590, -1, -1));
