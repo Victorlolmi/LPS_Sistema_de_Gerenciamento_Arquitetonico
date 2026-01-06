@@ -19,10 +19,11 @@ public class GerenciadorProjetosArq {
 
      public static void main(String[] args) {
  
+        FlatLightLaf.setup();
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
-                FrHome telaLogin = new FrHome();
+                FrLogin telaLogin = new FrLogin(); 
                 telaLogin.setVisible(true);
             }
         });

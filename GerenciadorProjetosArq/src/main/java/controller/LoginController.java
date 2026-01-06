@@ -12,7 +12,8 @@ import view.screens.FrLogin;
 import view.screens.FrCadastro;
 import view.screens.FrRecuperacaoSenha;
 import view.screens.dialogs.Gestor.FrHome;
-
+import model.entities.Gestor;  
+import model.entities.Cliente;
 /**
  * @author Viktin
  */
@@ -39,24 +40,39 @@ public class LoginController {
             return;
         }
 
+        // Busca o usuário no banco (Pode vir um Gestor ou um Cliente)
         Usuario usuarioDoBanco = usuarioDAO.findByEmailOrCpf(identificador);
 
         if (usuarioDoBanco == null) {
-            // FIXME: Risco de segurança (Enumeração de Usuários). 
-            // Em produção, retorne mensagem genérica ("Usuário ou senha inválidos") independente do erro.
             view.exibeMensagem("Falha no login: Usuário não encontrado.");
         } else {
-            // Valida o hash (nunca comparar strings puras em auth)
+            // Valida o hash da senha
             if (BCrypt.checkpw(senhaDigitada, usuarioDoBanco.getSenha())) {
-                FrHome telaPrincipal = new FrHome();
-                telaPrincipal.setVisible(true);
-                view.dispose();
+                
+                if (usuarioDoBanco instanceof Gestor) {
+                    System.out.println("Logado como GESTOR: " + usuarioDoBanco.getNome());
+                    abrirTelaPrincipal(usuarioDoBanco);
+                    
+                } else if (usuarioDoBanco instanceof Cliente) {
+                    System.out.println("Logado como CLIENTE: " + usuarioDoBanco.getNome());
+                    // O Cliente usa a mesma tela, mas ela vai se comportar diferente
+                    abrirTelaPrincipal(usuarioDoBanco);
+                    
+                } else {
+                    view.exibeMensagem("Tipo de usuário desconhecido.");
+                }
+
             } else {
                 view.exibeMensagem("Falha no login: Senha incorreta.");
             }
         }
     }
-
+    private void abrirTelaPrincipal(Usuario usuario) {
+        // NOTA: Precisarás alterar o construtor da FrHome para receber (Usuario usuario)
+        FrHome telaPrincipal = new FrHome(usuario); 
+        telaPrincipal.setVisible(true);
+        view.dispose();
+    }
     public void exibirRecuperacaoSenha() {
         FrRecuperacaoSenha telaRecuperacao = new FrRecuperacaoSenha();
         telaRecuperacao.setVisible(true);

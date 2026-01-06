@@ -8,7 +8,11 @@ import view.screens.dialogs.Gestor.DlgCadastroProjetos;
 import view.screens.dialogs.Gestor.DlgCadastroCliente;
 import view.screens.dialogs.Gestor.DlgVisualizarProjeto;
 import model.dao.ClienteDAO;
+
 import model.entities.Cliente;
+import model.entities.Usuario;
+import model.entities.Gestor;
+
 import model.dao.ProjetoDAO;
 import model.entities.Projeto;
 import controller.tableModel.ProjetoTableModel;
@@ -30,6 +34,9 @@ public class FrHome extends javax.swing.JFrame {
     
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(FrHome.class.getName());
     
+    // Variável para armazenar quem logou
+    private final Usuario usuarioLogado;
+    
     // Models das Tabelas
     private final ProjetoTableModel projetoModel;
     private final ClienteTableModel clienteModel;
@@ -40,10 +47,16 @@ public class FrHome extends javax.swing.JFrame {
     private final Color corBotaoVer = new Color(65, 105, 225);
     private final javax.swing.border.Border bordaInferior = BorderFactory.createMatteBorder(0, 0, 1, 0, new Color(230, 230, 230));
     
-    public FrHome() {
+    // CONSTRUTOR ALTERADO: Agora recebe (Usuario usuario)
+    public FrHome(Usuario usuario) {
+        this.usuarioLogado = usuario; // Salva o usuário recebido
+        
         initComponents();
         setLocationRelativeTo(null);
         estilizarAbasModernas();
+        
+        // Configura a visualização baseada no tipo (Gestor vs Cliente)
+        configurarVisaoUsuario();
         
         // 1. Inicializa Models
         this.projetoModel = new ProjetoTableModel();
@@ -63,6 +76,24 @@ public class FrHome extends javax.swing.JFrame {
         carregarTabelaClientes();
         carregarTabelaProjetos();
     }
+    
+    // aqui é onde eu atualizo as informações para o usuario especifico
+    private void configurarVisaoUsuario() {
+        
+        jLabel3.setText(usuarioLogado.getNome()); 
+
+        if (usuarioLogado instanceof Gestor) {
+            lblTipo_usuario.setText("Gestor");
+        } else {
+            lblTipo_usuario.setText("Cliente");
+            
+            btnCadastrarprojetos.setVisible(false); 
+            btnCadastrarCliente.setVisible(false); 
+
+            jTabbedPane2.removeTabAt(1); 
+        }
+    }
+    
    private void padronizarLayoutTabela(JTable table, JScrollPane scroll) {
         table.setRowHeight(50); // Altura confortável
         table.setShowGrid(false);
@@ -302,7 +333,7 @@ public class FrHome extends javax.swing.JFrame {
         jPanel6 = new javax.swing.JPanel();
         jPanel7 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
-        jLabel2 = new javax.swing.JLabel();
+        lblTipo_usuario = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
         jLabel4 = new javax.swing.JLabel();
 
@@ -440,10 +471,10 @@ public class FrHome extends javax.swing.JFrame {
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Imagens/Logo.png"))); // NOI18N
         jPanel7.add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 10, 260, 70));
 
-        jLabel2.setFont(new java.awt.Font("Segoe UI", 2, 14)); // NOI18N
-        jLabel2.setForeground(new java.awt.Color(44, 58, 78));
-        jLabel2.setText("Gestor");
-        jPanel7.add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(1130, 40, -1, -1));
+        lblTipo_usuario.setFont(new java.awt.Font("Segoe UI", 2, 14)); // NOI18N
+        lblTipo_usuario.setForeground(new java.awt.Color(44, 58, 78));
+        lblTipo_usuario.setText("Gestor");
+        jPanel7.add(lblTipo_usuario, new org.netbeans.lib.awtextra.AbsoluteConstraints(1130, 40, -1, -1));
 
         jLabel3.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         jLabel3.setForeground(new java.awt.Color(44, 58, 78));
@@ -560,9 +591,6 @@ public class FrHome extends javax.swing.JFrame {
     public static void main(String args[]) {
         /* Set the Nimbus look and feel */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
         try {
             for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
                 if ("Nimbus".equals(info.getName())) {
@@ -570,13 +598,16 @@ public class FrHome extends javax.swing.JFrame {
                     break;
                 }
             }
-        } catch (ReflectiveOperationException | javax.swing.UnsupportedLookAndFeelException ex) {
-            logger.log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | javax.swing.UnsupportedLookAndFeelException ex) {
+            java.util.logging.Logger.getLogger(FrHome.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
         //</editor-fold>
 
         /* Create and display the form */
-        java.awt.EventQueue.invokeLater(() -> new FrHome().setVisible(true));
+        java.awt.EventQueue.invokeLater(() -> {
+            // Precisamos simular um usuário ou passar null
+            new FrHome(null).setVisible(true); 
+        });
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -586,7 +617,6 @@ public class FrHome extends javax.swing.JFrame {
     private javax.swing.border.EtchedBorder etchedBorder2;
     private javax.swing.border.EtchedBorder etchedBorder3;
     private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JPanel jPanel1;
@@ -603,5 +633,6 @@ public class FrHome extends javax.swing.JFrame {
     private javax.swing.JTabbedPane jTabbedPane2;
     private javax.swing.JTextField lblBusca;
     private javax.swing.JTextField lblBuscaCliente;
+    private javax.swing.JLabel lblTipo_usuario;
     // End of variables declaration//GEN-END:variables
 }
