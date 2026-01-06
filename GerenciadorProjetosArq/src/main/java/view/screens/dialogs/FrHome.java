@@ -10,6 +10,8 @@ import view.screens.dialogs.DlgVisualizarProjeto;
 import model.dao.ClienteDAO;
 import model.dao.GestorDAO;
 
+import view.screens.dialogs.DlgVisualizarCliente;
+
 import controller.tableModel.GestorTableModel;
 import model.dao.GestorDAO; // Certifique-se que esta classe existe
 import model.entities.Gestor;
@@ -82,7 +84,14 @@ public class FrHome extends javax.swing.JFrame {
     
     // aqui é onde eu atualizo as informações para o usuario especifico
     private void configurarVisaoUsuario() {
-        
+        // BLINDAGEM: Se o usuário for null (ex: teste ou erro de login), não tenta pegar o nome
+        if (usuarioLogado == null) {
+            jLabel3.setText("Usuário Desconhecido");
+            lblTipo_usuario.setText("---");
+            return; // Para a execução aqui para não dar erro nos ifs abaixo
+        }
+
+        // Se chegou aqui, o usuário existe. Segue o fluxo normal.
         jLabel3.setText(usuarioLogado.getNome()); 
 
         if (usuarioLogado instanceof Gestor) {
@@ -416,7 +425,7 @@ public class FrHome extends javax.swing.JFrame {
                 btnCadastrarprojetosActionPerformed(evt);
             }
         });
-        jPanel3.add(btnCadastrarprojetos, new org.netbeans.lib.awtextra.AbsoluteConstraints(1090, 20, 170, 30));
+        jPanel3.add(btnCadastrarprojetos, new org.netbeans.lib.awtextra.AbsoluteConstraints(600, 20, 130, 30));
 
         jTProjetos.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -436,7 +445,7 @@ public class FrHome extends javax.swing.JFrame {
         });
         jScrollPane2.setViewportView(jTProjetos);
 
-        jPanel3.add(jScrollPane2, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 60, 1270, 540));
+        jPanel3.add(jScrollPane2, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 60, 1300, 540));
 
         lblBusca.setToolTipText("");
         lblBusca.addActionListener(new java.awt.event.ActionListener() {
@@ -449,7 +458,7 @@ public class FrHome extends javax.swing.JFrame {
                 lblBuscaKeyReleased(evt);
             }
         });
-        jPanel3.add(lblBusca, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 20, 340, 30));
+        jPanel3.add(lblBusca, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 20, 540, 30));
         jPanel3.add(jSeparator1, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 63, 340, 0));
 
         jTabbedPane2.addTab("Projetos", jPanel3);
@@ -468,9 +477,14 @@ public class FrHome extends javax.swing.JFrame {
                 "Title 1", "Title 2", "Title 3", "Title 4"
             }
         ));
+        jTClientes.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jTClientesMouseClicked(evt);
+            }
+        });
         jScrollPane1.setViewportView(jTClientes);
 
-        jPanel4.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 60, 1170, 410));
+        jPanel4.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 60, 1290, 520));
 
         btnCadastrarCliente.setBackground(new java.awt.Color(64, 86, 213));
         btnCadastrarCliente.setForeground(new java.awt.Color(255, 255, 255));
@@ -480,7 +494,7 @@ public class FrHome extends javax.swing.JFrame {
                 btnCadastrarClienteActionPerformed(evt);
             }
         });
-        jPanel4.add(btnCadastrarCliente, new org.netbeans.lib.awtextra.AbsoluteConstraints(1210, 20, 130, 40));
+        jPanel4.add(btnCadastrarCliente, new org.netbeans.lib.awtextra.AbsoluteConstraints(600, 20, 130, 30));
 
         lblBuscaCliente.setToolTipText("");
         lblBuscaCliente.addActionListener(new java.awt.event.ActionListener() {
@@ -493,9 +507,12 @@ public class FrHome extends javax.swing.JFrame {
                 lblBuscaClienteKeyReleased(evt);
             }
         });
-        jPanel4.add(lblBuscaCliente, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 20, 340, 30));
+        jPanel4.add(lblBuscaCliente, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 20, 540, 30));
 
         jTabbedPane2.addTab("Clientes", jPanel4);
+
+        jPanel5.setBackground(new java.awt.Color(249, 250, 251));
+        jPanel5.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         lblBuscaGestor.setToolTipText("");
         lblBuscaGestor.addActionListener(new java.awt.event.ActionListener() {
@@ -508,6 +525,7 @@ public class FrHome extends javax.swing.JFrame {
                 lblBuscaGestorKeyReleased(evt);
             }
         });
+        jPanel5.add(lblBuscaGestor, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 20, 510, 30));
 
         jTGestores.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -522,26 +540,7 @@ public class FrHome extends javax.swing.JFrame {
         ));
         jScrollPane3.setViewportView(jTGestores);
 
-        javax.swing.GroupLayout jPanel5Layout = new javax.swing.GroupLayout(jPanel5);
-        jPanel5.setLayout(jPanel5Layout);
-        jPanel5Layout.setHorizontalGroup(
-            jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel5Layout.createSequentialGroup()
-                .addContainerGap(34, Short.MAX_VALUE)
-                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(lblBuscaGestor, javax.swing.GroupLayout.PREFERRED_SIZE, 340, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 1170, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(156, 156, 156))
-        );
-        jPanel5Layout.setVerticalGroup(
-            jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel5Layout.createSequentialGroup()
-                .addGap(23, 23, 23)
-                .addComponent(lblBuscaGestor, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(10, 10, 10)
-                .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 410, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(152, Short.MAX_VALUE))
-        );
+        jPanel5.add(jScrollPane3, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 60, 1290, 510));
 
         jTabbedPane2.addTab("Gestores", jPanel5);
 
@@ -712,6 +711,32 @@ public class FrHome extends javax.swing.JFrame {
 
         gestorModel.setDados(resultados);
     }//GEN-LAST:event_lblBuscaGestorKeyReleased
+
+    private void jTClientesMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTClientesMouseClicked
+        int linha = jTClientes.rowAtPoint(evt.getPoint());
+        int coluna = jTClientes.columnAtPoint(evt.getPoint());
+
+        if (linha != -1) {
+            // Na tabela de Clientes, o botão está na coluna 4 (ver método configurarTabelaClientes)
+            boolean clicouNoBotao = (coluna == 4);
+            boolean duploClique = (evt.getClickCount() == 2);
+
+            if (clicouNoBotao || duploClique) {
+                // Recupera o objeto Cliente da linha selecionada
+                Cliente clienteSelecionado = clienteModel.getCliente(linha);
+
+                // Abre o DlgVisualizarCliente passando a referência deste form e o usuário logado
+                // Certifique-se que o construtor do DlgVisualizarCliente aceita (java.awt.Frame, boolean, Usuario)
+                DlgVisualizarCliente dlg = new DlgVisualizarCliente(this, true);
+
+                dlg.setCliente(clienteSelecionado); // Passa os dados do cliente
+                dlg.setVisible(true);
+
+                // Recarrega a tabela após fechar o dialog para atualizar possíveis edições
+                carregarTabelaClientes();
+            }
+        }
+    }//GEN-LAST:event_jTClientesMouseClicked
 
     /**
      * @param args the command line arguments
