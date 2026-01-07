@@ -138,9 +138,10 @@ public class DlgCadastroTerreno extends javax.swing.JDialog {
         });
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setResizable(false);
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        jPanel1.setBackground(new java.awt.Color(255, 255, 255));
+        jPanel1.setBackground(new java.awt.Color(249, 250, 251));
         jPanel1.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         edtNomeTerreno.addActionListener(new java.awt.event.ActionListener() {
@@ -150,13 +151,14 @@ public class DlgCadastroTerreno extends javax.swing.JDialog {
         });
         jPanel1.add(edtNomeTerreno, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 60, 280, -1));
 
-        jLabel8.setText("Nome do Terreno:");
+        jLabel8.setText("Nome do Terreno");
         jPanel1.add(jLabel8, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 40, -1, -1));
 
-        jLabel7.setText("Descrição / Observações:");
+        jLabel7.setText("Descrição / Observações");
         jPanel1.add(jLabel7, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 350, 140, -1));
 
         edtDescricaoTerreno.setColumns(20);
+        edtDescricaoTerreno.setLineWrap(true);
         edtDescricaoTerreno.setRows(5);
         jScrollPane1.setViewportView(edtDescricaoTerreno);
 
@@ -209,13 +211,13 @@ public class DlgCadastroTerreno extends javax.swing.JDialog {
         });
         jPanel1.add(edtCepTerreno, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 310, 280, -1));
 
-        jLabel13.setText("CEP:");
+        jLabel13.setText("CEP");
         jPanel1.add(jLabel13, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 290, -1, -1));
 
         edtAreaTotal.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.NumberFormatter(new java.text.DecimalFormat("#0.00"))));
         jPanel1.add(edtAreaTotal, new org.netbeans.lib.awtextra.AbsoluteConstraints(330, 160, 130, -1));
 
-        jLabel14.setText("Área Total (m²):");
+        jLabel14.setText("Área Total (m²)");
         jPanel1.add(jLabel14, new org.netbeans.lib.awtextra.AbsoluteConstraints(330, 140, -1, -1));
 
         cbTopografia.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Plano", "Aclive", "Declive", "Irregular" }));
@@ -226,7 +228,7 @@ public class DlgCadastroTerreno extends javax.swing.JDialog {
         });
         jPanel1.add(cbTopografia, new org.netbeans.lib.awtextra.AbsoluteConstraints(330, 110, 130, -1));
 
-        jLabel15.setText("Topografia:");
+        jLabel15.setText("Topografia");
         jPanel1.add(jLabel15, new org.netbeans.lib.awtextra.AbsoluteConstraints(330, 90, -1, -1));
 
         cbTipo.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Arenoso", "Argiloso", "Siltoso", "Humífero", "Outro" }));
@@ -237,7 +239,7 @@ public class DlgCadastroTerreno extends javax.swing.JDialog {
         });
         jPanel1.add(cbTipo, new org.netbeans.lib.awtextra.AbsoluteConstraints(480, 110, 130, -1));
 
-        jLabel16.setText("Tipo de Solo:");
+        jLabel16.setText("Tipo de Solo");
         jPanel1.add(jLabel16, new org.netbeans.lib.awtextra.AbsoluteConstraints(480, 90, -1, -1));
 
         edtReferenciaTerreno.addActionListener(new java.awt.event.ActionListener() {
@@ -247,7 +249,7 @@ public class DlgCadastroTerreno extends javax.swing.JDialog {
         });
         jPanel1.add(edtReferenciaTerreno, new org.netbeans.lib.awtextra.AbsoluteConstraints(330, 60, 280, -1));
 
-        jLabel17.setText("Referência:");
+        jLabel17.setText("Referência");
         jPanel1.add(jLabel17, new org.netbeans.lib.awtextra.AbsoluteConstraints(330, 40, -1, -1));
 
         edtCoeficienteTerreno.addActionListener(new java.awt.event.ActionListener() {
@@ -257,10 +259,10 @@ public class DlgCadastroTerreno extends javax.swing.JDialog {
         });
         jPanel1.add(edtCoeficienteTerreno, new org.netbeans.lib.awtextra.AbsoluteConstraints(330, 210, 280, -1));
 
-        jLabel18.setText("Coeficiente de Aproveitamento (C.A.):");
+        jLabel18.setText("Coeficiente de Aproveitamento (C.A.)");
         jPanel1.add(jLabel18, new org.netbeans.lib.awtextra.AbsoluteConstraints(330, 190, -1, -1));
 
-        jLabel19.setText("Gabarito de Altura (m):");
+        jLabel19.setText("Gabarito de Altura (m)");
         jPanel1.add(jLabel19, new org.netbeans.lib.awtextra.AbsoluteConstraints(330, 290, -1, -1));
 
         edtGabaritoTerreno.addActionListener(new java.awt.event.ActionListener() {
@@ -277,24 +279,27 @@ public class DlgCadastroTerreno extends javax.swing.JDialog {
         });
         jPanel1.add(edtTaxaTerreno, new org.netbeans.lib.awtextra.AbsoluteConstraints(330, 260, 280, -1));
 
-        jLabel20.setText("Taxa de Ocupação (%):");
+        jLabel20.setText("Taxa de Ocupação (%)");
         jPanel1.add(jLabel20, new org.netbeans.lib.awtextra.AbsoluteConstraints(330, 240, -1, -1));
 
         edtValorTerreno.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.NumberFormatter(new java.text.DecimalFormat("#0.00"))));
         jPanel1.add(edtValorTerreno, new org.netbeans.lib.awtextra.AbsoluteConstraints(480, 160, 130, -1));
 
-        jLabel21.setText("Valor do Terreno (R$):");
+        jLabel21.setText("Valor do Terreno (R$)");
         jPanel1.add(jLabel21, new org.netbeans.lib.awtextra.AbsoluteConstraints(480, 140, -1, -1));
 
+        jButton1.setBackground(new java.awt.Color(64, 86, 213));
+        jButton1.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        jButton1.setForeground(new java.awt.Color(255, 255, 255));
         jButton1.setText("Salvar");
         jButton1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton1ActionPerformed(evt);
             }
         });
-        jPanel1.add(jButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(250, 540, 150, 30));
+        jPanel1.add(jButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(240, 530, 150, 30));
 
-        getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 630, 610));
+        getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 630, 570));
 
         pack();
     }// </editor-fold>//GEN-END:initComponents

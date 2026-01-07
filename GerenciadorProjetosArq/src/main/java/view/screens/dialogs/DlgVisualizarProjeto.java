@@ -107,7 +107,11 @@ public class DlgVisualizarProjeto extends javax.swing.JDialog {
         
         lblNomeProjeto.setText(p.getNome());
         lblNomeCliente.setText((p.getCliente() != null) ? p.getCliente().getNome() : "Sem Cliente");
-        lblStatus.setText((p.getStatus() != null) ? p.getStatus() : "-");
+        
+        String statusTexto = (p.getStatus() != null) ? p.getStatus() : "-";
+        lblStatus.setText(statusTexto);
+        estilizarLabelStatus(statusTexto);
+        
         lblDataInicio.setText(inicio);
         lblPrevisao.setText(fim);
         
@@ -117,10 +121,11 @@ public class DlgVisualizarProjeto extends javax.swing.JDialog {
         lblOrcamento.setText((valor != null) ? nf.format(valor) : "R$ 0,00");
         
         // Descrição (somente leitura)
-        jTDescricao.setEditable(false);
-        jTDescricao.setLineWrap(true);
-        jTDescricao.setWrapStyleWord(true);
-        jTDescricao.setText(p.getDescricao());
+        lbldescrcaoProjeto.setText(p.getDescricao());
+        lbldescrcaoProjeto.setLineWrap(true);       // Ativa a quebra de linha automática
+        lbldescrcaoProjeto.setWrapStyleWord(true);  // Quebra palavras inteiras (não corta no meio)
+        lbldescrcaoProjeto.setEditable(false);      // Deixa apenas como leitura (usuário não pode digitar)
+        lbldescrcaoProjeto.setCaretPosition(0);
 
         // Aba Terreno
         if (p.getTerreno() != null) {
@@ -180,7 +185,12 @@ public class DlgVisualizarProjeto extends javax.swing.JDialog {
         lblResumoSaldo.setText(nf.format(saldo));
 
         // Cor do Saldo (Vermelho se negativo, Verde se positivo)
-        lblResumoSaldo.setForeground(saldo < 0 ? Color.RED : new Color(0, 153, 51));
+        // --- CORREÇÃO DA COR ---
+        if (saldo < 0) {
+            lblResumoSaldo.setForeground(new Color(220, 50, 50)); // Vermelho
+        } else {
+            lblResumoSaldo.setForeground(new Color(0, 153, 51));  // Verde Escuro
+        }
 
         // 7. Atualiza a Barra de Progresso
         if (orcamento > 0) {
@@ -227,10 +237,11 @@ public class DlgVisualizarProjeto extends javax.swing.JDialog {
         NumberFormat nf = NumberFormat.getCurrencyInstance(new Locale("pt", "BR"));
         lblValorTerreno.setText(t.getValorCompra() != null ? nf.format(t.getValorCompra()) : "-");
         
-        jTDescricaoTerreno.setText(t.getDescricao());
-        jTDescricaoTerreno.setEditable(false);
-        jTDescricaoTerreno.setLineWrap(true);
-        jTDescricaoTerreno.setWrapStyleWord(true);
+        lblDescricaoTerreno.setText(t.getDescricao());
+        lblDescricaoTerreno.setLineWrap(true);       // Quebra linha automático
+        lblDescricaoTerreno.setWrapStyleWord(true);  // Quebra palavras inteiras
+        lblDescricaoTerreno.setEditable(false);      // Somente leitura
+        lblDescricaoTerreno.setCaretPosition(0);
         
         Endereco e = t.getEndereco();
         if (e != null) {
@@ -337,13 +348,15 @@ public class DlgVisualizarProjeto extends javax.swing.JDialog {
 
     private void controlarVisibilidadeCamposTerreno(boolean visivel) {
         // Esconde labels quando não tem terreno para não ficar "vazio"
-        ref.setVisible(visivel);
+     
+        
         lblTopgrafia.setVisible(visivel);
         lblTipoSolo.setVisible(visivel);
         lblCA.setVisible(visivel);
         lblAreaTotal.setVisible(visivel);
         lblValor.setVisible(visivel);
-        lbldescricao.setVisible(visivel);
+        
+     
         
         lblReferenciaTerreno.setVisible(visivel);
         lblCidadeBairroRuaNumero.setVisible(visivel);
@@ -352,7 +365,8 @@ public class DlgVisualizarProjeto extends javax.swing.JDialog {
         lblCATerreno.setVisible(visivel);
         lblAreaTotalTerreno.setVisible(visivel);
         lblValorTerreno.setVisible(visivel);
-        jScrollPane2.setVisible(visivel);
+        
+        
     }
     
 
@@ -385,6 +399,45 @@ public class DlgVisualizarProjeto extends javax.swing.JDialog {
             @Override
             protected void paintContentBorder(Graphics g, int tabPlacement, int selectedIndex) {}
         });
+    }
+    
+    private void estilizarLabelStatus(String status) {
+        lblStatus.setOpaque(true);
+        lblStatus.setHorizontalAlignment(SwingConstants.CENTER);
+        lblStatus.setFont(new Font("Segoe UI", Font.BOLD, 15));
+        
+        Color corFundo;
+        Color corTexto;
+        
+        if (status == null) status = "";
+        
+        if ("Planejamento".equalsIgnoreCase(status)) {
+            // AZUL
+            corFundo = new Color(225, 235, 255);
+            corTexto = new Color(64, 86, 213);
+        } else if ("Em Andamento".equalsIgnoreCase(status)) {
+            // AMARELO
+            corFundo = new Color(255, 250, 220); 
+            corTexto = new Color(180, 140, 0);   
+        } else if ("Concluído".equalsIgnoreCase(status) || "Concluido".equalsIgnoreCase(status)) {
+            // VERDE (Sucesso)
+            corFundo = new Color(220, 255, 220); 
+            corTexto = new Color(0, 100, 0);     
+        } else {
+            // Padrão (Cinza)
+            corFundo = new Color(240, 240, 240);
+            corTexto = Color.BLACK;
+        }
+        
+        lblStatus.setBackground(corFundo);
+        lblStatus.setForeground(corTexto);
+        
+        // Cria uma borda da mesma cor do fundo para dar a sensação de retângulo/cápsula
+        // Com um padding (espaçamento) interno
+        lblStatus.setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createLineBorder(corFundo, 1), 
+            BorderFactory.createEmptyBorder(5, 15, 5, 15) // Padding: Top, Left, Bottom, Right
+        ));
     }
 
     private void padronizarTabela(JTable table, JScrollPane scroll) {
@@ -622,6 +675,7 @@ public class DlgVisualizarProjeto extends javax.swing.JDialog {
         jFileChooser1 = new javax.swing.JFileChooser();
         cadastroButton2 = new javax.swing.JLabel();
         shadowPathEffect1 = new org.jdesktop.swingx.painter.effects.ShadowPathEffect();
+        lineBorder1 = (javax.swing.border.LineBorder)javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0));
         jPanel1 = new javax.swing.JPanel();
         lblNomeCliente = new javax.swing.JLabel();
         lblNomeProjeto = new javax.swing.JLabel();
@@ -629,52 +683,70 @@ public class DlgVisualizarProjeto extends javax.swing.JDialog {
         jTabbedPane1 = new javax.swing.JTabbedPane();
         jTabbedPane2 = new javax.swing.JTabbedPane();
         jPanel3 = new javax.swing.JPanel();
-        jLabel7 = new javax.swing.JLabel();
-        lblStatus = new javax.swing.JLabel();
-        jLabel9 = new javax.swing.JLabel();
+        btnExcluirProjeto = new javax.swing.JButton();
+        btnAdicionarTerreno = new javax.swing.JButton();
+        btnExcluirTerreno = new javax.swing.JButton();
+        jSeparator1 = new javax.swing.JSeparator();
+        jSeparator2 = new javax.swing.JSeparator();
+        jPanel5 = new javax.swing.JPanel();
         jLabel8 = new javax.swing.JLabel();
         lblDataInicio = new javax.swing.JLabel();
         jLabel6 = new javax.swing.JLabel();
         lblPrevisao = new javax.swing.JLabel();
         jLabel10 = new javax.swing.JLabel();
         lblOrcamento = new javax.swing.JLabel();
-        jScrollPane1 = new javax.swing.JScrollPane();
-        jTDescricao = new javax.swing.JTextArea();
+        jSeparator4 = new javax.swing.JSeparator();
+        jSeparator5 = new javax.swing.JSeparator();
+        jSeparator8 = new javax.swing.JSeparator();
+        jPanel7 = new javax.swing.JPanel();
+        lblStatus = new javax.swing.JLabel();
+        jScrollPane5 = new javax.swing.JScrollPane();
+        lbldescrcaoProjeto = new javax.swing.JTextArea();
+        jLabel14 = new javax.swing.JLabel();
+        jSeparator12 = new javax.swing.JSeparator();
         bntEditar = new javax.swing.JButton();
-        btnExcluirProjeto = new javax.swing.JButton();
+        jPanel8 = new javax.swing.JPanel();
+        lblStatus1 = new javax.swing.JLabel();
+        jLabel13 = new javax.swing.JLabel();
+        jScrollPane6 = new javax.swing.JScrollPane();
+        lbldescrcaoProjeto1 = new javax.swing.JTextArea();
+        jPanel9 = new javax.swing.JPanel();
         lblNomeTerreno = new javax.swing.JLabel();
         lblCidadeBairroRuaNumero = new javax.swing.JLabel();
-        ref = new javax.swing.JLabel();
         lblReferenciaTerreno = new javax.swing.JLabel();
         lblTopgrafia = new javax.swing.JLabel();
         lblTopografiaTerreno = new javax.swing.JLabel();
-        lblCA = new javax.swing.JLabel();
-        lblCATerreno = new javax.swing.JLabel();
-        lblAreaTotal = new javax.swing.JLabel();
-        lblAreaTotalTerreno = new javax.swing.JLabel();
         lblTipoSolo = new javax.swing.JLabel();
         lblTipoSoloTerreno = new javax.swing.JLabel();
+        lblAreaTotal = new javax.swing.JLabel();
+        lblAreaTotalTerreno = new javax.swing.JLabel();
+        lblCA = new javax.swing.JLabel();
+        lblCATerreno = new javax.swing.JLabel();
+        jSeparator6 = new javax.swing.JSeparator();
+        jSeparator7 = new javax.swing.JSeparator();
+        jSeparator9 = new javax.swing.JSeparator();
+        jSeparator10 = new javax.swing.JSeparator();
         lblValor = new javax.swing.JLabel();
         lblValorTerreno = new javax.swing.JLabel();
-        lbldescricao = new javax.swing.JLabel();
-        jScrollPane2 = new javax.swing.JScrollPane();
-        jTDescricaoTerreno = new javax.swing.JTextArea();
-        btnAdicionarTerreno = new javax.swing.JButton();
-        btnExcluirTerreno = new javax.swing.JButton();
-        jSeparator1 = new javax.swing.JSeparator();
-        jSeparator2 = new javax.swing.JSeparator();
+        jLabel9 = new javax.swing.JLabel();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        lblDescricaoTerreno = new javax.swing.JTextArea();
+        jSeparator11 = new javax.swing.JSeparator();
         jPanel6 = new javax.swing.JPanel();
         btnLancarDespesa = new javax.swing.JToggleButton();
         btnExcluirDespesa = new javax.swing.JToggleButton();
-        lblResumoSaldo = new javax.swing.JLabel();
-        jLabel11 = new javax.swing.JLabel();
-        lblResumoGasto = new javax.swing.JLabel();
-        jLabel12 = new javax.swing.JLabel();
-        lblResumoOrcamento = new javax.swing.JLabel();
-        jLabel5 = new javax.swing.JLabel();
         barProgressoFinanceiro = new javax.swing.JProgressBar();
         JTDespesa = new javax.swing.JScrollPane();
         jTable1 = new javax.swing.JTable();
+        jPanel10 = new javax.swing.JPanel();
+        lblResumoOrcamento = new javax.swing.JLabel();
+        jLabel5 = new javax.swing.JLabel();
+        lblResumoGasto = new javax.swing.JLabel();
+        jLabel12 = new javax.swing.JLabel();
+        jLabel11 = new javax.swing.JLabel();
+        lblResumoSaldo = new javax.swing.JLabel();
+        jSeparator13 = new javax.swing.JSeparator();
+        jSeparator14 = new javax.swing.JSeparator();
         jPanel4 = new javax.swing.JPanel();
         jPanel2 = new javax.swing.JPanel();
         jScrollPane3 = new javax.swing.JScrollPane();
@@ -703,6 +775,7 @@ public class DlgVisualizarProjeto extends javax.swing.JDialog {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setMinimumSize(new java.awt.Dimension(1370, 760));
+        setResizable(false);
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         jPanel1.setBackground(new java.awt.Color(255, 255, 255));
@@ -737,121 +810,31 @@ public class DlgVisualizarProjeto extends javax.swing.JDialog {
         jPanel3.setBackground(new java.awt.Color(249, 250, 251));
         jPanel3.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        jLabel7.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
-        jLabel7.setText("Status:");
-        jPanel3.add(jLabel7, new org.netbeans.lib.awtextra.AbsoluteConstraints(260, 60, -1, -1));
-
-        lblStatus.setText("Status");
-        jPanel3.add(lblStatus, new org.netbeans.lib.awtextra.AbsoluteConstraints(330, 70, 120, -1));
-
-        jLabel9.setText("Descrição:");
-        jPanel3.add(jLabel9, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 100, -1, -1));
-
-        jLabel8.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
-        jLabel8.setText("Data de Início:");
-        jPanel3.add(jLabel8, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 20, -1, -1));
-
-        lblDataInicio.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
-        lblDataInicio.setText("01/12/2023");
-        jPanel3.add(lblDataInicio, new org.netbeans.lib.awtextra.AbsoluteConstraints(150, 20, 120, -1));
-
-        jLabel6.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
-        jLabel6.setText("Previsão de fim:");
-        jPanel3.add(jLabel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(260, 20, -1, -1));
-
-        lblPrevisao.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
-        lblPrevisao.setText("01/12/2024");
-        jPanel3.add(lblPrevisao, new org.netbeans.lib.awtextra.AbsoluteConstraints(400, 20, 110, -1));
-
-        jLabel10.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
-        jLabel10.setText("Orçamento:");
-        jPanel3.add(jLabel10, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 60, -1, -1));
-
-        lblOrcamento.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
-        lblOrcamento.setText("30,232");
-        jPanel3.add(lblOrcamento, new org.netbeans.lib.awtextra.AbsoluteConstraints(120, 60, 160, -1));
-
-        jTDescricao.setColumns(20);
-        jTDescricao.setRows(5);
-        jScrollPane1.setViewportView(jTDescricao);
-
-        jPanel3.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 130, 420, 190));
-
-        bntEditar.setText("Editar");
-        bntEditar.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                bntEditarActionPerformed(evt);
-            }
-        });
-        jPanel3.add(bntEditar, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 340, 110, -1));
-
+        btnExcluirProjeto.setBackground(new java.awt.Color(64, 86, 213));
+        btnExcluirProjeto.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        btnExcluirProjeto.setForeground(new java.awt.Color(255, 255, 255));
         btnExcluirProjeto.setText("Excluir Projeto");
         btnExcluirProjeto.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnExcluirProjetoActionPerformed(evt);
             }
         });
-        jPanel3.add(btnExcluirProjeto, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 340, 130, -1));
+        jPanel3.add(btnExcluirProjeto, new org.netbeans.lib.awtextra.AbsoluteConstraints(160, 20, 130, 30));
 
-        lblNomeTerreno.setText("Terreno Casas Nobres");
-        jPanel3.add(lblNomeTerreno, new org.netbeans.lib.awtextra.AbsoluteConstraints(840, 50, -1, -1));
-
-        lblCidadeBairroRuaNumero.setText("Rio Pomba, Centro, Rua alves de Castro, 98");
-        jPanel3.add(lblCidadeBairroRuaNumero, new org.netbeans.lib.awtextra.AbsoluteConstraints(840, 80, -1, -1));
-
-        ref.setText("Referência:");
-        jPanel3.add(ref, new org.netbeans.lib.awtextra.AbsoluteConstraints(840, 110, -1, -1));
-
-        lblReferenciaTerreno.setText("Perto do Hospital");
-        jPanel3.add(lblReferenciaTerreno, new org.netbeans.lib.awtextra.AbsoluteConstraints(900, 110, -1, -1));
-
-        lblTopgrafia.setText("Topografia: ");
-        jPanel3.add(lblTopgrafia, new org.netbeans.lib.awtextra.AbsoluteConstraints(840, 140, -1, -1));
-
-        lblTopografiaTerreno.setText("Plano");
-        jPanel3.add(lblTopografiaTerreno, new org.netbeans.lib.awtextra.AbsoluteConstraints(910, 140, -1, -1));
-
-        lblCA.setText("C.A.: ");
-        jPanel3.add(lblCA, new org.netbeans.lib.awtextra.AbsoluteConstraints(840, 170, -1, -1));
-
-        lblCATerreno.setText("1,5");
-        jPanel3.add(lblCATerreno, new org.netbeans.lib.awtextra.AbsoluteConstraints(870, 170, -1, -1));
-
-        lblAreaTotal.setText("Área Total: ");
-        jPanel3.add(lblAreaTotal, new org.netbeans.lib.awtextra.AbsoluteConstraints(910, 170, -1, -1));
-
-        lblAreaTotalTerreno.setText("245 m²");
-        jPanel3.add(lblAreaTotalTerreno, new org.netbeans.lib.awtextra.AbsoluteConstraints(980, 170, 80, -1));
-
-        lblTipoSolo.setText("Tipo de Solo: ");
-        jPanel3.add(lblTipoSolo, new org.netbeans.lib.awtextra.AbsoluteConstraints(1010, 140, -1, -1));
-
-        lblTipoSoloTerreno.setText("Arenoso");
-        jPanel3.add(lblTipoSoloTerreno, new org.netbeans.lib.awtextra.AbsoluteConstraints(1090, 140, -1, -1));
-
-        lblValor.setText("Valor do Terreno:");
-        jPanel3.add(lblValor, new org.netbeans.lib.awtextra.AbsoluteConstraints(1080, 170, -1, -1));
-
-        lblValorTerreno.setText("234,00");
-        jPanel3.add(lblValorTerreno, new org.netbeans.lib.awtextra.AbsoluteConstraints(1180, 170, 80, -1));
-
-        lbldescricao.setText("Descrição:");
-        jPanel3.add(lbldescricao, new org.netbeans.lib.awtextra.AbsoluteConstraints(840, 220, -1, -1));
-
-        jTDescricaoTerreno.setColumns(20);
-        jTDescricaoTerreno.setRows(5);
-        jScrollPane2.setViewportView(jTDescricaoTerreno);
-
-        jPanel3.add(jScrollPane2, new org.netbeans.lib.awtextra.AbsoluteConstraints(850, 250, 380, 110));
-
+        btnAdicionarTerreno.setBackground(new java.awt.Color(64, 86, 213));
+        btnAdicionarTerreno.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        btnAdicionarTerreno.setForeground(new java.awt.Color(255, 255, 255));
         btnAdicionarTerreno.setText("Adicionar Terreno");
         btnAdicionarTerreno.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnAdicionarTerrenoActionPerformed(evt);
             }
         });
-        jPanel3.add(btnAdicionarTerreno, new org.netbeans.lib.awtextra.AbsoluteConstraints(1260, 10, -1, -1));
+        jPanel3.add(btnAdicionarTerreno, new org.netbeans.lib.awtextra.AbsoluteConstraints(860, 20, 140, 30));
 
+        btnExcluirTerreno.setBackground(new java.awt.Color(64, 86, 213));
+        btnExcluirTerreno.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        btnExcluirTerreno.setForeground(new java.awt.Color(255, 255, 255));
         btnExcluirTerreno.setText("Excluir Terreno");
         btnExcluirTerreno.setToolTipText("");
         btnExcluirTerreno.addActionListener(new java.awt.event.ActionListener() {
@@ -859,50 +842,241 @@ public class DlgVisualizarProjeto extends javax.swing.JDialog {
                 btnExcluirTerrenoActionPerformed(evt);
             }
         });
-        jPanel3.add(btnExcluirTerreno, new org.netbeans.lib.awtextra.AbsoluteConstraints(1120, 10, 130, -1));
+        jPanel3.add(btnExcluirTerreno, new org.netbeans.lib.awtextra.AbsoluteConstraints(720, 20, 120, 30));
 
         jSeparator1.setOrientation(javax.swing.SwingConstants.VERTICAL);
         jPanel3.add(jSeparator1, new org.netbeans.lib.awtextra.AbsoluteConstraints(690, 0, 20, 630));
         jPanel3.add(jSeparator2, new org.netbeans.lib.awtextra.AbsoluteConstraints(970, 480, -1, -1));
+
+        jPanel5.setBackground(new java.awt.Color(255, 255, 255));
+        jPanel5.setForeground(new java.awt.Color(102, 153, 255));
+        jPanel5.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+
+        jLabel8.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        jLabel8.setForeground(new java.awt.Color(64, 86, 213));
+        jLabel8.setText("Inicio do Projeto");
+        jPanel5.add(jLabel8, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 20, -1, -1));
+
+        lblDataInicio.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        lblDataInicio.setForeground(new java.awt.Color(44, 58, 78));
+        lblDataInicio.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lblDataInicio.setText("01/12/2023");
+        lblDataInicio.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        jPanel5.add(lblDataInicio, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 50, 110, -1));
+
+        jLabel6.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        jLabel6.setForeground(new java.awt.Color(64, 86, 213));
+        jLabel6.setText("Previsão de fim");
+        jPanel5.add(jLabel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 20, -1, -1));
+
+        lblPrevisao.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        lblPrevisao.setForeground(new java.awt.Color(44, 58, 78));
+        lblPrevisao.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lblPrevisao.setText("01/12/2024");
+        jPanel5.add(lblPrevisao, new org.netbeans.lib.awtextra.AbsoluteConstraints(210, 50, 110, -1));
+
+        jLabel10.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        jLabel10.setForeground(new java.awt.Color(64, 86, 213));
+        jLabel10.setText("Orçamento");
+        jPanel5.add(jLabel10, new org.netbeans.lib.awtextra.AbsoluteConstraints(450, 20, -1, -1));
+
+        lblOrcamento.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        lblOrcamento.setForeground(new java.awt.Color(44, 58, 78));
+        lblOrcamento.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lblOrcamento.setText("30,232");
+        jPanel5.add(lblOrcamento, new org.netbeans.lib.awtextra.AbsoluteConstraints(390, 50, 230, 20));
+
+        jSeparator4.setOrientation(javax.swing.SwingConstants.VERTICAL);
+        jPanel5.add(jSeparator4, new org.netbeans.lib.awtextra.AbsoluteConstraints(350, 10, 10, 90));
+
+        jSeparator5.setOrientation(javax.swing.SwingConstants.VERTICAL);
+        jPanel5.add(jSeparator5, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 10, 10, 90));
+        jPanel5.add(jSeparator8, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 10, 630, 10));
+
+        jPanel3.add(jPanel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 60, 650, 100));
+
+        jPanel7.setBackground(new java.awt.Color(255, 255, 255));
+        jPanel7.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+
+        lblStatus.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        lblStatus.setText("Status");
+        jPanel7.add(lblStatus, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 20, 230, 30));
+
+        jScrollPane5.setBackground(new java.awt.Color(255, 255, 255));
+        jScrollPane5.setBorder(null);
+
+        lbldescrcaoProjeto.setColumns(20);
+        lbldescrcaoProjeto.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        lbldescrcaoProjeto.setLineWrap(true);
+        lbldescrcaoProjeto.setRows(5);
+        lbldescrcaoProjeto.setBorder(null);
+        lbldescrcaoProjeto.setDisabledTextColor(new java.awt.Color(255, 255, 255));
+        lbldescrcaoProjeto.setFocusable(false);
+        jScrollPane5.setViewportView(lbldescrcaoProjeto);
+
+        jPanel7.add(jScrollPane5, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 90, 610, 330));
+
+        jLabel14.setFont(new java.awt.Font("Segoe UI", 2, 18)); // NOI18N
+        jLabel14.setText("Descrição");
+        jPanel7.add(jLabel14, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 60, -1, -1));
+        jPanel7.add(jSeparator12, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 0, 630, 10));
+
+        jPanel3.add(jPanel7, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 160, 650, 440));
+
+        bntEditar.setBackground(new java.awt.Color(64, 86, 213));
+        bntEditar.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        bntEditar.setForeground(new java.awt.Color(255, 255, 255));
+        bntEditar.setText("Editar Projeto");
+        bntEditar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                bntEditarActionPerformed(evt);
+            }
+        });
+        jPanel3.add(bntEditar, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 20, 120, 30));
+
+        jPanel8.setBackground(new java.awt.Color(255, 255, 255));
+        jPanel8.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+
+        lblStatus1.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        lblStatus1.setText("Status");
+        jPanel8.add(lblStatus1, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 10, 230, 30));
+
+        jLabel13.setFont(new java.awt.Font("Segoe UI", 2, 18)); // NOI18N
+        jLabel13.setText("Descrição");
+        jPanel8.add(jLabel13, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 60, -1, -1));
+
+        jScrollPane6.setBackground(new java.awt.Color(255, 255, 255));
+        jScrollPane6.setBorder(null);
+
+        lbldescrcaoProjeto1.setColumns(20);
+        lbldescrcaoProjeto1.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        lbldescrcaoProjeto1.setLineWrap(true);
+        lbldescrcaoProjeto1.setRows(5);
+        lbldescrcaoProjeto1.setDisabledTextColor(new java.awt.Color(255, 255, 255));
+        lbldescrcaoProjeto1.setFocusable(false);
+        jScrollPane6.setViewportView(lbldescrcaoProjeto1);
+
+        jPanel8.add(jScrollPane6, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 90, 620, 300));
+
+        jPanel3.add(jPanel8, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 160, 650, 440));
+
+        jPanel9.setBackground(new java.awt.Color(255, 255, 255));
+        jPanel9.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+
+        lblNomeTerreno.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
+        lblNomeTerreno.setText("Terreno Casas Nobres");
+        jPanel9.add(lblNomeTerreno, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 10, 620, -1));
+
+        lblCidadeBairroRuaNumero.setFont(new java.awt.Font("Segoe UI", 2, 18)); // NOI18N
+        lblCidadeBairroRuaNumero.setText("Rio Pomba, Centro, Rua alves de Castro, 98");
+        jPanel9.add(lblCidadeBairroRuaNumero, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 50, 630, -1));
+
+        lblReferenciaTerreno.setFont(new java.awt.Font("Segoe UI", 3, 12)); // NOI18N
+        lblReferenciaTerreno.setText("Perto do Hospital");
+        jPanel9.add(lblReferenciaTerreno, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 80, 340, -1));
+
+        lblTopgrafia.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        lblTopgrafia.setForeground(new java.awt.Color(64, 86, 213));
+        lblTopgrafia.setText("Topografia");
+        jPanel9.add(lblTopgrafia, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 120, -1, -1));
+
+        lblTopografiaTerreno.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        lblTopografiaTerreno.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lblTopografiaTerreno.setText("Plano");
+        jPanel9.add(lblTopografiaTerreno, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 150, 150, -1));
+
+        lblTipoSolo.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        lblTipoSolo.setForeground(new java.awt.Color(64, 86, 213));
+        lblTipoSolo.setText("Tipo de Solo");
+        jPanel9.add(lblTipoSolo, new org.netbeans.lib.awtextra.AbsoluteConstraints(210, 120, -1, -1));
+
+        lblTipoSoloTerreno.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        lblTipoSoloTerreno.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lblTipoSoloTerreno.setText("Arenoso");
+        jPanel9.add(lblTipoSoloTerreno, new org.netbeans.lib.awtextra.AbsoluteConstraints(191, 150, 140, -1));
+
+        lblAreaTotal.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        lblAreaTotal.setForeground(new java.awt.Color(64, 86, 213));
+        lblAreaTotal.setText("Área Total");
+        jPanel9.add(lblAreaTotal, new org.netbeans.lib.awtextra.AbsoluteConstraints(390, 120, -1, -1));
+
+        lblAreaTotalTerreno.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        lblAreaTotalTerreno.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lblAreaTotalTerreno.setText("245 m²");
+        jPanel9.add(lblAreaTotalTerreno, new org.netbeans.lib.awtextra.AbsoluteConstraints(390, 150, 80, -1));
+
+        lblCA.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        lblCA.setForeground(new java.awt.Color(64, 86, 213));
+        lblCA.setText("C.A");
+        jPanel9.add(lblCA, new org.netbeans.lib.awtextra.AbsoluteConstraints(560, 120, -1, -1));
+
+        lblCATerreno.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        lblCATerreno.setText("1,5");
+        jPanel9.add(lblCATerreno, new org.netbeans.lib.awtextra.AbsoluteConstraints(560, 150, -1, -1));
+
+        jSeparator6.setOrientation(javax.swing.SwingConstants.VERTICAL);
+        jPanel9.add(jSeparator6, new org.netbeans.lib.awtextra.AbsoluteConstraints(520, 110, 10, 80));
+        jPanel9.add(jSeparator7, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 110, 650, 40));
+
+        jSeparator9.setOrientation(javax.swing.SwingConstants.VERTICAL);
+        jPanel9.add(jSeparator9, new org.netbeans.lib.awtextra.AbsoluteConstraints(170, 110, 10, 80));
+
+        jSeparator10.setOrientation(javax.swing.SwingConstants.VERTICAL);
+        jPanel9.add(jSeparator10, new org.netbeans.lib.awtextra.AbsoluteConstraints(350, 110, 10, 80));
+
+        lblValor.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        lblValor.setForeground(new java.awt.Color(64, 86, 213));
+        lblValor.setText("Valor do Terreno");
+        jPanel9.add(lblValor, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 210, -1, -1));
+
+        lblValorTerreno.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        lblValorTerreno.setText("234,00");
+        jPanel9.add(lblValorTerreno, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 210, 240, -1));
+
+        jLabel9.setFont(new java.awt.Font("Segoe UI", 2, 18)); // NOI18N
+        jLabel9.setText("Descrição");
+        jPanel9.add(jLabel9, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 240, -1, -1));
+
+        lblDescricaoTerreno.setColumns(20);
+        lblDescricaoTerreno.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        lblDescricaoTerreno.setLineWrap(true);
+        lblDescricaoTerreno.setRows(5);
+        lblDescricaoTerreno.setBorder(null);
+        lblDescricaoTerreno.setDisabledTextColor(new java.awt.Color(255, 255, 255));
+        lblDescricaoTerreno.setFocusable(false);
+        jScrollPane1.setViewportView(lblDescricaoTerreno);
+
+        jPanel9.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 270, 630, 250));
+        jPanel9.add(jSeparator11, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 190, 650, 10));
+
+        jPanel3.add(jPanel9, new org.netbeans.lib.awtextra.AbsoluteConstraints(720, 60, 670, 540));
 
         jTabbedPane2.addTab("Visão Geral", jPanel3);
 
         jPanel6.setBackground(new java.awt.Color(249, 250, 251));
         jPanel6.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
+        btnLancarDespesa.setBackground(new java.awt.Color(64, 86, 213));
+        btnLancarDespesa.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        btnLancarDespesa.setForeground(new java.awt.Color(255, 255, 255));
         btnLancarDespesa.setText("Lançar Despesa");
         btnLancarDespesa.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnLancarDespesaActionPerformed(evt);
             }
         });
-        jPanel6.add(btnLancarDespesa, new org.netbeans.lib.awtextra.AbsoluteConstraints(1200, 90, -1, -1));
+        jPanel6.add(btnLancarDespesa, new org.netbeans.lib.awtextra.AbsoluteConstraints(1020, 90, -1, 30));
 
+        btnExcluirDespesa.setBackground(new java.awt.Color(64, 86, 213));
+        btnExcluirDespesa.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        btnExcluirDespesa.setForeground(new java.awt.Color(255, 255, 255));
         btnExcluirDespesa.setText("Excluir Despesa");
         btnExcluirDespesa.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnExcluirDespesaActionPerformed(evt);
             }
         });
-        jPanel6.add(btnExcluirDespesa, new org.netbeans.lib.awtextra.AbsoluteConstraints(1030, 80, -1, -1));
-
-        lblResumoSaldo.setText("$R$ 0,00");
-        jPanel6.add(lblResumoSaldo, new org.netbeans.lib.awtextra.AbsoluteConstraints(910, 30, 150, -1));
-
-        jLabel11.setText("Saldo DIsponivel:");
-        jPanel6.add(jLabel11, new org.netbeans.lib.awtextra.AbsoluteConstraints(790, 30, -1, -1));
-
-        lblResumoGasto.setText("$R$ 0,00");
-        jPanel6.add(lblResumoGasto, new org.netbeans.lib.awtextra.AbsoluteConstraints(490, 30, 150, -1));
-
-        jLabel12.setText("Total Gasto:");
-        jPanel6.add(jLabel12, new org.netbeans.lib.awtextra.AbsoluteConstraints(410, 30, -1, -1));
-
-        lblResumoOrcamento.setText("$R$ 0,00");
-        jPanel6.add(lblResumoOrcamento, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 30, 100, -1));
-
-        jLabel5.setText("Orçamento Total:");
-        jPanel6.add(jLabel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 30, -1, -1));
+        jPanel6.add(btnExcluirDespesa, new org.netbeans.lib.awtextra.AbsoluteConstraints(880, 90, -1, 30));
 
         barProgressoFinanceiro.setStringPainted(true);
         jPanel6.add(barProgressoFinanceiro, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 580, 1340, -1));
@@ -921,6 +1095,49 @@ public class DlgVisualizarProjeto extends javax.swing.JDialog {
         JTDespesa.setViewportView(jTable1);
 
         jPanel6.add(JTDespesa, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 130, 1350, 430));
+
+        jPanel10.setBackground(new java.awt.Color(255, 255, 255));
+        jPanel10.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
+        jPanel10.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+
+        lblResumoOrcamento.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        lblResumoOrcamento.setForeground(new java.awt.Color(0, 153, 0));
+        lblResumoOrcamento.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lblResumoOrcamento.setText("$R$ 0,00");
+        jPanel10.add(lblResumoOrcamento, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 50, 220, 30));
+
+        jLabel5.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        jLabel5.setForeground(new java.awt.Color(64, 86, 213));
+        jLabel5.setText("Orçamento Total");
+        jPanel10.add(jLabel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 10, -1, -1));
+
+        lblResumoGasto.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        lblResumoGasto.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lblResumoGasto.setText("$R$ 0,00");
+        jPanel10.add(lblResumoGasto, new org.netbeans.lib.awtextra.AbsoluteConstraints(310, 50, 190, -1));
+
+        jLabel12.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        jLabel12.setForeground(new java.awt.Color(64, 86, 213));
+        jLabel12.setText("Total Gasto");
+        jPanel10.add(jLabel12, new org.netbeans.lib.awtextra.AbsoluteConstraints(360, 10, -1, -1));
+
+        jLabel11.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        jLabel11.setForeground(new java.awt.Color(64, 86, 213));
+        jLabel11.setText("Saldo Disponível");
+        jPanel10.add(jLabel11, new org.netbeans.lib.awtextra.AbsoluteConstraints(600, 10, -1, -1));
+
+        lblResumoSaldo.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        lblResumoSaldo.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lblResumoSaldo.setText("$R$ 0,00");
+        jPanel10.add(lblResumoSaldo, new org.netbeans.lib.awtextra.AbsoluteConstraints(540, 50, 250, -1));
+
+        jSeparator13.setOrientation(javax.swing.SwingConstants.VERTICAL);
+        jPanel10.add(jSeparator13, new org.netbeans.lib.awtextra.AbsoluteConstraints(280, 10, 10, 80));
+
+        jSeparator14.setOrientation(javax.swing.SwingConstants.VERTICAL);
+        jPanel10.add(jSeparator14, new org.netbeans.lib.awtextra.AbsoluteConstraints(530, 10, 10, 80));
+
+        jPanel6.add(jPanel10, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 20, 820, 100));
 
         jTabbedPane2.addTab("Controle de Gastos", jPanel6);
 
@@ -1265,27 +1482,43 @@ public class DlgVisualizarProjeto extends javax.swing.JDialog {
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
     private javax.swing.JLabel jLabel12;
+    private javax.swing.JLabel jLabel13;
+    private javax.swing.JLabel jLabel14;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
-    private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
     private javax.swing.JLabel jLabel9;
     private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel10;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
+    private javax.swing.JPanel jPanel5;
     private javax.swing.JPanel jPanel6;
+    private javax.swing.JPanel jPanel7;
+    private javax.swing.JPanel jPanel8;
+    private javax.swing.JPanel jPanel9;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JScrollPane jScrollPane4;
+    private javax.swing.JScrollPane jScrollPane5;
+    private javax.swing.JScrollPane jScrollPane6;
     private javax.swing.JSeparator jSeparator1;
+    private javax.swing.JSeparator jSeparator10;
+    private javax.swing.JSeparator jSeparator11;
+    private javax.swing.JSeparator jSeparator12;
+    private javax.swing.JSeparator jSeparator13;
+    private javax.swing.JSeparator jSeparator14;
     private javax.swing.JSeparator jSeparator2;
     private javax.swing.JSeparator jSeparator3;
-    private javax.swing.JTextArea jTDescricao;
-    private javax.swing.JTextArea jTDescricaoTerreno;
+    private javax.swing.JSeparator jSeparator4;
+    private javax.swing.JSeparator jSeparator5;
+    private javax.swing.JSeparator jSeparator6;
+    private javax.swing.JSeparator jSeparator7;
+    private javax.swing.JSeparator jSeparator8;
+    private javax.swing.JSeparator jSeparator9;
     private javax.swing.JTable jTDocs;
     private javax.swing.JScrollPane jTFeedback;
     private javax.swing.JTabbedPane jTabbedPane1;
@@ -1298,6 +1531,7 @@ public class DlgVisualizarProjeto extends javax.swing.JDialog {
     private javax.swing.JLabel lblCATerreno;
     private javax.swing.JLabel lblCidadeBairroRuaNumero;
     private javax.swing.JLabel lblDataInicio;
+    private javax.swing.JTextArea lblDescricaoTerreno;
     private javax.swing.JButton lblHome;
     private javax.swing.JLabel lblNomeCliente;
     private javax.swing.JLabel lblNomeProjeto;
@@ -1309,14 +1543,16 @@ public class DlgVisualizarProjeto extends javax.swing.JDialog {
     private javax.swing.JLabel lblResumoOrcamento;
     private javax.swing.JLabel lblResumoSaldo;
     private javax.swing.JLabel lblStatus;
+    private javax.swing.JLabel lblStatus1;
     private javax.swing.JLabel lblTipoSolo;
     private javax.swing.JLabel lblTipoSoloTerreno;
     private javax.swing.JLabel lblTopgrafia;
     private javax.swing.JLabel lblTopografiaTerreno;
     private javax.swing.JLabel lblValor;
     private javax.swing.JLabel lblValorTerreno;
-    private javax.swing.JLabel lbldescricao;
-    private javax.swing.JLabel ref;
+    private javax.swing.JTextArea lbldescrcaoProjeto;
+    private javax.swing.JTextArea lbldescrcaoProjeto1;
+    private javax.swing.border.LineBorder lineBorder1;
     private org.jdesktop.swingx.painter.effects.ShadowPathEffect shadowPathEffect1;
     // End of variables declaration//GEN-END:variables
 }

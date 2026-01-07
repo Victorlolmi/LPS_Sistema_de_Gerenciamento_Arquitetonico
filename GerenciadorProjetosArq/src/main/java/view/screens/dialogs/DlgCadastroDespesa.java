@@ -46,69 +46,60 @@ public class DlgCadastroDespesa extends javax.swing.JDialog {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jLabel1 = new javax.swing.JLabel();
-        edtDescricaoDespesa = new javax.swing.JTextField();
-        edtValorDespesa = new javax.swing.JFormattedTextField();
-        jLabel4 = new javax.swing.JLabel();
-        edtFornecedorDespesa = new javax.swing.JTextField();
-        jLabel2 = new javax.swing.JLabel();
-        edtDataDespesa = new javax.swing.JFormattedTextField();
-        jLabel3 = new javax.swing.JLabel();
-        cbCategoria = new javax.swing.JComboBox<>();
-        jLabel5 = new javax.swing.JLabel();
-        jLabel6 = new javax.swing.JLabel();
-        cbFormaPag = new javax.swing.JComboBox<>();
-        jLabel7 = new javax.swing.JLabel();
-        cbStatusDespesa = new javax.swing.JComboBox<>();
+        jPanel1 = new javax.swing.JPanel();
+        btnSalvarDespesa = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
         jTObservacoes = new javax.swing.JTextArea();
+        jLabel7 = new javax.swing.JLabel();
+        cbStatusDespesa = new javax.swing.JComboBox<>();
         jLabel8 = new javax.swing.JLabel();
-        btnSalvarDespesa = new javax.swing.JButton();
+        cbCategoria = new javax.swing.JComboBox<>();
+        jLabel2 = new javax.swing.JLabel();
+        cbFormaPag = new javax.swing.JComboBox<>();
+        jLabel6 = new javax.swing.JLabel();
+        edtFornecedorDespesa = new javax.swing.JTextField();
+        jLabel3 = new javax.swing.JLabel();
+        edtValorDespesa = new javax.swing.JFormattedTextField();
+        jLabel4 = new javax.swing.JLabel();
+        edtDataDespesa = new javax.swing.JFormattedTextField();
+        jLabel5 = new javax.swing.JLabel();
+        edtDescricaoDespesa = new javax.swing.JTextField();
+        jLabel1 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setBackground(new java.awt.Color(255, 255, 255));
+        setResizable(false);
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        jLabel1.setText("Descrição:");
-        getContentPane().add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 20, -1, -1));
+        jPanel1.setBackground(new java.awt.Color(249, 250, 251));
+        jPanel1.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        edtDescricaoDespesa.addActionListener(new java.awt.event.ActionListener() {
+        btnSalvarDespesa.setBackground(new java.awt.Color(64, 86, 213));
+        btnSalvarDespesa.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        btnSalvarDespesa.setForeground(new java.awt.Color(255, 255, 255));
+        btnSalvarDespesa.setText("Salvar");
+        btnSalvarDespesa.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                edtDescricaoDespesaActionPerformed(evt);
+                btnSalvarDespesaActionPerformed(evt);
             }
         });
-        getContentPane().add(edtDescricaoDespesa, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 40, 340, -1));
+        jPanel1.add(btnSalvarDespesa, new org.netbeans.lib.awtextra.AbsoluteConstraints(120, 410, 110, 30));
 
-        edtValorDespesa.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.NumberFormatter(new java.text.DecimalFormat("#0.00"))));
-        edtValorDespesa.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                edtValorDespesaActionPerformed(evt);
-            }
-        });
-        getContentPane().add(edtValorDespesa, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 90, 160, -1));
+        jTObservacoes.setColumns(20);
+        jTObservacoes.setLineWrap(true);
+        jTObservacoes.setRows(5);
+        jScrollPane1.setViewportView(jTObservacoes);
 
-        jLabel4.setText("Valor (R$):");
-        getContentPane().add(jLabel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 70, -1, -1));
+        jPanel1.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 290, 340, 90));
 
-        edtFornecedorDespesa.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                edtFornecedorDespesaActionPerformed(evt);
-            }
-        });
-        getContentPane().add(edtFornecedorDespesa, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 140, 340, -1));
+        jLabel7.setText("Observaçoes:");
+        jPanel1.add(jLabel7, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 270, -1, -1));
 
-        jLabel2.setText("Categoria");
-        getContentPane().add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 170, -1, -1));
+        cbStatusDespesa.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Pago", "Pendente" }));
+        jPanel1.add(cbStatusDespesa, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 240, 160, -1));
 
-        edtDataDespesa.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.DateFormatter(new java.text.SimpleDateFormat("dd/MM/yyyy"))));
-        edtDataDespesa.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                edtDataDespesaActionPerformed(evt);
-            }
-        });
-        getContentPane().add(edtDataDespesa, new org.netbeans.lib.awtextra.AbsoluteConstraints(190, 90, 160, -1));
-
-        jLabel3.setText("Fornecedor:");
-        getContentPane().add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 120, -1, -1));
+        jLabel8.setText("Status");
+        jPanel1.add(jLabel8, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 220, -1, -1));
 
         cbCategoria.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Material", "Mão de Obra", "Transporte", "Taxas", "Alimentação", "Outros" }));
         cbCategoria.addActionListener(new java.awt.event.ActionListener() {
@@ -116,39 +107,60 @@ public class DlgCadastroDespesa extends javax.swing.JDialog {
                 cbCategoriaActionPerformed(evt);
             }
         });
-        getContentPane().add(cbCategoria, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 190, 160, -1));
+        jPanel1.add(cbCategoria, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 190, 160, -1));
 
-        jLabel5.setText("Data do Gasto");
-        getContentPane().add(jLabel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(190, 70, -1, -1));
-
-        jLabel6.setText("Forma de Pagamento");
-        getContentPane().add(jLabel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(190, 170, -1, -1));
+        jLabel2.setText("Categoria");
+        jPanel1.add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 170, -1, -1));
 
         cbFormaPag.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Pix", "Cartão de Crédito", "Cartão de Débito", "Dinheiro", "Boleto", "Transferência" }));
-        getContentPane().add(cbFormaPag, new org.netbeans.lib.awtextra.AbsoluteConstraints(190, 190, 160, -1));
+        jPanel1.add(cbFormaPag, new org.netbeans.lib.awtextra.AbsoluteConstraints(190, 190, 160, -1));
 
-        jLabel7.setText("Observaçoes:");
-        getContentPane().add(jLabel7, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 270, -1, -1));
+        jLabel6.setText("Forma de Pagamento");
+        jPanel1.add(jLabel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(190, 170, -1, -1));
 
-        cbStatusDespesa.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Pago", "Pendente" }));
-        getContentPane().add(cbStatusDespesa, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 240, 160, -1));
-
-        jTObservacoes.setColumns(20);
-        jTObservacoes.setRows(5);
-        jScrollPane1.setViewportView(jTObservacoes);
-
-        getContentPane().add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 290, 340, 90));
-
-        jLabel8.setText("Status");
-        getContentPane().add(jLabel8, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 220, -1, -1));
-
-        btnSalvarDespesa.setText("Salvar");
-        btnSalvarDespesa.addActionListener(new java.awt.event.ActionListener() {
+        edtFornecedorDespesa.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnSalvarDespesaActionPerformed(evt);
+                edtFornecedorDespesaActionPerformed(evt);
             }
         });
-        getContentPane().add(btnSalvarDespesa, new org.netbeans.lib.awtextra.AbsoluteConstraints(120, 390, 110, 40));
+        jPanel1.add(edtFornecedorDespesa, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 140, 340, -1));
+
+        jLabel3.setText("Fornecedor:");
+        jPanel1.add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 120, -1, -1));
+
+        edtValorDespesa.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.NumberFormatter(new java.text.DecimalFormat("#0.00"))));
+        edtValorDespesa.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                edtValorDespesaActionPerformed(evt);
+            }
+        });
+        jPanel1.add(edtValorDespesa, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 90, 160, -1));
+
+        jLabel4.setText("Valor (R$):");
+        jPanel1.add(jLabel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 70, -1, -1));
+
+        edtDataDespesa.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.DateFormatter(new java.text.SimpleDateFormat("dd/MM/yyyy"))));
+        edtDataDespesa.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                edtDataDespesaActionPerformed(evt);
+            }
+        });
+        jPanel1.add(edtDataDespesa, new org.netbeans.lib.awtextra.AbsoluteConstraints(190, 90, 160, -1));
+
+        jLabel5.setText("Data do Gasto");
+        jPanel1.add(jLabel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(190, 70, -1, -1));
+
+        edtDescricaoDespesa.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                edtDescricaoDespesaActionPerformed(evt);
+            }
+        });
+        jPanel1.add(edtDescricaoDespesa, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 40, 340, -1));
+
+        jLabel1.setText("Descrição:");
+        jPanel1.add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 20, -1, -1));
+
+        getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 360, 470));
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -246,6 +258,7 @@ public class DlgCadastroDespesa extends javax.swing.JDialog {
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
+    private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTextArea jTObservacoes;
     // End of variables declaration//GEN-END:variables

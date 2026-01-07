@@ -55,8 +55,10 @@ public class DlgCadastroDocumento extends javax.swing.JDialog {
         btnSalvarDocumento = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setResizable(false);
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
+        jPanel1.setBackground(new java.awt.Color(249, 250, 251));
         jPanel1.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
         jPanel1.add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 150, -1, -1));
 
@@ -67,13 +69,13 @@ public class DlgCadastroDocumento extends javax.swing.JDialog {
         });
         jPanel1.add(edtCaminhoArquivo, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 100, 290, -1));
 
-        jLabel2.setText("Nome do Documento: ");
+        jLabel2.setText("Nome do Documento ");
         jPanel1.add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 20, -1, -1));
 
         cbCategoriaDocumento.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Legal", "terreno", "Executivo", "Contratos", "Financeiro" }));
-        jPanel1.add(cbCategoriaDocumento, new org.netbeans.lib.awtextra.AbsoluteConstraints(70, 60, 120, -1));
+        jPanel1.add(cbCategoriaDocumento, new org.netbeans.lib.awtextra.AbsoluteConstraints(70, 60, 150, -1));
 
-        jLabel3.setText("Categoria:");
+        jLabel3.setText("Categoria");
         jPanel1.add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 60, -1, -1));
 
         edtNomeDocumento.addActionListener(new java.awt.event.ActionListener() {
@@ -83,7 +85,7 @@ public class DlgCadastroDocumento extends javax.swing.JDialog {
         });
         jPanel1.add(edtNomeDocumento, new org.netbeans.lib.awtextra.AbsoluteConstraints(140, 20, 430, -1));
 
-        jLabel4.setText("Caminho do Arquivo:");
+        jLabel4.setText("Caminho do Arquivo");
         jPanel1.add(jLabel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 100, -1, -1));
 
         btnSelecionar.setText("Selecionar Arquivo...");
@@ -94,15 +96,18 @@ public class DlgCadastroDocumento extends javax.swing.JDialog {
         });
         jPanel1.add(btnSelecionar, new org.netbeans.lib.awtextra.AbsoluteConstraints(430, 100, -1, -1));
 
+        btnSalvarDocumento.setBackground(new java.awt.Color(64, 86, 213));
+        btnSalvarDocumento.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        btnSalvarDocumento.setForeground(new java.awt.Color(255, 255, 255));
         btnSalvarDocumento.setText("Salvar");
         btnSalvarDocumento.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnSalvarDocumentoActionPerformed(evt);
             }
         });
-        jPanel1.add(btnSalvarDocumento, new org.netbeans.lib.awtextra.AbsoluteConstraints(250, 140, -1, -1));
+        jPanel1.add(btnSalvarDocumento, new org.netbeans.lib.awtextra.AbsoluteConstraints(230, 130, 100, 30));
 
-        getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 580, 190));
+        getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 580, 170));
 
         pack();
     }// </editor-fold>//GEN-END:initComponents

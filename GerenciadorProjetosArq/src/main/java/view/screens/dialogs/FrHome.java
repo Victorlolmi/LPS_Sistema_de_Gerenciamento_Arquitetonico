@@ -432,6 +432,7 @@ public class FrHome extends javax.swing.JFrame {
         sairButton = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setResizable(false);
 
         jPanel1.setBackground(new java.awt.Color(255, 255, 255));
         jPanel1.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
@@ -469,7 +470,7 @@ public class FrHome extends javax.swing.JFrame {
         });
         jScrollPane2.setViewportView(jTProjetos);
 
-        jPanel3.add(jScrollPane2, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 60, 1300, 540));
+        jPanel3.add(jScrollPane2, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 60, 1300, 530));
 
         lblBusca.setToolTipText("");
         lblBusca.addActionListener(new java.awt.event.ActionListener() {
@@ -508,7 +509,7 @@ public class FrHome extends javax.swing.JFrame {
         });
         jScrollPane1.setViewportView(jTClientes);
 
-        jPanel4.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 60, 1290, 520));
+        jPanel4.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 60, 1290, 530));
 
         btnCadastrarCliente.setBackground(new java.awt.Color(64, 86, 213));
         btnCadastrarCliente.setForeground(new java.awt.Color(255, 255, 255));
@@ -564,7 +565,7 @@ public class FrHome extends javax.swing.JFrame {
         ));
         jScrollPane3.setViewportView(jTGestores);
 
-        jPanel5.add(jScrollPane3, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 60, 1290, 510));
+        jPanel5.add(jScrollPane3, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 60, 1290, 530));
 
         jTabbedPane2.addTab("Gestores", jPanel5);
 
@@ -582,14 +583,14 @@ public class FrHome extends javax.swing.JFrame {
         lblTipo_usuario.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         lblTipo_usuario.setText("Gestor");
         lblTipo_usuario.setHorizontalTextPosition(javax.swing.SwingConstants.RIGHT);
-        jPanel7.add(lblTipo_usuario, new org.netbeans.lib.awtextra.AbsoluteConstraints(1170, 60, 100, -1));
+        jPanel7.add(lblTipo_usuario, new org.netbeans.lib.awtextra.AbsoluteConstraints(1100, 60, 170, -1));
 
         jLabel3.setFont(new java.awt.Font("Segoe UI", 1, 26)); // NOI18N
         jLabel3.setForeground(new java.awt.Color(44, 58, 78));
         jLabel3.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         jLabel3.setText("Victor Emmanuel");
         jLabel3.setHorizontalTextPosition(javax.swing.SwingConstants.RIGHT);
-        jPanel7.add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(800, 20, 470, -1));
+        jPanel7.add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(730, 20, 540, -1));
 
         sairButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Imagens/sair.png"))); // NOI18N
         sairButton.setText("jLabel4");
@@ -610,7 +611,7 @@ public class FrHome extends javax.swing.JFrame {
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
         );
 
         pack();

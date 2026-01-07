@@ -105,20 +105,7 @@ public class DlgVisualizarCliente extends javax.swing.JDialog {
         // 1. Preencher Informações Básicas (Mapeando seus Labels)
         lblNomeCli.setText(c.getNome());
         jLabel3.setText(c.getEmail()); // jLabel3 é o Email no seu layout
-        
-        // Verifica se tem CPF e Endereço (Evita NullPointerException)
-        jLabel1.setText(c.getCpf() != null ? c.getCpf() : "-"); // jLabel1 é o CPF
-        
-        if (c.getEndereco() != null) {
-            Endereco e = c.getEndereco();
-            String endCompleto = String.format("%s, %s - %s, %s", 
-                    e.getLogradouro(), e.getNumero(), e.getBairro(), e.getCidade());
-            jLabel2.setText(endCompleto); // jLabel2 é o Endereço
-            jLabel4.setText(e.getCep());  // jLabel4 é o CEP
-        } else {
-            jLabel2.setText("Endereço não cadastrado");
-            jLabel4.setText("-");
-        }
+       
 
         // 2. Carregar Indicadores e Tabela
         carregarDadosFinanceirosEProjetos();
@@ -129,32 +116,59 @@ public class DlgVisualizarCliente extends javax.swing.JDialog {
 
         List<Projeto> projetos = projetoDAO.buscarPorClienteId(clienteAtual.getId());
         
-        // --- CORREÇÃO: Usa o método setDados do HistoricoTableModel ---
+        // Atualiza a tabela visual
         historicoModel.setDados(projetos);
         
-        // Cálculo de KPIs
+        // Variáveis para os cálculos
         double valorTotal = 0.0;
         int qtdAtivos = 0;
+        int qtdConcluidos = 0; // Nova variável para contar os concluídos
+        
         NumberFormat nf = NumberFormat.getCurrencyInstance(new Locale("pt", "BR"));
 
         if (projetos != null && !projetos.isEmpty()) {
             for (Projeto p : projetos) {
+                // 1. Soma do Orçamento
                 if (p.getOrcamento() != null) {
                     valorTotal += p.getOrcamento();
                 }
-                if ("Em Andamento".equalsIgnoreCase(p.getStatus()) || "Pendente".equalsIgnoreCase(p.getStatus())) {
-                    qtdAtivos++;
+                
+                // 2. Lógica de Contagem de Status
+                String status = p.getStatus();
+                if (status != null) {
+                    // Normaliza para facilitar a comparação (remove espaços extras)
+                    status = status.trim();
+                    
+                    // Lógica para PROJETOS ATIVOS (Andamento + Planejamento)
+                    if (status.equalsIgnoreCase("Em Andamento") || 
+                        status.equalsIgnoreCase("Planejamento") || 
+                        status.equalsIgnoreCase("Em Planejamento")) {
+                        qtdAtivos++;
+                    }
+                    // Lógica para PROJETOS CONCLUÍDOS
+                    else if (status.equalsIgnoreCase("Concluido") || 
+                             status.equalsIgnoreCase("Concluído")) {
+                        qtdConcluidos++;
+                    }
                 }
             }
             
+            // Atualiza os Labels na tela
             lblSomaOrcamneto.setText(nf.format(valorTotal));
-            double ticketMedio = valorTotal / projetos.size();
+            
+            // Evita divisão por zero no ticket médio
+            double ticketMedio = (projetos.size() > 0) ? valorTotal / projetos.size() : 0.0;
             lblticket.setText(nf.format(ticketMedio));
-            lblquantidadeProjetos.setText(String.valueOf(qtdAtivos));
+            
+            lblquantidadeProjetosAtivos.setText(String.valueOf(qtdAtivos));
+            lblquantidadeProjetosConcluidos.setText(String.valueOf(qtdConcluidos));
+            
         } else {
+            // Caso não tenha projetos, zera tudo
             lblSomaOrcamneto.setText("R$ 0,00");
             lblticket.setText("R$ 0,00");
-            lblquantidadeProjetos.setText("0");
+            lblquantidadeProjetosAtivos.setText("0");
+            lblquantidadeProjetosConcluidos.setText("0");
         }
     }
 
@@ -286,39 +300,30 @@ public class DlgVisualizarCliente extends javax.swing.JDialog {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        lblNomeCli = new javax.swing.JLabel();
-        jLabel1 = new javax.swing.JLabel();
-        jLabel2 = new javax.swing.JLabel();
-        jLabel3 = new javax.swing.JLabel();
-        jLabel4 = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
         jTabelaHistorico = new javax.swing.JTable();
-        jLabel5 = new javax.swing.JLabel();
+        jPanel1 = new javax.swing.JPanel();
+        lblNomeCli = new javax.swing.JLabel();
+        jLabel3 = new javax.swing.JLabel();
+        jLabel2 = new javax.swing.JLabel();
+        jPanel2 = new javax.swing.JPanel();
+        jLabel10 = new javax.swing.JLabel();
         jLabel6 = new javax.swing.JLabel();
+        jLabel5 = new javax.swing.JLabel();
+        jLabel11 = new javax.swing.JLabel();
         lblSomaOrcamneto = new javax.swing.JLabel();
+        jSeparator2 = new javax.swing.JSeparator();
+        jSeparator3 = new javax.swing.JSeparator();
+        jSeparator4 = new javax.swing.JSeparator();
         lblticket = new javax.swing.JLabel();
-        jLabel8 = new javax.swing.JLabel();
-        lblquantidadeProjetos = new javax.swing.JLabel();
+        lblquantidadeProjetosConcluidos = new javax.swing.JLabel();
+        lblquantidadeProjetosAtivos = new javax.swing.JLabel();
+        jSeparator1 = new javax.swing.JSeparator();
+        jLabel9 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-        setPreferredSize(new java.awt.Dimension(1403, 760));
+        setResizable(false);
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
-
-        lblNomeCli.setFont(new java.awt.Font("Segoe UI", 1, 36)); // NOI18N
-        lblNomeCli.setText("Lucas Cabrine");
-        getContentPane().add(lblNomeCli, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 20, -1, -1));
-
-        jLabel1.setText("13879875693");
-        getContentPane().add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(1210, 20, 80, -1));
-
-        jLabel2.setText("Rio Pomba, Centro, Rua alves de Castro, 98");
-        getContentPane().add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(800, 20, 310, -1));
-
-        jLabel3.setText("email@gmail.com");
-        getContentPane().add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 70, -1, -1));
-
-        jLabel4.setText("36180000");
-        getContentPane().add(jLabel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(1140, 20, -1, -1));
 
         jTabelaHistorico.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -333,25 +338,85 @@ public class DlgVisualizarCliente extends javax.swing.JDialog {
         ));
         jScrollPane1.setViewportView(jTabelaHistorico);
 
-        getContentPane().add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 170, 1080, 370));
+        getContentPane().add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 240, 1000, 400));
 
-        jLabel5.setText("Tcket Médio: ");
-        getContentPane().add(jLabel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 140, -1, -1));
+        jPanel1.setBackground(new java.awt.Color(255, 255, 255));
+        jPanel1.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        jLabel6.setText("Valor Total em Contratos:");
-        getContentPane().add(jLabel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 110, -1, -1));
+        lblNomeCli.setFont(new java.awt.Font("Segoe UI", 1, 36)); // NOI18N
+        lblNomeCli.setText("Lucas Cabrine");
+        jPanel1.add(lblNomeCli, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 10, 970, -1));
 
+        jLabel3.setFont(new java.awt.Font("Segoe UI", 3, 12)); // NOI18N
+        jLabel3.setText("email@gmail.com");
+        jPanel1.add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 70, 260, 20));
+
+        jLabel2.setFont(new java.awt.Font("Segoe UI", 2, 18)); // NOI18N
+        jLabel2.setText("Rio Pomba, Centro, Rua alves de Castro, 98");
+        jPanel1.add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 50, 690, -1));
+
+        jPanel2.setBackground(new java.awt.Color(255, 255, 255));
+        jPanel2.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED, new java.awt.Color(204, 204, 204), new java.awt.Color(204, 204, 204), null, null));
+        jPanel2.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+
+        jLabel10.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        jLabel10.setForeground(new java.awt.Color(64, 86, 213));
+        jLabel10.setText("Projetos Ativos");
+        jPanel2.add(jLabel10, new org.netbeans.lib.awtextra.AbsoluteConstraints(350, 20, -1, -1));
+
+        jLabel6.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        jLabel6.setForeground(new java.awt.Color(64, 86, 213));
+        jLabel6.setText("Valor Total em Contratos");
+        jPanel2.add(jLabel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 20, 230, -1));
+
+        jLabel5.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        jLabel5.setForeground(new java.awt.Color(64, 86, 213));
+        jLabel5.setText("Ticket Médio");
+        jPanel2.add(jLabel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(820, 20, -1, -1));
+
+        jLabel11.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        jLabel11.setForeground(new java.awt.Color(64, 86, 213));
+        jLabel11.setText("Projetos Concluidos");
+        jPanel2.add(jLabel11, new org.netbeans.lib.awtextra.AbsoluteConstraints(550, 20, -1, -1));
+
+        lblSomaOrcamneto.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        lblSomaOrcamneto.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         lblSomaOrcamneto.setText("3000000");
-        getContentPane().add(lblSomaOrcamneto, new org.netbeans.lib.awtextra.AbsoluteConstraints(160, 110, 130, -1));
+        jPanel2.add(lblSomaOrcamneto, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 60, 260, -1));
 
+        jSeparator2.setOrientation(javax.swing.SwingConstants.VERTICAL);
+        jPanel2.add(jSeparator2, new org.netbeans.lib.awtextra.AbsoluteConstraints(310, 0, 10, 120));
+
+        jSeparator3.setOrientation(javax.swing.SwingConstants.VERTICAL);
+        jPanel2.add(jSeparator3, new org.netbeans.lib.awtextra.AbsoluteConstraints(760, 0, 10, 120));
+
+        jSeparator4.setOrientation(javax.swing.SwingConstants.VERTICAL);
+        jPanel2.add(jSeparator4, new org.netbeans.lib.awtextra.AbsoluteConstraints(510, 0, 10, 120));
+
+        lblticket.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        lblticket.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         lblticket.setText("3000000");
-        getContentPane().add(lblticket, new org.netbeans.lib.awtextra.AbsoluteConstraints(100, 140, 130, -1));
+        jPanel2.add(lblticket, new org.netbeans.lib.awtextra.AbsoluteConstraints(780, 60, 190, -1));
 
-        jLabel8.setText("Projetos Ativos: ");
-        getContentPane().add(jLabel8, new org.netbeans.lib.awtextra.AbsoluteConstraints(480, 110, -1, -1));
+        lblquantidadeProjetosConcluidos.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        lblquantidadeProjetosConcluidos.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lblquantidadeProjetosConcluidos.setText("3");
+        jPanel2.add(lblquantidadeProjetosConcluidos, new org.netbeans.lib.awtextra.AbsoluteConstraints(580, 60, 110, -1));
 
-        lblquantidadeProjetos.setText("34");
-        getContentPane().add(lblquantidadeProjetos, new org.netbeans.lib.awtextra.AbsoluteConstraints(570, 110, -1, -1));
+        lblquantidadeProjetosAtivos.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        lblquantidadeProjetosAtivos.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lblquantidadeProjetosAtivos.setText("34");
+        jPanel2.add(lblquantidadeProjetosAtivos, new org.netbeans.lib.awtextra.AbsoluteConstraints(360, 60, 110, -1));
+
+        jPanel1.add(jPanel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 110, 1000, 120));
+
+        jSeparator1.setOrientation(javax.swing.SwingConstants.VERTICAL);
+        jPanel1.add(jSeparator1, new org.netbeans.lib.awtextra.AbsoluteConstraints(810, 100, 10, 120));
+
+        getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 1040, 660));
+
+        jLabel9.setText("Projetos Ativos");
+        getContentPane().add(jLabel9, new org.netbeans.lib.awtextra.AbsoluteConstraints(480, 110, -1, -1));
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -394,18 +459,25 @@ public class DlgVisualizarCliente extends javax.swing.JDialog {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel10;
+    private javax.swing.JLabel jLabel11;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
-    private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
-    private javax.swing.JLabel jLabel8;
+    private javax.swing.JLabel jLabel9;
+    private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel2;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JSeparator jSeparator1;
+    private javax.swing.JSeparator jSeparator2;
+    private javax.swing.JSeparator jSeparator3;
+    private javax.swing.JSeparator jSeparator4;
     private javax.swing.JTable jTabelaHistorico;
     private javax.swing.JLabel lblNomeCli;
     private javax.swing.JLabel lblSomaOrcamneto;
-    private javax.swing.JLabel lblquantidadeProjetos;
+    private javax.swing.JLabel lblquantidadeProjetosAtivos;
+    private javax.swing.JLabel lblquantidadeProjetosConcluidos;
     private javax.swing.JLabel lblticket;
     // End of variables declaration//GEN-END:variables
 }

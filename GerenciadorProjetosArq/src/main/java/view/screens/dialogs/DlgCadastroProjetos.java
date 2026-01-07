@@ -87,9 +87,10 @@ public class DlgCadastroProjetos extends javax.swing.JDialog {
         cbCliente = new javax.swing.JComboBox<>();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setResizable(false);
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        jPanel1.setBackground(new java.awt.Color(255, 255, 255));
+        jPanel1.setBackground(new java.awt.Color(249, 250, 251));
         jPanel1.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         edtNomeProjeto.addActionListener(new java.awt.event.ActionListener() {
@@ -97,16 +98,16 @@ public class DlgCadastroProjetos extends javax.swing.JDialog {
                 edtNomeProjetoActionPerformed(evt);
             }
         });
-        jPanel1.add(edtNomeProjeto, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 60, 280, -1));
+        jPanel1.add(edtNomeProjeto, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 40, 280, -1));
 
-        jLabel8.setText("Nome do Projeto:");
-        jPanel1.add(jLabel8, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 40, -1, -1));
+        jLabel8.setText("Nome do Projeto");
+        jPanel1.add(jLabel8, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 20, -1, -1));
 
-        jLabel2.setText("Cliente:");
-        jPanel1.add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 90, -1, -1));
+        jLabel2.setText("Cliente");
+        jPanel1.add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 70, -1, -1));
 
-        jLabel5.setText("Data Início:");
-        jPanel1.add(jLabel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 150, -1, -1));
+        jLabel5.setText("Data Início");
+        jPanel1.add(jLabel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 130, -1, -1));
 
         edtDataInicio.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.DateFormatter(new java.text.SimpleDateFormat("dd/MM/yyyy"))));
         edtDataInicio.addActionListener(new java.awt.event.ActionListener() {
@@ -114,56 +115,60 @@ public class DlgCadastroProjetos extends javax.swing.JDialog {
                 edtDataInicioActionPerformed(evt);
             }
         });
-        jPanel1.add(edtDataInicio, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 170, 129, -1));
+        jPanel1.add(edtDataInicio, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 150, 129, -1));
 
         edtPrevisao.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.DateFormatter(new java.text.SimpleDateFormat("dd/MM/yyyy"))));
-        jPanel1.add(edtPrevisao, new org.netbeans.lib.awtextra.AbsoluteConstraints(170, 170, 129, -1));
+        jPanel1.add(edtPrevisao, new org.netbeans.lib.awtextra.AbsoluteConstraints(170, 150, 129, -1));
 
-        jLabel6.setText("Previsão:");
-        jPanel1.add(jLabel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(170, 150, -1, -1));
+        jLabel6.setText("Previsão");
+        jPanel1.add(jLabel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(170, 130, -1, -1));
 
         jLabel7.setText("Descrição / Observações");
-        jPanel1.add(jLabel7, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 200, -1, -1));
+        jPanel1.add(jLabel7, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 180, -1, -1));
 
         edtDescricao.setColumns(20);
+        edtDescricao.setLineWrap(true);
         edtDescricao.setRows(5);
         jScrollPane1.setViewportView(edtDescricao);
 
-        jPanel1.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 220, 440, 110));
+        jPanel1.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 200, 440, 110));
 
-        cbStatus.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Em Andamento", "Concluido", "Pausado" }));
+        cbStatus.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Em Andamento", "Concluido", "Planejamento" }));
         cbStatus.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 cbStatusActionPerformed(evt);
             }
         });
-        jPanel1.add(cbStatus, new org.netbeans.lib.awtextra.AbsoluteConstraints(330, 60, 130, -1));
+        jPanel1.add(cbStatus, new org.netbeans.lib.awtextra.AbsoluteConstraints(330, 40, 130, -1));
 
         edtOrcamento.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.NumberFormatter(new java.text.DecimalFormat("#0.00"))));
-        jPanel1.add(edtOrcamento, new org.netbeans.lib.awtextra.AbsoluteConstraints(330, 110, 130, -1));
+        jPanel1.add(edtOrcamento, new org.netbeans.lib.awtextra.AbsoluteConstraints(330, 90, 130, -1));
 
-        jLabel4.setText("Orçamento (R$):");
-        jPanel1.add(jLabel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(330, 90, -1, -1));
+        jLabel4.setText("Orçamento (R$)");
+        jPanel1.add(jLabel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(330, 70, -1, -1));
 
-        jLabel3.setText("Status:");
-        jPanel1.add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(330, 40, -1, -1));
+        jLabel3.setText("Status");
+        jPanel1.add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(330, 20, -1, -1));
 
+        btnSalvar.setBackground(new java.awt.Color(64, 86, 213));
+        btnSalvar.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        btnSalvar.setForeground(new java.awt.Color(255, 255, 255));
         btnSalvar.setText("Salvar");
         btnSalvar.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnSalvarActionPerformed(evt);
             }
         });
-        jPanel1.add(btnSalvar, new org.netbeans.lib.awtextra.AbsoluteConstraints(190, 350, 130, 30));
+        jPanel1.add(btnSalvar, new org.netbeans.lib.awtextra.AbsoluteConstraints(170, 320, 130, 30));
 
         cbCliente.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 cbClienteActionPerformed(evt);
             }
         });
-        jPanel1.add(cbCliente, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 110, 280, -1));
+        jPanel1.add(cbCliente, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 90, 280, -1));
 
-        getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 490, 450));
+        getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 490, 360));
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -212,8 +217,20 @@ public class DlgCadastroProjetos extends javax.swing.JDialog {
         return edtDescricao.getText();
     }
 
-    public String getOrcamento() {
-        return edtOrcamento.getText();
+   public String getOrcamento() {
+        // Tenta obter o valor já convertido pelo formatador do componente
+        Object valor = edtOrcamento.getValue();
+        if (valor != null) {
+            return valor.toString(); 
+        }
+        
+        // Fallback: Se getValue() for nulo, pega o texto e limpa formatação
+        String texto = edtOrcamento.getText();
+        if (texto == null || texto.isEmpty()) return "0.0";
+        
+        // Remove pontos de milhar e troca vírgula decimal por ponto (padrão double Java)
+        // Ex: "1.200,50" -> "1200.50"
+        return texto.replace(".", "").replace(",", ".");
     }
 
     public String getStatus() {

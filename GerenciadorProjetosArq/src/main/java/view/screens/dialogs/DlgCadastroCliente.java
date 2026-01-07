@@ -76,8 +76,9 @@ public class DlgCadastroCliente extends javax.swing.JDialog {
         jLabel15.setText("Cep");
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setResizable(false);
 
-        jPanel1.setBackground(new java.awt.Color(255, 255, 255));
+        jPanel1.setBackground(new java.awt.Color(249, 250, 251));
         jPanel1.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         edtNomeCliente.addActionListener(new java.awt.event.ActionListener() {
@@ -90,6 +91,9 @@ public class DlgCadastroCliente extends javax.swing.JDialog {
         jLabel8.setText("Nome do Cliente");
         jPanel1.add(jLabel8, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 40, -1, -1));
 
+        btnSalvar.setBackground(new java.awt.Color(64, 86, 213));
+        btnSalvar.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        btnSalvar.setForeground(new java.awt.Color(255, 255, 255));
         btnSalvar.setText("Salvar");
         btnSalvar.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
