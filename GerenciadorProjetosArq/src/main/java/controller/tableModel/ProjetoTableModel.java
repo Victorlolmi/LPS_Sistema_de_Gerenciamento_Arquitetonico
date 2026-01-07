@@ -6,7 +6,9 @@ package controller.tableModel;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.table.AbstractTableModel;
+import model.entities.Cliente;
 import model.entities.Projeto;
+import model.entities.Usuario;
 /**
  *
  * @author Viktin
@@ -14,13 +16,28 @@ import model.entities.Projeto;
 public class ProjetoTableModel extends AbstractTableModel {
 
     private List<Projeto> dados = new ArrayList<>();
-    
-    // 1. ADICIONAMOS A COLUNA "AÇÕES" NO FINAL
-    private final String[] colunas = {"Projeto", "Cliente", "Status", "Visualizar"};
+    private final boolean isClienteLogado; // Flag para saber se é visão de cliente
+
+    // Construtor padrão (assume que NÃO é cliente se não passar nada, ou pode adaptar)
+    public ProjetoTableModel() {
+        this.isClienteLogado = false;
+    }
+
+    // NOVO CONSTRUTOR: Recebe o usuário logado para decidir as colunas
+    public ProjetoTableModel(Usuario usuarioLogado) {
+        this.isClienteLogado = (usuarioLogado instanceof Cliente);
+    }
 
     @Override
     public String getColumnName(int column) {
-        return colunas[column];
+        // Se for cliente logado, a segunda coluna (índice 1) vira "Gestor"
+        if (column == 1) {
+            return isClienteLogado ? "Gestor" : "Cliente";
+        }
+        
+        // As outras colunas permanecem iguais
+        String[] colunasPadrao = {"Projeto", "Cliente", "Status", "Visualizar"};
+        return colunasPadrao[column];
     }
 
     @Override
@@ -30,7 +47,7 @@ public class ProjetoTableModel extends AbstractTableModel {
 
     @Override
     public int getColumnCount() {
-        return colunas.length;
+        return 4; // "Projeto", "Cliente/Gestor", "Status", "Visualizar"
     }
 
     @Override
@@ -40,12 +57,18 @@ public class ProjetoTableModel extends AbstractTableModel {
         switch (coluna) {
             case 0: // Projeto
                 return p.getNome();
-            case 1: // Cliente
-                return (p.getCliente() != null) ? p.getCliente().getNome() : "---";
+            case 1: // Cliente OU Gestor
+                if (isClienteLogado) {
+                    // Se sou cliente, mostro o nome do Gestor
+                    return (p.getGestor() != null) ? p.getGestor().getNome() : "---";
+                } else {
+                    // Se sou Gestor (ou outro), mostro o nome do Cliente
+                    return (p.getCliente() != null) ? p.getCliente().getNome() : "---";
+                }
             case 2: // Status
                 return (p.getStatus() != null) ? p.getStatus() : "-";
-            case 3: // Ações (Nova Coluna)
-                return "Abrir"; // O texto que vai aparecer no botão (opcional)
+            case 3: // Ações
+                return "Abrir";
             default:
                 return null;
         }

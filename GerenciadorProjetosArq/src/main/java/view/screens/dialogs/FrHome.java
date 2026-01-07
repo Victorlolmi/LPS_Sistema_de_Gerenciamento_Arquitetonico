@@ -61,7 +61,7 @@ public class FrHome extends javax.swing.JFrame {
         configurarVisaoUsuario();
         
         // Inicializa Models
-        this.projetoModel = new ProjetoTableModel();
+        this.projetoModel = new ProjetoTableModel(this.usuarioLogado);
         this.clienteModel = new ClienteTableModel();
         this.gestorModel = new controller.tableModel.GestorTableModel(); 
         
@@ -232,7 +232,6 @@ public class FrHome extends javax.swing.JFrame {
                 label.setFont(new Font("Segoe UI", Font.BOLD, 11));
                 label.setPreferredSize(new Dimension(120, 25));
                 label.setHorizontalAlignment(SwingConstants.CENTER);
-                label.setBorder(BorderFactory.createLineBorder(new Color(225, 235, 255), 2));
                 panel.add(label);
             }
             @Override
@@ -240,9 +239,34 @@ public class FrHome extends javax.swing.JFrame {
                 String status = (value != null) ? value.toString() : "-";
                 label.setText(status);
                 
-                // Estilo "Pill" (Cápsula)
-                label.setBackground(new Color(225, 235, 255));
-                label.setForeground(corAzulEscuro);
+                // LÓGICA DE CORES
+                Color corFundo;
+                Color corTexto;
+                Color corBorda;
+
+                if ("Em Andamento".equalsIgnoreCase(status)) {
+                    // AMARELO
+                    corFundo = new Color(255, 250, 220); // Creme suave
+                    corTexto = new Color(180, 140, 0);   // Ocre escuro (Legível)
+                    corBorda = corFundo; // Mantém clean
+                    
+                } else if ("Concluído".equalsIgnoreCase(status) || "Concluido".equalsIgnoreCase(status)) {
+                    // VERMELHO
+                    corFundo = new Color(220, 255, 220); // Rosa suave
+                    corTexto = new Color(0, 120, 0);   // Vermelho Escuro
+                    corBorda = corFundo;
+                    
+                } else {
+                    // AZUL (Padrão para "Em Planejamento" e outros)
+                    corFundo = new Color(225, 235, 255);
+                    corTexto = corAzulEscuro;
+                    corBorda = new Color(225, 235, 255);
+                }
+
+                // Aplica cores
+                label.setBackground(corFundo);
+                label.setForeground(corTexto);
+                label.setBorder(BorderFactory.createLineBorder(corBorda, 2));
                 
                 panel.setBackground(isSelected ? table.getSelectionBackground() : Color.WHITE);
                 panel.setBorder(bordaInferior);
@@ -551,17 +575,21 @@ public class FrHome extends javax.swing.JFrame {
         jPanel7.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Imagens/Logo.png"))); // NOI18N
-        jPanel7.add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 10, 260, 70));
+        jPanel7.add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 10, 250, 70));
 
-        lblTipo_usuario.setFont(new java.awt.Font("Segoe UI", 2, 14)); // NOI18N
+        lblTipo_usuario.setFont(new java.awt.Font("Segoe UI", 2, 20)); // NOI18N
         lblTipo_usuario.setForeground(new java.awt.Color(44, 58, 78));
+        lblTipo_usuario.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         lblTipo_usuario.setText("Gestor");
-        jPanel7.add(lblTipo_usuario, new org.netbeans.lib.awtextra.AbsoluteConstraints(1130, 40, -1, -1));
+        lblTipo_usuario.setHorizontalTextPosition(javax.swing.SwingConstants.RIGHT);
+        jPanel7.add(lblTipo_usuario, new org.netbeans.lib.awtextra.AbsoluteConstraints(1170, 60, 100, -1));
 
-        jLabel3.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        jLabel3.setFont(new java.awt.Font("Segoe UI", 1, 26)); // NOI18N
         jLabel3.setForeground(new java.awt.Color(44, 58, 78));
+        jLabel3.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         jLabel3.setText("Victor Emmanuel");
-        jPanel7.add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(1130, 20, -1, -1));
+        jLabel3.setHorizontalTextPosition(javax.swing.SwingConstants.RIGHT);
+        jPanel7.add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(800, 20, 470, -1));
 
         sairButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Imagens/sair.png"))); // NOI18N
         sairButton.setText("jLabel4");
@@ -570,9 +598,9 @@ public class FrHome extends javax.swing.JFrame {
                 sairButtonMouseClicked(evt);
             }
         });
-        jPanel7.add(sairButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(1300, 20, 40, 40));
+        jPanel7.add(sairButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(1300, 40, 40, 40));
 
-        jPanel1.add(jPanel7, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 1370, 80));
+        jPanel1.add(jPanel7, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 1370, 100));
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
